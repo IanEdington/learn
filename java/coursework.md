@@ -1,4 +1,847 @@
 # Course Handbook
+## Language Constructs
+### Reserved names
+Reserved names:
+    special values
+        true
+        false
+        null
+        void
+    primitives
+        boolean
+        char
+        byte
+        short
+        int
+        long
+        float
+        double
+    control structures
+        if
+        else
+        for
+        do
+        while
+        case
+        default
+        break
+        continue
+    method
+        return
+    classes
+        class
+        new
+        extends - defines class as a sub-class another class
+        this
+        super - like this but refers to super-class constructor
+        instanceof - checks if an object is an instance of a class or any of it's sub-classes
+        interface - Defines an object API
+        implements - defines a class or interface as implementing a specific or multiple interfaces.
+    class modifiers
+        public
+        protected
+        private
+        static
+        abstract
+        final
+    exceptions
+        throw
+        throws
+        try
+        catch
+    packages
+        import
+        package
+
+assert
+const
+goto
+enum
+finally
+native
+strictfp
+switch
+synchronized
+transient
+volatile
+
+### indexing
+Java is a zero indexed language.
+### Comments
+Three types of comments
+
+`//` start inline comment: ignore everything after these characters
+
+Comment block: starts at `/*` ends at `*/`
+
+```
+/*
+ * This is a block comment and is not read by automatic documenting tools.
+ */
+```
+
+Javadoc Comment block: starts at `/**` ends at `*/`
+
+```java
+/**
+ * This is a block comment that is parsed by the javadoc and other automatic documentation tools.
+ *
+ * @author text: Identifies each author (one per line) for a class.
+ */
+public class SomeClass {
+    /**
+     * This is a method comment that will be attached to the method below
+     * @throws exceptionName description: Identifies an error condition that is signaled by this method.
+     * @param parameterName description: Identifies a parameter accepted by this method.
+     * @return description: Describes the return type and its range of values for a method.
+     */
+    public someMethod(){
+        // something here
+    }
+}
+```
+
+### Base types (primitives)
+bool, char and 6 number types:
+
+`boolean`: a boolean value (`true` or `false`)
+`char`: a 16-bit unicode character value
+- denoted with single quotes: `i`
+`byte`: 8-bit signed two's compliment integer
+`short`: 16-bit signed two's compliment integer
+`int`: 32-bit signed two's compliment integer
+`long`: 64-bit signed two's compliment integer
+`float`: 32-bit floating point number
+`double`: 64-bit floating point number
+
+#### Wrapper Types
+Each primitive has a corresponding wrapper object type. This is because many datastructures and algorythems in Java are specifically designed for objects, not primitives.
+
+Automatic boxing and unboxing is the process of converting from primitive to wrapper and back.
+The result is that you can use the primitive and wrapper class interchangeably.
+
+### Array
+TODO: what happens when you declare an array of objects? Are arrays limited to primivites?
+
+Arrays are a special type of object with slightly different syntax.
+
+Has final property `length` 
+
+```java
+// Declare an array variable (pointer):
+int[ ] variableName;
+
+// create array and assign to variable
+variableName = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+
+// create new array with size n
+variableName = new elementType[n];
+
+// declare array variable and assign it a new array
+double[ ] measurements = new double[1000];
+
+// retreive length of array
+System.out.println(measurements.length);
+```
+
+### Enum types
+Useful for representing groups of constants like the days of the week.
+
+modifier enum name { valueName0 , valueName1 , . . . , valueNamen−1 };
+
+Modifiers: public, protected, private
+valueName_n: can be any legal identifier but convention is to use all caps
+
+```
+// Declare enum type of Day
+public enum Day { MON, TUE, WED, THU, FRI, SAT, SUN };
+
+// Declare variable will Day enum type
+Day today;
+
+// assign value of TUE to variable (1)
+today = Day.TUE;
+```
+
+### Strings
+Java has a built in string class denoted by double quotes
+
+```
+String title = "Data Structures & Algorithms in Java";
+char[ ] msg = original.toCharArray();
+```
+
+indexing by character
+the String class is immutable
+For a mutable string use the StringBuilder class.
+
+
+
+### Expressions
+#### Literals
+Constants in the expression
+
+- **null**: only object literal, allowed to be any object type.
+- Boolean: **true** and **false**.
+- Integer & Floating point: Literal number
+- Character: surrounded by single quotes
+        '\n' (newline)
+        '\b' (backspace)
+        '\f' (form feed)
+        '\'' (single quote)
+        '\t' (tab)
+        '\r' (return)
+        '\\' (backslash)
+        '\"' (double quote)
+- Strings: surrounded by double quotes
+
+#### Operators
+
+Arithmetic
+
+```
+    + addition
+    − subtraction
+    ∗ multiplication / division
+    % the modulo operator
+    -- unary minus: reverses sign of number (* -1)
+```
+
+Increment and decrement
+
+```
+    ++i : add 1 to i then preform expression i is involved in
+    i++ : preform expression i is involved in then increment i
+    --i :
+    i-- :
+
+    // given
+    i = 1;
+    j = 5;
+
+    j = i++; // is equivalent to
+    j = i;
+    i += 1;
+
+    j = ++i; // is equivalent to
+    i += 1;
+    j = i;
+```
+
+TODO: what happens when there's multiple ++ operators in a single line?
+ie:
+
+```
+    a[5] = 10;
+    j = 5;
+    a[j++] = a[j++] + 2;
+```
+
+String
+
+```
+    + string concatenation
+```
+
+Logic
+
+```
+    < less than
+    <= less than or equal to == equal to
+    != not equal to
+    >= greater than or equal to
+    > greater than
+
+    ! not (prefix)
+    && conditional 
+    || conditional or
+```
+
+Bitwise (for boolean and integer variables)
+
+```
+    ∼ bitwise complement (prefix unary operator)
+    & bitwise and | bitwise or
+    ˆ bitwise exclusive-or
+    << shift bits left, filling in with zeros
+    >> shift bits right, filling in with sign bit
+    >>> shift bits right, filling in with zeros
+```
+
+Assignment
+
+```
+    = straight assignment
+    op= : assignment while performing operation (op)
+
+    x op= 2 is equivalent to x = x op 2
+```
+
+#### Operator precedence
+
+Operators on the same line are evaluated in left-to-right order.
+Except for assignment which is done in right-to-left order.
+
+Operation Precedence Reference table:
+
+|Operator Precedence|
+|-|-|-|
+| | Type | Symbols |
+|1| array index method call dot operator | [] () . |
+|2| postfix ops <br/> prefix ops <br/> cast | exp++ exp−− <br/> ++exp −−exp +exp −exp  ̃exp !exp <br/>(type) exp
+|3| mult./div. | ∗ / % |
+|4| add./subt. | + - |
+|5| shift | << >> >>> |
+|6| comparison | < <= > >= instanceof |
+|7| equality | == != |
+|8| bitwise-and | & |
+|9| bitwise-xor | ˆ |
+|10| bitwise-or | &#124; |
+|11| and | && |
+|12| or | &#124;&#124; |
+|13| conditional | booleanExpression ? valueIfTrue : valueIfFalse |
+|14| assignment | = += −= ∗= /= %= <<= >>= >>>= &= ˆ= &#124;= |
+
+#### Control Flow
+- single statement bodies don't need curly braces
+
+##### If
+
+```java
+if (firstBooleanExpression)
+    firstBody
+else if (secondBooleanExpression) {
+    secondBody
+    withTwoLines
+} else
+    thirdBody
+```
+
+##### Switch
+Evaluates expression which must result in an integer, string, or Enum.
+Jumps to case that matches that result, or the default expression.
+This is the only explicit jump, therefor a brake statement must be used to exit the switch once the code is finished or it will continue evaluating the next expression.
+
+- especially useful with Enum types
+- no curly braces are needed
+
+```
+switch (expression) {
+    case result1:
+        System.out.println("This is tough.");
+        break;
+    case result2:
+        System.out.println("This is getting better.");
+        break;
+    default:
+        System.out.println("Day off!");
+}
+```
+
+##### While Loop
+
+```
+while (booleanExpression)
+    loopBody
+```
+
+This example advances through an array data until it finds the value target or reaches the end of the array and exits.
+```java
+int[] data = {1,2,3,4,5};
+int target = 3;
+int j = 0;
+while ((j < data.length) && (data[j] != target))
+    j++;
+```
+
+##### Do While
+Same as While but executes body once before evaluating.
+Most useful where the condition is dependent on the body code.
+
+```
+do
+    loopBody
+while (booleanExpression)
+```
+
+##### For
+```
+for (initialization; booleanCondition; increment)
+    loopBody
+
+for (int i = 0; i < length; i++) {
+    loopBody
+}
+```
+- variables define in initialization step are only available in loop scope
+- booleanCondition is checked at beginning of loop
+- increment is executed after the loopBody and can be any valid statement.
+
+##### For each
+introduced in java 5
+
+```
+for (elementType containerElement : container)
+    loopBody
+```
+
+- container must either be an array of `elementType` or a collection that implements the Iterable interface.
+- containerElement is assigned next element in the container and is scoped to the loop
+    - regular assignment rules apply as per [object-assignment](#object-assignment)
+
+##### Explicit Control flow (continue and break)
+`break` moves flow of control out of a switch, for, while, or do-while
+`continue` moves flow of control to the end of the loopBody
+TODO: does `continue` execute the condition at the end of a do-while loop?
+
+#### return
+A method that is declared as returning a type must return that type!
+TODO: in a Java method defined as returning void can you `return void`?
+
+### Variables, Objects and Assignment
+All variables must be declaired before they are used.
+There are two main types of variables; primivites and objects.
+Objects are actually pointers(references) to a datastructure, whereas a primitives is the data.
+
+When two variables are assigned the same object they are assigned the same instance of that object.
+For primitives this means making a replica of the data point.
+For Objects this means making a replica of the **pointer**.<a name="object-assignment"></a>
+
+Declare constants using `final` modifier
+
+### Objects
+#### Class Modifiers
+Access control modifiers:
+- default without any modifier (package-private): restricts access to within the same package
+- public: an element with this modifier can be accessed from anywhere by any class or method
+- private: ONLY accessible to the class itself
+- protected: restricts access to a class, method or variable to:
+    - classes that are part of the same package
+    - sub-classes through inheritance
+
+static:
+Created and associated with class instead of instance.
+This means there is only one version for every instance to share.
+When methods are static they are usually called using the ClassName instead of the instanceName.
+
+abstract:
+Define only the Method Signature.
+This allows for public classes to be completely abstracted from the user.
+
+final:
+Final version of that element:
+- final variable is similar to a constant, and usually has static (uses less space)
+Final method or class: Only relevant for inheritance
+- a final method cannot be overriden by a subclass
+    - TODO: is this specific to the name of the method or to the method signature?
+- a final class cannot be have a subclass
+
+#### Methods
+Method Signature: Method name with the number and types of its parameters
+An object can have multiple methods with the same name so long as they return the same type(because type isn't part of the "Method Signature").
+When multiple methods are present, the JVM uses the first method that matches the number and type of parameters being called.
+
+#### Declaring methods and variables
+Declaring a class (static) or instance (without static) variable
+$$$
+[modifiers] type identifier_1[=initialValue1], identifier_2[=initialValue2];
+$$$
+
+Declaring a Method signature and method body
+$$$
+[modifiers] returnType methodName(type_1 param_1, ..., type_n param_n) {
+    // method body ...
+}
+$$$
+
+Void is a valid `returnType`.
+Method must return a value of type `returnType`.
+If multiple items must be returned:
+- return a compound object
+- modify the internal state of an existing object
+
+Parameters are passed as copies of the original value using assignment. see [object-assignment](#object-assignment)
+- objects passed can be modified
+
+#### Constructor Method
+Define a constructor method by naming it after the class.  
+Default: `public nameOfClass() { }`. If you override the default the default signature won't be available.
+
+1. cannot be static, abstract, or final
+1. cannot specify a `returnType`
+
+Constructing a `new` object with variables initiated.  
+1. new object is allocated in memory on the heap (dynamically)
+1. instance variables are initialized
+1. the constructor method is called
+1. returns a (reference | memory address | pointer) to the newly created object
+
+#### this
+Static pointer to the class instance from within an instance method (nonstatic).
+- instance variables can be accessed from within a method, however, `this` allows differentiation between instance variables and local variables
+- allows calling other instance methods from within an instance method `this.method()`
+- allows calling one constructor from within another constructor `this()`
+
+Method scope is inherited from class so `this` is not required to reference instance variables.
+
+#### The main Method
+must be declared as follows:
+
+```java
+public static void main(String[ ] args) {
+    // main method body...
+}
+```
+
+
+
+#### Object equality
+TODO: how is equality determined in Java?
+
+#### Inheritence
+`extend` is used to create a sub-class in java
+`super` is like `this` but refers to the super-class.
+
+In Java, each class can extend exactly one other class. Because of this property, Java is said to allow only single inheritance among classes.
+
+The constructor methods are never inherited in java.
+`super()` is used to call a method from within the sub-class constructor.
+If `super(*args)` is not found an implicit call to `super()` is made before a sub-classes constructor.
+
+
+#### Polymorphism
+Variables in java are **polymorphic**: A variable declared as a super-class can hold a sub-class but are limited to the interface of the super-class.
+```java
+// If PredatoryCreditCard is a subclass of CreditCard this assignment with work.
+CreditCard card;
+card = new PredatoryCreditCard();
+```
+
+"dynamic dispatch" is how java calls the sub-class methods instead of the super-class methods for a given instance.
+
+`instanceof` tests at runtime if a variable is an instance of a specific class or any of it's sub-classes.
+```java
+CreditCard card1 = new CreditCard();
+CreditCard card2 = new PredatoryCreditCard();
+
+print(card1 instanceof CreditCard); // will return true
+print(card2 instanceof CreditCard); // will return true
+print(card1 instanceof PredatoryCreditCard); // will return false
+print(card2 instanceof PredatoryCreditCard); // will return true
+```
+
+#### Abstract Class
+A class that is partially defined in that you can mix methods with method signatures.
+`abstact` modifier must be used for abstract classes or methods within an abstact class.
+- can extend another class
+- can implement an interface
+- can not produce object
+- Sub-classes that do not implement all abstract methods are themselves abstract
+
+Useful in many design patterns.
+
+```
+public abstract class AbstractProgression {
+    /** Constuctors can be created and called using super() */
+    public AbstractProgression() { this(0); }
+    public AbstractProgression(long start) { current = start; }
+
+    /** Concreat methods can be created */
+    public long nextValue() { /* code goes here */ }
+
+    /** so to can abstract methods */
+    protected abstract void advance();
+}
+```
+
+#### Interface
+
+`interface` defines an interface. Same modifiers as class but without method body.
+`implements` keyword is used to declare a class as implementing an interface.
+- a class can implement multiple interfaces
+- an interface can extend multiple other interfaces
+
+```java
+public interface Sellable {
+    public String description();
+    public int listPrice();
+    public int lowestPrice();
+}
+
+/∗∗ Class extending an interface ∗/
+public class Photograph implements Sellable {
+    // MUST implement all interface methods!
+}
+
+public interface Transportable {
+    public int weight();
+    public boolean isHazardous();
+}
+
+/∗∗ Class extending multiple interfaces ∗/
+public class BoxedItem implements Sellable, Transportable {
+    // MUST implement all interfaces methods!
+}
+
+/∗∗ interface extending multiple interfaces ∗/
+public interface Insurable extends Sellable, Transportable {
+    public int insuredValue();
+}
+
+/** class extending Insurable interface */
+public class BoxedItem2 implements Insurable {
+    // MUST implement all interfaces methods!
+}
+```
+
+### Casting
+Two types. Explicit and Implicit.
+Implicit casting happens when operations produce a larger object and that larger object is expected
+
+```
+int i = 42;
+double d = i; // implicit casting from int to double
+i = d; // implicit cast results in loss of precision; compile error is thrown
+```
+
+Explicit casting can be done anywhere there is implicit casting however it is necessary where a casting would result in loss of precision. `(type) exp` is the general form.
+
+```
+i = (int)d; // forces the casting and loss of precision;
+```
+
+Strings break this rule. Explicit casting to a string is not allowed.
+
+```
+String s = 22; // this is wrong!
+String s = Integer.toString(22); // this is good
+String t = (String) 4.5; // this is wrong!
+String t = "" + 4.5; // correct, but poor style
+String u = "Value = " + (String) 13; // this is wrong!
+String u = "Value = " + 13; // this is good
+```
+
+#### Casting object and interfaces
+Moving to a more generic datatype does not need an Explicit type cast. (widening conversion)
+    - correctness can be checked by compiler
+Moving to a more specific datatype needs an Explicit type cast. (narrowing conversion)
+    - must be tested by java run time environment
+    - throws ClassCastException if not the correct type
+
+```
+// example of widening conversion
+CreditCard card = new PredatoryCreditCard(...);
+// example of narrowing conversion with explicit cast
+PredatoryCreditCard pcard = (PredatoryCreditCard) card;
+```
+
+A narrowing conversion happens when a type T is converted into type S given:
+- S is a subclass of T
+- S is a subinterface of T
+- S is a class that implements the interface T
+
+**instanceof is a useful operator when working with object casting**
+
+### Generics
+Introduced in Java 5.
+Used to create type independent methods.
+```java
+public class Pair<A,B> {
+    A first;
+    B second;
+
+    // constructor
+    public Pair(A a, B b) {
+        first = a;
+        second = b;
+    }
+
+    // getters for a and b
+    public A getFirst() { return first; }
+    public B getSecond() { return second;}
+}
+```
+
+By default every type within this declaration is the completely generic Object type. However there are many ways to narrow these types which makes this framework more useful.
+Use `<E>` when refering to class. Use `E` when refering to element within class.
+
+#### Arrays and Generics
+
+#### Generic Methods
+
+#### Bounding Generic types
+
+### Nested Classes
+Useful for keeping closely related classes together.
+
+
+```
+public class OuterName {
+    // declaring a nested class
+    public static class NestedName { /∗ class details omitted ∗/ }
+    private class NestedName2 {
+        public NestedName2(){
+            OuterName.this; // refers to outer class instance
+        }
+    }
+}
+
+public class Other {
+    public void main(String[] args) {
+        // Accessing nested class from outside outer class
+        OuterName.NestedName nested = new OuterName.NestedName();
+    }
+}
+```
+
+fully qualified name is OuterName.NestedName
+private nested class can be used by the outer class, but by no other classes
+
+A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
+The outer instance can be referenced from within the inner class using `OuterName.this`
+Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
+
+
+### Exceptions
+#### Checked vs Un-Checked exceptions
+TODO: understand and take notes on Checked vs Un-Checked exceptions
+
+#### Add Exceptions to a method
+```java
+// method definition with throws and throw
+modifiers returnType methodName(parameters) throws exceptionType1, exceptionType2 {
+    throw new exceptionType1(parameters);
+    throw new exceptionType2(parameters);
+}
+```
+
+`throws`: defines a method as possibly throwing an exception.
+- all checked exceptions that might propagate upward from a method must be explicitly declared in its signature.
+- Can be thrown in the method itself or in one of the methods it calls.
+- Multiple exceptionTypes can be separated by commas.
+- Can designate a super-class of the exception thrown instead.
+- does not negate the need for @throws javadoc
+
+#### Throwing Exceptions
+`throw`: from within a method, throw an exception
+
+Usually when throwing an exception a new exception object is created with optional constructor parameters.
+
+#### Catching
+```java
+try {
+    guardedBody
+} catch (exceptionType1 variable1) {
+    remedyBody1
+} catch (exceptionType2 | exceptionType3 variable2) {
+    remedyBody2
+} catch ...
+```
+
+exceptionType: valid exception type extending the Exception class
+|: separates multiple exceptions
+variable: valid java variable name holding the execption object
+
+#### Creating new Exception types
+An exception is a special class extended from the Exception class.
+Create a new exception type by extending the Exception class or any of it's subclasses.
+
+
+### Package management
+Group files containing Enums and Classes into packages by:
+- all located in directory _packagename_
+- first line of every file must be `package packagename;`
+
+By convention:
+- packages are lowercase
+- classes are camel case
+You immediately know if referring to a package or a class within a package.
+
+Reverse URL package names are recommended to avoid name collision.
+ie. com.ianedington.comp308.tpa1
+
+#### Importing Packages
+It is possible to refer to a class or enum within a package directly:
+
+```
+fully.qualified.package.ClassName object = new fully.qualified.package.Class();
+```
+
+but this gets long and so we use `import`
+
+import a specific Class or Enum from a package:
+- name collision will throw error
+
+```
+import fully.qualified.package.ClassName;
+```
+
+import an entire package:
+- name collision will force you to use the qualified package name `package.ClassName`
+TODO: with a name collision using `import package.*` do you need to use the fully qualified or partially qualified package name?
+
+```
+import fully.qualified.package.*;
+```
+
+### Compilation
+Class files will run cross platform. No need to compile on each system individually.
+Provides API for system functions - meaning it completely abstracts away the underlying hardware.
+
+Each file can only have one public class defined. That class must have the same name as the file.
+Main program file must have a "main" method. The main method is always the first thing to run.
+
+```flow
+f1=>start: *.java
+o1=>operation: javac|past
+f2=>start: *.class
+o2=>operation: java|past
+p=>end: End
+
+f1(right)->o1(right)->f2(right)->o2(right)->p(right)
+```
+
+#### ClassPath
+Calling `java program.class` the runtime environment locates the packages and class according to a special operating system environment variable named “CLASSPATH”.
+This variable defines an order of directories in which to search for the package or class.
+
+```
+export CLASSPATH=.:/usr/local/java/lib:/usr/netscape/classes
+```
+
+## Object Oriented Programming
+### Design Patters
+#### Template method
+#### Composition
+#### Adapter
+#### Position
+#### Iterator
+#### Factory Method
+#### Comparator
+#### Locator
+
+### Clonable Interface
+Seems to be a concessus that clonable is broken. 
+http://www.artima.com/intv/bloch13.html
+
+Cloning is a secondary object creation path that does not use the object constructors and instead relies on class creators to implement a clone method.
+This method starts by calling the `supper.clone()` method on the object in order to get a hierarchically cloned object. This intoduces room for errors since there are now two object creation paths to maintain.
+
+```java
+public class clonableClass implements Cloneable {
+    public clonableClass clone() throws CloneNotSupportedException {
+        // Call all previous clonning steps in order to clone any private elements from super classes.
+        clonableClass other = (clonableClass) super.clone();
+        // preform cloning process for the current class.
+        return other;
+    }
+}
+```
+
+## Testing
+
+- zero, null, '', "", or empty value
+- 
 
 ## Unit 0: Introducing the Java Platform
 

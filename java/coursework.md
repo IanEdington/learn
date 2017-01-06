@@ -844,27 +844,8 @@ public class clonableClass implements Cloneable {
 - 
 
 ## Unit 0: Introducing the Java Platform
-
-### Unit Purpose
-To introduce you to the basic Java Platform (the Java language plus the Java package) and set up a Java development
-environment.
-
-Please **note** that all exercises students submit are expected to run
-with Sun's JDK version 5 or greater. *This specification may change as
-the course evolves.* Before installing your software, check the news
-topic in the course conference to see whether the specifications have
-been updated since the time COMP 308 opened.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but recommended)
-
-### Digital Reading Room
--   [javadoc online](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27608) javadoc online is a search engine project, to get public java documentation over Internet
--   [About the Java Technology](http://library.athabascau.ca/drr/redirect.php?id=8121) [About the Java Technology](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27609)
--   [What can Java Technology do?](http://library.athabascau.ca/drr/redirect.php?id=8122) [What can java technology do?](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27610)
--   [How will Java Technology change my life](http://library.athabascau.ca/drr/redirect.php?id=8123) [How will java technology change my life?](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27611)
-
 ### Section 1: Annotations and Java Documentation
+
 **Section Goal and Notes:** Learn about the basics of Java versions and
 Java development environment.
 
@@ -899,8 +880,7 @@ Java language, not IDEs.
 **Section Goal: ** Describe the Java language and the various components
 of the Java platform.
 
-#### Learning Objective 1
--   Describe the Java language and platform. and the Java platform.
+#### Learning Objective 1: Describe the Java language and platform. and the Java platform.
 
 ##### Readings
 **Required:**
@@ -911,8 +891,7 @@ of the Java platform.
 1.  What buzzwords can be used to describe the Java language?
 2.  What is the Java platform?
 
-#### Learning Objective 2
--   Describe key features of the Java platform.
+#### Learning Objective 2: Describe key features of the Java platform.
 
 ##### Readings
 **Required:**
@@ -922,8 +901,7 @@ of the Java platform.
 **Questions**
 1.  How does the Java API support many kinds of programs?
 
-#### Learning Objective 3
--   Outline the advantages of Java.
+#### Learning Objective 3: Outline the advantages of Java.
 
 ##### Readings
 **Required:**
@@ -934,8 +912,8 @@ of the Java platform.
 1.  What are the advantages of Java?
 
 
-## Unit 1: Getting Started with the Java Programming Language
 
+## Unit 1: Getting Started with the Java Programming Language
 ### Unit Purpose
 Design, develop, implement and run a simple
 Java application. This unit provides a bit of hands-on experience with
@@ -965,8 +943,7 @@ Post any questions or comments to the CMC system (conferencing is optional, but 
 **Section Goal:**  Compile and run a simple Java application using the
 Sun JDK.
 
-#### Learning Objective 1
--   Confirm that the necessary tools are in place for your first Java Application using the JDK.
+#### Learning Objective 1: Confirm that the necessary tools are in place for your first Java Application using the JDK.
 
 ##### Readings
 **Required:**
@@ -978,8 +955,7 @@ not affect the content of the course and the textbook.
 ##### Exercises
 Review the checklist and install the software if necessary.
 
-#### Learning Objective 2
--   Create, compile, and run your first Java application using the JDK.
+#### Learning Objective 2: Create, compile, and run your first Java application using the JDK.
 
 ##### Readings
 **Required:**
@@ -988,8 +964,7 @@ Review the checklist and install the software if necessary.
 ##### Exercises
 Complete the reading instructions.
 
-#### Learning Objective 3
--   Review creating Java applications.
+#### Learning Objective 3: Review creating Java applications.
 
 ##### Readings
 **Required:**
@@ -1022,7 +997,6 @@ You will find a list of IDEs at the end of Unit links.
 
 
 ## Unit 2: Object Oriented Programming with Java
-
 ### Unit Purpose
 Describe the basics of object-oriented programming
 with Java.
@@ -1032,8 +1006,7 @@ with Java.
 ### Section 1: Methods and Parameters
 **Section Goal:** Introduce objects in the Java language.
 
-#### Learning Objective 1
--   Describe the process of abstraction in using objects, hiding implementation details, and re-using objects.
+#### Learning Objective 1: Describe the process of abstraction in using objects, hiding implementation details, and re-using objects.
 
 ##### Readings
 **Required:** Pages 23 to 38 of TIJ
@@ -1044,8 +1017,7 @@ with Java.
 2.  What are two reasons for controlling access to members of objects and how does Java implement control? (See TIJ page 31.)
 3.  What are two ways of re-using classes? (See TIJ pages 32 to 33.)
 
-#### Learning Objective 2
--   Explain the concept and use of polymorphism.
+#### Learning Objective 2: Explain the concept and use of polymorphism.
 
 ##### Readings
 **Required:** Pages 38 to 43 of TIJ
@@ -1055,8 +1027,7 @@ with Java.
 
 1.  How does late binding enable upcasting and polymorphism? (See TIJ pages 38 to 43.)
 
-#### Learning Objective 3
--   Outline object hierarchy, containers, generics, and object lifetime in Java.
+#### Learning Objective 3: Outline object hierarchy, containers, generics, and object lifetime in Java.
 
 ##### Readings
 **Required:** Pages 43 to 48 of TIJ
@@ -1067,8 +1038,7 @@ with Java.
 2.  What is 'parameterized types/generics'? Explain how it eliminates the need for downcasting. (See TIJ pages 45 to 46.)
 3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
 
-#### Learning Objective 4
--   Explain how Java handles exceptions and concurrency.
+#### Learning Objective 4: Explain how Java handles exceptions and concurrency.
 
 ##### Readings
 **Required:** Pages 49 to 50 of TIJ
@@ -1078,8 +1048,7 @@ with Java.
 1.  What is function of exception handling and how does Java reinforce consistent use of handling exceptions? (See TIJ page 49.)
 2.  What are the functions of threads in single-processor and multi-processor environments? (See TIJ page 50.)
 
-#### Learning Objective 5
--   Explain the relationships between Java and the development of the Internet.
+#### Learning Objective 5: Explain the relationships between Java and the development of the Internet.
 
 ##### Readings
 **Required:** Pages 50 to 60 of TIJ
@@ -1096,8 +1065,7 @@ with Java.
 8.  What are the issues of Intranet versus Internet programming? (See TIJ page 58.)
 9.  What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
 
-#### Learning Objective 6
--   Provide a summary of this section.
+#### Learning Objective 6: Provide a summary of this section.
 
 ##### Readings
 **Required:** Page 60 of TIJ
@@ -1106,8 +1074,7 @@ with Java.
 **Section Goal**: Describe and analyse the use of objects and classes in
 a Java program, and create Java documentation.
 
-#### Learning Objective 1
--   Describe the creation and use of objects and primitive types in programming with Java.
+#### Learning Objective 1: Describe the creation and use of objects and primitive types in programming with Java.
 
 ##### Readings
 **Required:** Pages 61 to 69 of TIJ
@@ -1120,8 +1087,7 @@ a Java program, and create Java documentation.
 4.  What are two classes of high-precision numbers with no primitive analog? (See TIJ page 66.)
 5.  How does scope differ for primitives and objects? (See TIJ pages 68 to 69.)
 
-#### Learning Objective 2
--   Explain classes, fields, methods, arguments, and return values in Java.
+#### Learning Objective 2: Explain classes, fields, methods, arguments, and return values in Java.
 
 ##### Readings
 **Required:** Pages 69 to 74 of TIJ
@@ -1132,8 +1098,7 @@ a Java program, and create Java documentation.
 2.  What is the difference between default values for primitive types as members of a class and local variables? (See TIJ page 71.)
 3.  What are the fundamental parts of a Java method? (See TIJ page 72.)
 
-#### Learning Objective 3
--   Outline these aspects of building a program in Java: namespaces, using other components, and the use of the static keyword.
+#### Learning Objective 3: Outline these aspects of building a program in Java: namespaces, using other components, and the use of the static keyword.
 
 ##### Readings
 **Required:** Pages 74 to 78 of TIJ
@@ -1144,8 +1109,7 @@ a Java program, and create Java documentation.
 2.  What is the purpose of the import keyword? (See TIJ page 75.)
 3.  What are the functions of the static keyword? (See TIJ pages 76 to 78.)
 
-#### Learning Objective 4
--   Write, compile and run a Java program.
+#### Learning Objective 4: Write, compile and run a Java program.
 
 ##### Readings
 **Required:** Pages 78 to 81 of TIJ
@@ -1163,8 +1127,7 @@ a Java program, and create Java documentation.
 ##### Programs
 Compile, run, and analyze [HelloDate.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/object/HelloDate.java).
 
-#### Learning Objective 5
--   Describe comments, documentation facilities, and coding style for Java.
+#### Learning Objective 5: Describe comments, documentation facilities, and coding style for Java.
 
 ##### Readings
 **Required:** Pages 81 to 89 of TIJ
@@ -1173,8 +1136,7 @@ Compile, run, and analyze [HelloDate.java](https://triton2.athabascau.ca/html/co
 **Questions**
 1.  In Java, what is the standard coding style for classes and methods? (See TIJ pages 88 to 89.)
 
-#### Learning Objective 6
--   Integrate the material covered in this section in writing programs.
+#### Learning Objective 6: Integrate the material covered in this section in writing programs.
 
 ##### Readings
 **Required:** Page 89 of TIJ
@@ -1209,8 +1171,7 @@ the function of the programs.
 ### Section 1: Java Operators
 **Section Goal**: Describe Java operators.
 
-#### Learning Objective 1
--   Use the assignment operator.
+#### Learning Objective 1: Use the assignment operator.
 
 ##### Readings
 **Required:** Pages 93 to 98 of TIJ
@@ -1228,8 +1189,7 @@ Compile, run, and analyze programs:
 [Assignment.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Assignment.java)
 [PassObject.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/PassObject.java)
 
-#### Learning Objective 2
--   Use the common Java operators.
+#### Learning Objective 2: Use the common Java operators.
 
 ##### Readings
 **Required:** Pages 98 to 111 of TIJ
@@ -1255,8 +1215,7 @@ Compile, run, and analyze programs:
 [Bool.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Bool.java)
 [ShortCircuit.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/ShortCircuit.java)
 
-#### Learning Objective 3
--   Describe the Java bitwise operators.
+#### Learning Objective 3: Describe the Java bitwise operators.
 
 ##### Readings
 **Required:** Pages 111 to 116 of TIJ
@@ -1272,8 +1231,7 @@ Compile, run, and analyze programs:
 [URShift.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/URShift.java)
 [BitManipulation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/BitManipulation.java)
 
-#### Learning Objective 4
--   Describe other operators used in Java.
+#### Learning Objective 4: Describe other operators used in Java.
 
 ##### Readings
 **Required:** Pages 116 to 119 of TIJ
@@ -1289,8 +1247,7 @@ Compile, run, and analyze programs:
 [TerneryIfElse.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/TernaryIfElse.java)
 [StringOperators.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/StringOperators.java)
 
-#### Learning Objective 5
--   Use Java operators in various situations.
+#### Learning Objective 5: Use Java operators in various situations.
 
 ##### Readings
 **Required:** Pages 118 to 133 of TIJ
@@ -1307,8 +1264,7 @@ Compile, run, and analyse programs:
 [AllOps.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/AllOps.java)
 [Overflow.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Overflow.java)
 
-#### Learning Objective 6
--   Apply the material covered in this section to the writing of your Java programs.
+#### Learning Objective 6: Apply the material covered in this section to the writing of your Java programs.
 
 ##### Readings
 **Required:** Pages 133 of TIJ
@@ -1322,8 +1278,7 @@ Exercises 5 and 6 on page 105 of TIJ.
 ### Section 2: Execution Control
 **Section Goal:**  Describe execution control in Java programming.
 
-#### Learning Objective 1
--   Describe execution control using the **if-else** commands.
+#### Learning Objective 1: Describe execution control using the **if-else** commands.
 
 ##### Readings
 **Required:** Pages 135 to 137 of TIJ
@@ -1338,8 +1293,7 @@ Compile, run, and analyze programs:
 [IfElse.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/IfElse.java)
 [IfElse2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/IfElse2.java)
 
-#### Learning Objective 2
--   Describe execution control using iteration constructs.
+#### Learning Objective 2: Describe execution control using iteration constructs.
 
 ##### Readings
 **Required:** Pages 137 to 151 of TIJ
@@ -1363,8 +1317,7 @@ Compile, run, and analyze programs:
 [LabeledFor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/LabeledFor.java)
 [LabeledWhile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/LabeledWhile.java)
 
-#### Learning Objective 3
--   Describe execution control using the **switch** statement.
+#### Learning Objective 3: Describe execution control using the **switch** statement.
 
 ##### Readings
 **Required:** Pages 151 to 154 of TIJ
@@ -1378,8 +1331,7 @@ Compile, run, and analyze programs:
 
 [VowelsAndConsonants.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/VowelsAndConsonants.java)
 
-#### Learning Objective 4
--   Apply the material covered in this section to the writing of your Java programs.
+#### Learning Objective 4: Apply the material covered in this section to the writing of your Java programs.
 
 ##### Readings
 **Required:** Page 154 of TIJ
@@ -1398,8 +1350,7 @@ Exercise 1 on page 139, exercise 7 on page 146 and exercise 8 on page
 **Section Goal:** Describe *initialization* and *clean up * in Java
 programming.
 
-#### Learning Objective 1
--   Describe the creation of objects with constructors and overloading.
+#### Learning Objective 1: Describe the creation of objects with constructors and overloading.
 
 ##### Readings
 **Required:** Pages 155 to 172 of TIJ
@@ -1434,8 +1385,7 @@ Compile, run, and analyze programs:
 [Leaf.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Leaf.java)
 [Flower.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Flower.java)
 
-#### Learning Objective 2
--   Describe finalization, garbage collection, and cleaning up in Java.
+#### Learning Objective 2: Describe finalization, garbage collection, and cleaning up in Java.
 
 ##### Readings
 **Required:** Pages 173 to 181 of TIJ
@@ -1451,8 +1401,7 @@ Compile, run, and analyze programs:
 
 [TerminationCondition.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/TerminationCondition.java)
 
-#### Learning Objective 3
--   Outline and use the process of member initialization.
+#### Learning Objective 3: Outline and use the process of member initialization.
 
 ##### Readings
 **Required:** Pages 181 to 193 of TIJ
@@ -1476,8 +1425,7 @@ Compile, run, and analyze programs:
 [ExplicitStatic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ExplicitStatic.java)
 [Mugs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Mugs.java)
 
-#### Learning Objective 4
--   Explain how to initialize arrays.
+#### Learning Objective 4: Explain how to initialize arrays.
 
 ##### Readings
 **Required:** Pages 193 to 204 of TIJ
@@ -1499,8 +1447,7 @@ Compile, run and analyse programs
 [NewVarArgs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/NewVarArgs.java)
 [OverloadingVarargs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OverloadingVarargs.java)
 
-#### Learning Objective 5
--   Explain how to use enumerated types.
+#### Learning Objective 5: Explain how to use enumerated types.
 
 ##### Readings
 **Required:** Pages 204 to 207 of TIJ
@@ -1515,8 +1462,7 @@ Compile, run, and analyze programs:
 [EnumOrder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/EnumOrder.java)
 [Burrito.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Burrito.java)
 
-#### Learning Objective 6
--   Apply material covered in this section to the writing of your Java programs.
+#### Learning Objective 6: Apply material covered in this section to the writing of your Java programs.
 
 ##### Readings
 **Required:** Pages 207 to 208 of TIJ
@@ -1543,8 +1489,7 @@ Post any questions or comments to the CMC system (conferencing is optional, but 
 **Section Goal**: Use the capabilities for organizing, protecting, and
 encapsulating classes in Java.
 
-#### Learning Objective 1
--   Describe and use packages.
+#### Learning Objective 1: Describe and use packages.
 
 ##### Readings
 **Required:** Pages 209 to 217 of TIJ
@@ -1567,8 +1512,7 @@ Compile, run, and analyze programs:
 [LibTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/LibTest.java)
 [QualifiedMyClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/QualifiedMyClass.java)
 
-#### Learning Objective 2
--   Explain more advanced issues in using packages.
+#### Learning Objective 2: Explain more advanced issues in using packages.
 
 ##### Readings
 **Required:** Pages 217 to 221 in TIJ
@@ -1583,8 +1527,7 @@ Compile, run, and analyze programs:
 
 [PrintTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/PrintTest.java)
 
-#### Learning Objective 3
--   Describe in detail, and use, the access levels.
+#### Learning Objective 3: Describe in detail, and use, the access levels.
 
 ##### Readings
 **Required:** Pages 221 to 228 in TIJ
@@ -1607,8 +1550,7 @@ Compile, run, and analyze programs:
 [ChocolateChip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/ChocolateChip.java)
 [ChocolateChip2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/ChocolateChip2.java)
 
-#### Learning Objective 4
--   Discuss issues of access in implementation when using Java's protection levels.
+#### Learning Objective 4: Discuss issues of access in implementation when using Java's protection levels.
 
 ##### Readings
 **Required:** Pages 228 to 233 in TIJ
@@ -1623,8 +1565,7 @@ Compile, run, and analyze programs:
 
 [Lunch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/Lunch.java)
 
-#### Learning Objective 5
--   Integrate and summarize the material on Java as the object-oriented programming language of the Internet.
+#### Learning Objective 5: Integrate and summarize the material on Java as the object-oriented programming language of the Internet.
 
 ##### Readings
 **Required:** Pages 233 to 235 of TIJ
@@ -1643,8 +1584,7 @@ Exercises 5 and 6 on pages 227 to 228, exercise 9 on page 233 of TIJ
 **Section Goal:**  Use composition and inheritance to design re-usable
 classes.
 
-#### Learning Objective 1
--   Describe and use composition.
+#### Learning Objective 1 Describe and use composition.
 
 ##### Readings
 **Required:** Pages 237 to 241 of TIJ
@@ -1660,8 +1600,7 @@ Compile, run, and analyze programs:
 [SprinklerSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SprinklerSystem.java)
 [Bath.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Bath.java)
 
-#### Learning Objective 2
--   Describe and use inheritance.
+#### Learning Objective 2 Describe and use inheritance.
 
 ##### Readings
 **Required:** Pages 241 to 246 of TIJ
@@ -1679,8 +1618,7 @@ Compile, run, and analyze programs:
 [Cartoon.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Cartoon.java)
 [Chess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Chess.java)
 
-#### Learning Objective 3
--   Explain and use *delegation*.
+#### Learning Objective 3: Explain and use *delegation*.
 
 ##### Readings
 **Required:** Pages 246 to 248 of TIJ
@@ -1696,8 +1634,7 @@ Compile, run, and analyze programs:
 [SpaceShip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShip.java)
 [SpaceShipDelegation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShipDelegation.java)
 
-#### Learning Objective 4
--   Demonstrate, contrast, and compare inheritance and composition.
+#### Learning Objective 4: Demonstrate, contrast, and compare inheritance and composition.
 
 ##### Readings
 **Required:** Pages 249 to 262 of TIJ
@@ -1722,8 +1659,7 @@ Compile, run, and analyze programs:
 [Orc.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Orc.java)
 [Wind.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Wind.java)
 
-#### Learning Objective 5
--   Explain and use **final** in various contexts.
+#### Learning Objective 5: Explain and use **final** in various contexts.
 
 ##### Readings
 **Required:** Pages 262 to 272 of TIJ
@@ -1746,8 +1682,7 @@ Compile, run, and analyze programs:
 [FinalOverridingIllusion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalOverridingIllusion.java)
 [Jurassic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Jurassic.java)
 
-#### Learning Objective 6
--   Explain the process of initialization and class loading.
+#### Learning Objective 6: Explain the process of initialization and class loading.
 
 ##### Readings
 **Required:** Pages 272 to 274 of TIJ
@@ -1761,8 +1696,7 @@ Compile, run, and analyze programs:
 
 [Beetle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Beetle.java)
 
-#### Learning Objective 7
--   Integrate and summarize the material in this section.
+#### Learning Objective 7: Integrate and summarize the material in this section.
 
 ##### Readings
 **Required:** Pages 274 to 275 of TIJ
@@ -1780,8 +1714,7 @@ page 262 of TIJ
 ### Section 3: Polymorphism
 **Section Goal**: Use polymorphism in advanced Java programming.
 
-#### Learning Objective 1
--   Describe the role of upcasting in polymorphism.
+#### Learning Objective 1: Describe the role of upcasting in polymorphism.
 
 ##### Readings
 **Required:** Pages 277 to 289 of TIJ
@@ -1806,8 +1739,7 @@ Compile, run, and analyze programs:
 [Music3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/music3/Music3.java)
 [StaticPolymorphism.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/StaticPolymorphism.java)
 
-#### Learning Objective 2
--   Describe the use of constructors in the context of polymorphism.
+#### Learning Objective 2: Describe the use of constructors in the context of polymorphism.
 
 ##### Readings
 **Required:** Pages 293 to 303 of TIJ
@@ -1826,8 +1758,7 @@ Compile, run, and analyze programs:
 [ReferenceCounting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/ReferenceCounting.java)
 [PolyConstructors.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/PolyConstructors.java)
 
-#### Learning Objective 3
--   Explain and use covariant return types.
+#### Learning Objective 3: Explain and use covariant return types.
 
 ##### Readings
 **Required:** Pages 303 to 304 of TIJ
@@ -1841,8 +1772,7 @@ Compile, run, and analyze programs:
 
 [CovariantReturn.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/CovariantReturn.java)
 
-#### Learning Objective 4
--   Design re-usable programs.
+#### Learning Objective 4: Design re-usable programs.
 
 ##### Readings
 **Required:** Pages 304 to 310 of TIJ
@@ -1860,8 +1790,7 @@ Compile, run, and analyze programs:
 [Transmogrify.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/Transmogrify.java)
 [RTTI.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/RTTI.java)
 
-#### Learning Objective 5
--   Integrate and summarize the material on polymorphism in Java.
+#### Learning Objective 5: Integrate and summarize the material on polymorphism in Java.
 
 ##### Readings
 **Required:** Pages 310 of TIJ
@@ -1878,8 +1807,7 @@ TIJ.
 **Section Goal**: Discuss and use interfaces and inner classes in
 advanced Java programming.
 
-#### Learning Objective 1
--   Explain the use of abstract classes in Java.
+#### Learning Objective 1: Explain the use of abstract classes in Java.
 
 ##### Readings
 **Required:** Pages 311 to 315 of TIJ
@@ -1893,8 +1821,7 @@ Compile, run, and analyze programs:
 
 [Music4.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/music4/Music4.java)
 
-#### Learning Objective 2
--   Explain the use of interfaces in Java.
+#### Learning Objective 2: Explain the use of interfaces in Java.
 
 ##### Readings
 **Required:** Pages 316 to 334 of TIJ
@@ -1921,8 +1848,7 @@ Compile, run, and analyze programs:
 [RandomWords.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/RandomWords.java)
 [RandomDoubles.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/RandomDoubles.java)
 
-#### Learning Objective 3
--   Discuss other features of Java interface.
+#### Learning Objective 3: Discuss other features of Java interface.
 
 ##### Readings
 **Required:** Pages 335 to 343 of TIJ
@@ -1941,8 +1867,7 @@ Compile, run, and analyze programs:
 [Factories.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/Factories.java)
 [Games.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/Games.java)
 
-#### Learning Objective 4
--   Describe the use of inner classes.
+#### Learning Objective 4: Describe the use of inner classes.
 
 ##### Readings
 **Required:** Pages 345 to 368 of TIJ
@@ -1978,8 +1903,7 @@ Compile, run, and analyze programs:
 [ClassInInterface.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/ClassInInterface.java)
 [MultiNestingAccess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/MultiNestingAccess.java)
 
-#### Learning Objective 5
--   Discuss the design issues of inner classes.
+#### Learning Objective 5: Discuss the design issues of inner classes.
 
 ##### Readings
 **Required:** Pages 369 to 383 of TIJ
@@ -2002,8 +1926,7 @@ Compile, run, and analyze programs:
 [GreenhouseControls.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/GreenhouseControls.java)
 [InheritInner.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/InheritInner.java)
 
-#### Learning Objective 6
--   Discuss other issues of inner classes.
+#### Learning Objective 6: Discuss other issues of inner classes.
 
 ##### Readings
 **Required:** Pages 369 to 383 of TIJ.
@@ -2020,8 +1943,7 @@ Compile, run, and analyze programs:
 [BigEgg2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/BigEgg2.java)
 [LocalInnerClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/LocalInnerClass.java)
 
-#### Learning Objective 7
--   Integrate and summarize the material on interface and inner class in Java.
+#### Learning Objective 7: Integrate and summarize the material on interface and inner class in Java.
 
 ##### Readings
 **Required:** Pages 349 and 388 of TIJ
@@ -2040,7 +1962,6 @@ Please complete TME 1 and submit it by electronic mail.
 
 Tutor Marked Exercise 1 is scored out of 100 and contributes to 5% of
 your final grade.
-
 
 ## Unit 5: Collections, Arrays, Exceptions and Strings
 

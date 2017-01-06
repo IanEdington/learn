@@ -1,425 +1,395 @@
 # COMP272: Data Structures and Algorithms (Revision 7)
+## Notes
+### Useful classes
+java.util.Array - many array based methods
+java.util.Random - pseudo-random number generator
 
+### Recursion
+### Amortization
+### Divide-and-conquer
+### Prune-and-search (aka decrease-and-conquer)
+### Brute force
+### The greedy method
+### Dynamic programming
 
 ## Unit 0: Orientation
-### From the Course Coordinator
-
-Welcome to *Computer Science 272: Data Structures and Algorithms*.
-Online learning requires an extra notch of self-regulation, support,
-guidance, and help compared to regular classroom learning. Important
-factors for online learning include your interaction with study
-activities, engagement in competency activities, involvement with
-content, communication with the tutor/coordinator, and peer-to-peer
-interaction. You can post questions and provide help for classmates in
-the unit discussion forums.
-
--   **Important**: Do not post answers to assignment questions—this will be viewed as cheating and treated accordingly.
-
-You will need the orientation information given below before you start.
-We sincerely hope that you enjoy the course.
-
-### Course Schedule
-
-The 16-week schedule set up on the course home page is designed to guide
-the sequence and timing of your course activities. You are not expected
-to follow the schedule exactly, and may complete the course in less, or
-more, time than it suggests, as long as you stay within your course
-contract. Your contract with Athabasca University allows you a total of
-24 weeks to complete this course. However, I urge you to set yourself
-the goal of completing the course in 16 weeks. The additional weeks can
-be held in reserve if you need more time to study a particular topic or
-assessment activity. The rest of this discussion assumes a 16-week study
-plan.
-
--   Note that if you are receiving financial aid, you are expected to complete the course within 16 weeks.
-
-Depending on your background in Java or C++ programming, different units
-may take different amounts of time to complete. Do adjust your study
-schedule accordingly, and consult the tutor at any time in the course if
-you feel you may be getting out of step.
-
-**Delay in assignment submission is not acceptable**. Assignments should
-be submitted at regular intervals, as prescribed by the 16-week study
-schedule. If a delay is unavoidable, you should contact your tutor. **If
-you go past your contract period, you will need to [request an extension](http://calendar.athabascau.ca/undergrad/current/page06_16.php).**
 
 ### Using the Textbooks
 
-The main textbook for this course is *Open Data Structures* by Pat
-Morin. You can choose to complete COMP 272 using either Java or C++, or
-both. *Open Data Structures* can be downloaded as a free PDF from
-<http://www.aupress.ca/index.php/books/120226>.
+You can choose to complete COMP 272 using either Java or C++, or both.
 
--   Exercises from the textbook are assigned throughout the course. You are expected to work out as many problems as you can to gain key competencies, not only in understanding individual data structures and algorithms, but also how these are employed in computing applications. Start each unit by noting the desired **learning outcomes**. Map your personal learning activities in every unit to these outcomes, and do a self-check on the outcomes before moving on to the next unit.
-
-In addition to the main text, we will use another free online textbook
-by Granville Barnett and Luca Del Tongo titled *[Data Structures and
-Algorithms: Annotated Reference with
-Examples](http://dotnetslackers.com/Community/files/folders/data-structures-and-algorithms/entry30283.aspx)*.
-Although no readings or exercises from it are assigned, you will use
-this book as a reference text, particularly on algorithms using
-pseudocode. We will also use material from the Internet to supplement
-the main text.
+TODO: add note to forms with link to DSA:
+https://drive.google.com/file/d/0B48k2jhdQ5P2aVlmMFB1UUJLczA/edit
+> In addition to the main text, we will use another free online textbook by Granville Barnett and Luca Del Tongo titled [Data Structures and Algorithms: Annotated Reference with Examples](http://dotnetslackers.com/Community/files/folders/data-structures-and-algorithms/entry30283.aspx).
 
 ### Assessment and Reflection
 
-COMP 272 has four assessments – three assignments and one [invigilated
-final
-exam](http://calendar.athabascau.ca/undergrad/current/page07_01.php).
-You must score 50% in each assessment to pass the course. Each
-assignment contributes 20% towards your final grade, and the final exam
-contributes 40% towards your final grade.
+The assessment activities are marked using these guidelines.
 
-All programming questions in the assessment activities are marked using
-the guidelines given below.
+You are expected to add any inline comment in your code or prepare a separate document to reflect on how the essential methods, classes, parameters, or entire programs were designed and handled while implementing those algorithms.
 
-You are expected to add any inline comment in your code or prepare a
-separate document to reflect on how the essential methods, classes,
-parameters, or entire programs were designed and handled while
-implementing those algorithms. Reflection is nothing but your personal
-commentary on your own coding habits. For COMP 272 assessment,
-reflection includes ***two*** ***or more*** of the following:
-
--   Significant types of errors/warnings you faced when coding programs
--   Whether you were able to correct these errors/warnings quickly
--   What debugging strategy you used, e.g., searched the Web for a solution, contacted tutor, solved by self, used a debugging tool, posted in forum, talked to a friend, . . .
--   What commenting strategy you used, eg., Javadoc or inline commenting of key methods and variables, . . .
--   What testing strategy you used, eg., JUnit, tested for typical inputs, extensively tested the code, . . .
--   What code optimization techniques you followed, if any (e.g., unused local variables, parameters, and private methods; wasteful string/stringbuffer usage; unnecessary *if* statements and *for* loops that could be *while* loops; duplicate code; . . .
--   Resources that you referred to (online resources, book references, discussions, . . .)
--   Other comments that reflect on the process of your learning to program
-
+You need to submit a reflection component for each program/code that you create or review as part of this course. ****
+Reflection is nothing but your personal commentary on your own coding habits. For COMP 272 assessment, reflection includes ***two*** ***or more*** of the following:
 As you can see, the reflection component is quite fluid. 
-
--   You need to submit a reflection component for each program/code that you create or review as part of this course. ****
-
-### Course Tutor and Course Coordinator
-
-Learning Services Tutorial will let you know which of the able tutors
-will guide you along as you study through the course and provide contact
-information.
-
-You have to take the initiative to study the material and solve
-problems; approach your tutor only if you require additional guidance or
-clarification. You are most welcome to contact your tutor concerning a
-doubt or clarification or with a general question about the course, the
-content, the activities, or the assessment.
-
-All other questions can be directed to the course coordinator, Dr
-Xiaokun Zhang.
-
-Contact information for the tutors and the course coordinators is
-available at <http://scis.athabascau.ca/scis/staff/ourPeople.php>
-
-### Using Moodle
-
-All SCIS undergraduate courses are now delivered through Moodle. This
-interface should be fairly easy to use, but if you have any questions or
-concerns, please email <scistech@athabascau.ca>. Improvements and
-updates to Moodle are being done on an ongoing basis. Log in to Moodle
-either through [myAU](https://my.athabascau.ca/) or from the SCIS direct
-course access link: <http://scis.lms.athabascau.ca/>
-
-You will have full access to your active course in Moodle until the
-course end date. Afterwards, you will have partial access for 4 more
-months, but can no longer contact the tutor or post in the discussion
-forums.
-
-**Assignments** are submitted through the upload feature at the bottom
-of each assignment page. The first step is to attach one or more files,
-as well as to delete or overwrite uploaded files. Be sure you have
-completed uploading all files and that all edits are done before you
-proceed to the next step, which is to submit the assignment. Once you
-hit the **Send for marking** button, you will no longer be able to add,
-delete, or edit your assignment files.
-
--   **Note:** Do not discuss the contents of assessments (assignments, profile, final exam) on any forum or post them anywhere on the Internet. Doing so will be considered cheating and will be dealt with accordingly.
+- Significant errors/warnings you faced when coding programs
+- if you were able to correct these errors/warnings quickly
+- What debugging strategy you used, e.g., searched the Web for a solution, contacted tutor, solved by self, used a debugging tool, posted in forum, talked to a friend, ect.
+- What commenting strategy you used, eg., Javadoc or inline commenting of key methods and variables, ect.
+- What testing strategy you used, eg., JUnit, tested for typical inputs, extensively tested the code, . . .
+- What code optimization techniques you followed, if any (e.g., unused local variables, parameters, and private methods; wasteful string/stringbuffer usage; unnecessary *if* statements and *for* loops that could be *while* loops; duplicate code; . . .
+- Resources that you referred to (online resources, book references, discussions, . . .)
+- Other comments that reflect on the process of your learning to program
 
 ### Guidelines for Marking Programming Assignments
 
 The following table presents the overall approach to marking a program.
-The first column lists the five key criteria on which your program will
-be marked. *Functionality* is the main criterion. The rest of them will
-receive proportionally reduced marks depending on the percentage of
-functionality implemented in the program. If you have implemented only
-half the functionality expected in the program, don’t expect to receive
-full marks for documentation, test cases, and so on.
+The first column lists the five key criteria on which your program will be marked.
+*Functionality* is the main criterion.
+The rest of them will receive proportionally reduced marks depending on the percentage of functionality implemented in the program.
+If you have implemented only half the functionality expected in the program, don’t expect to receive full marks for documentation, test cases, and so on.
 
-+-------------+-------------+-------------+-------------+-------------+
-| | **Unsatisfa | **Satisfact | **Good\     | **Excellent |
-| **Criteria* | ctory| ory\        | 66%–85%**   | \           |
-| *           | &lt; 50%**  | 50%–65%**   |             | 86%–100%**  |
-+-------------+-------------+-------------+-------------+-------------+
-| Functionali | Completed   | Completed   | Completed   | Completed   |
-| ty| less than   | between 71% | between 86% | between 96% |
-| = 20%       | 70% of the  | and 85% of  | and 95% of  | and 100% of |
-|             | requirement | the         | the         | the         |
-|             | s.| requirement | requirement | requirement |
-|             | Not         | s.| s.\         | s.\         |
-|             | delivered   | Delivered   | Delivered   | Delivered   |
-|             | on time or  | on time,    | on time,    | on time,    |
-|             | not in      | and in      | and in      | and in      |
-|             | correct     | correct     | correct     | correct     |
-|             | format      | format      | format      | format      |
-|             | (zipped     | (zipped     | (zipped     | (zipped     |
-|             | files,      | files,      | files,      | files,      |
-|             | Moodle      | Moodle      | Moodle      | Moodle      |
-|             | submission, | submission, | submission, | submission, |
-|             | etc.).      | etc.).      | etc.).      | etc.).      |
-+-------------+-------------+-------------+-------------+-------------+
-| Reflection| No          | Minimal     | Moderate    | Excellent   |
-| = 20%       | reflection  | reflection  | reflection  | reflection  |
-|             | on coding   | on coding   | on coding   | on coding   |
-|             | habits.     | habits.     | habits.     | habits.     |
-+-------------+-------------+-------------+-------------+-------------+
-| Coding      | No name,    | Includes    | Includes    | Includes    |
-| Standards| date, or    | name, date, | name, date, | name, date, |
-| = 15%       | assignment  | and         | and         | and         |
-|             | title       | assignment  | assignment  | assignment  |
-|             | included.| title.\     | title.\     | title.\     |
-|             | Poor use of | White space | Good use of | Excellent   |
-|             | white space | makes       | white       | use of      |
-|             | (indentatio | program     | space.| white       |
-|             | n,          | fairly easy | Organized   | space.|
-|             | blank       | to read.| work.\      | Consistentl |
-|             | lines).| Organized   | Good use of | y           |
-|             | Disorganize | work.| variables   | organized   |
-|             | d           | Good use of | (no global  | work.|
-|             | and messy.| variables   | variables,  | Excellent   |
-|             | Poor use of | (few global | unambiguous | use of      |
-|             | variables   | variables,  | naming).    | variables   |
-|             | (many       | unambiguous |             | (no global  |
-|             | global      | naming).    |             | variables,  |
-|             | variables,  |             |             | unambiguous |
-|             | ambiguous   |             |             | naming).    |
-|             | naming).    |             |             |             |
-+-------------+-------------+-------------+-------------+-------------+
-| Documentati | No          | Basic       | Clearly     | Clearly and |
-| on| documentati | documentati | documented  | effectively |
-| = 15%       | on          | on          | including   | documented  |
-|             | included.   | has been    | description | including   |
-|             |             | completed   | s           | description |
-|             |             | including   | of all key  | s           |
-|             |             | description | variables.| of all key  |
-|             |             | s           | Specific    | variables.|
-|             |             | of all key  | purpose is  | Specific    |
-|             |             | variables.| noted for   | purpose is  |
-|             |             | Purpose is  | each        | noted for   |
-|             |             | noted for   | function    | each        |
-|             |             | each        | and control | function,   |
-|             |             | function.   | structure.  | control     |
-|             |             |             |             | structure,  |
-|             |             |             |             | input       |
-|             |             |             |             | requirement |
-|             |             |             |             | s,          |
-|             |             |             |             | and output. |
-+-------------+-------------+-------------+-------------+-------------+
-| Runtime +   | Does not    | Executes    | Executes    | Executes    |
-| test cases  | execute due | without     | without     | without     |
-| = 15%       | to errors.| errors.\    | errors.\    | errors      |
-|             | User        | User        | User        | excellent   |
-|             | prompts are | prompts     | prompts are | user        |
-|             | misleading  | contain     | understanda | prompts,    |
-|             | or          | little      | ble,        | good use of |
-|             | non-existen | information | minimum use | symbols,    |
-|             | t.| ,           | of symbols  | spacing in  |
-|             | No testing  | poor        | or spacing  | output.|
-|             | has been    | design.| in output.\ | Thorough    |
-|             | completed.  | Some        | Thorough    | and         |
-|             |             | testing has | testing has | organized   |
-|             |             | been        | been        | testing has |
-|             |             | completed.  | completed   | been        |
-|             |             |             |             | completed,  |
-|             |             |             |             | and output  |
-|             |             |             |             | from test   |
-|             |             |             |             | cases is    |
-|             |             |             |             | included.   |
-+-------------+-------------+-------------+-------------+-------------+
-| Efficiency  | A difficult | A logical   | Solution is | Solution is |
-| = 15%       | and         | solution    | efficient   | efficient,  |
-|             | inefficient | that is     | and easy to | easy to     |
-|             | solution.   | easy to     | follow      | understand  |
-|             |             | follow, but | (i.e., no   | and         |
-|             |             | it is not   | confusing   | maintain.   |
-|             |             | the most    | tricks).    |             |
-|             |             | efficient.  |             |             |
-+-------------+-------------+-------------+-------------+-------------+
+![Guidelines for Marking Programming Assignments](img/program-marking.png "Guidelines for Marking Programming Assignments")
 
 ## Unit 1: Introduction
 
-### Learning Outcomes
+Data structure: a declared format to hold a specific type of data, designed to organize data to suite a specific purpose so it can be worked with in an appropriate way.
+Algorithm: set of actions that manipulates data to provide a desired outcome.
 
-After completing Unit 1, you should be able to
-
--   explain the concept of *data structures*.
--   explain the concept of *algorithms*.
--   explain the need for efficiency in data structures and algorithms.
--   distinguish the difference between an *interface* and an *implementation*.
--   use mathematical concepts required to understand data structures and algorithms.
--   apply a model of computation.
--   apply correctness, time complexity, and space complexity to data structures and algorithms.
-
-### Study Activities
+### Study Questions
 
 What are data structures and algorithms?
 
-Data structures and algorithms are the heart and soul of computer
-science and information systems. There are thousands of algorithms being
-employed both in theory and in the real world – see
-<http://en.wikipedia.org/wiki/List_of_algorithms>
+Data structures and algorithms are the heart and soul of computer science and information systems. There are thousands of algorithms being employed both in theory and in the real world – see http://en.wikipedia.org/wiki/List_of_algorithms
 
 What is a data structure?
 
-A data structure is a collection of data stored in the computer, usually
-organized to make it easy to add, delete, and retrieve pieces of data.
-For instance, *integer* is a type of data, and an array of integers
-stored in the computer is a data structure.
+A data structure is a collection of data stored in the computer, usually organized to make it easy to add, delete, and retrieve pieces of data. For instance, *integer* is a type of data, and an array of integers stored in the computer is a data structure.
 
 Why are data structures important?
 
-Good algorithms and data structures can make your programs run much
-faster. If you are writing code in a specialized area, such as graphics
-or databases, you don't waste time writing programs that run slower than
-existing programs. The data structures and algorithms covered in this
-unit are fundamental building blocks for almost all later and more
-complex programs.
+Good algorithms and data structures can make your programs run much faster. If you are writing code in a specialized area, such as graphics or databases, you don't waste time writing programs that run slower than existing programs. The data structures and algorithms covered in this unit are fundamental building blocks for almost all later and more complex programs.
 
 What is an algorithm?
 
-As you will recall from earlier in your studies, an algorithm is a
-step-by-step process that performs actions on data structures. For
-example, you can design and write code for an algorithm to find the
-smallest integer in an array of integers; you can design and write code
-for an algorithm that finds all red pixels in a 2-D colour image.
+As you will recall from earlier in your studies, an algorithm is a step-by-step process that performs actions on data structures. For example, you can design and write code for an algorithm to find the smallest integer in an array of integers; you can design and write code for an algorithm that finds all red pixels in a 2-D colour image.
 
-I see. So, in the second example, is the 2-D colour image a data
-structure?
+I see. So, in the second example, is the 2-D colour image a data structure?
 
-A 2-D colour image can be a collection of pixels; in this case, a pixel
-is a data item. If you suppose the 2-D colour image is stored in the
-computer in a two-dimensional array of pixels, then this two-dimensional
-array is the corresponding data structure.
+A 2-D colour image can be a collection of pixels; in this case, a pixel is a data item. If you suppose the 2-D colour image is stored in the computer in a two-dimensional array of pixels, then this two-dimensional array is the corresponding data structure.
 
 Is the code in a program an algorithm?
 
-A program is *an implementation of an algorithm*. In fact, every program
-is an implementation of some algorithm.
+A program is *an implementation of an algorithm*. In fact, every program is an implementation of some algorithm.
 
 Why are algorithms important?
 
-Browse through the material from the following web page: http://www.topcoder.com/tc?module=Static&d1=tutorials&d2=importance_of_algorithms
-It introduces the analysis of algorithms and presents a measure of
-complexity for algorithms called *big Oh*. Don’t worry if you don’t
-understand it much at this point. What is important is for you to read
-about different classes of algorithms that we employ in our day-to-day
-life.
+Browse through the material from the following web page: http://www.topcoder.com/tc?module=Static&d1=tutorials&d2=importance_of_algorithms It introduces the analysis of algorithms and presents a measure of complexity for algorithms called *big Oh*. Don’t worry if you don’t understand it much at this point. What is important is for you to read about different classes of algorithms that we employ in our day-to-day life.
 
-What next?
+### Analysis
 
-Well, study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226).
+### 1.1 The Need for Efficiency
+As the available data becomes larger and larger efficiency becomes important. Although many applications will work without efficient implementations, some will fail because of poor implementation choices.
 
-1.1 The Need for Efficiency
+### 1.2 Interfaces or Abstract Data Type (ADT)
+Distinguish the difference between an *interface* and an *implementation*.  
+Interface: describes what a data structure does and how you can interact with it  
+Implementation: describes how it is done.  
 
-1.2 Interfaces
+https://en.wikipedia.org/wiki/Abstract_data_type
+http://opendatastructures.org/ods-python/1_2_Interfaces.html
 
-1.3 Mathematical Background
+#### What are ADTs?
 
-1.4 The Model of Computation
+Abstract data types is the interface. List, dictionary, stacks, queues, objects, all have their own way of thinking about data but none of them tell us how the data is stored or what algorithms are used to process the data.
 
-1.5 Correctness, Time Complexity, and Space Complexity
+From the point of view of the user
+Purely theoretical
 
--   Check the desired learning outcomes at the beginning of this unit. Try writing out the definitions given in your own words without looking at the textbook. Go through the exercises at the end of Chapter 1, using sections 1.6 and 1.7 for reference. Post to the Unit 1 discussion forum if you have questions. Check the Unit 1 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 1 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
+#### Types of ADTs
+
+##### Queue's
+Item's added and removed from a data structure in order.
+
+###### Deque (Double Ended Queue)
+interface: `addFirst | addLast | removeFirst | removeLast`  
+Can implement both LIFO and FIFO queues.
+
+###### FIFO (First in, First out)
+interface: `add queue addFirst | remove dequeue removeLast`
+
+###### Stack aka LIFO (Last in, First out)
+interface: `push addFirst | pop removeFirst`
+
+###### Priority Queue
+This queue has some kind of prioritization that occurs during the add method.  
+interface: `insert_with_priority | pop_next_priority_element deleteMin`
+
+##### List or sequence
+Lists essentially replace all the benefits of Queue's:
+
+![list deque and queue](img/list-deque-queue.png "list deque and queue")
+
+x_1,x_2,...,x_(n-1)
+ - `size()`: returns length of list
+ - `get(i)`: returns x_i
+ - `set(i, y)`: sets x_i to y
+ - `add(i, y)`: add x at position i, moving *x_i,...,x_(n−1)* => *x_(i+1),...,x_(n−1+1)*
+ - `remove(i)`: remove the value x_i, moving *x_(i+1),...,x_(n−1)* => *x_i),...,x_(n−1-1)*
+
+##### Sets
+
+###### Unordered Set (Uset or Mathematical Set)
+This is the basis of dictionaries or named arrays. Each item can be stored as a pair of items.
+
+- `size()`: return the number of elements in the set
+- `add(x)`: add the element x to the set if not already present. Return true if x was added to the set and false otherwise.
+- `remove(x)`: remove x from the set. Return x, or null if no such element exists.
+- `find(x)`: find x in the set if it exists. Return y, or null if no such element exists.
+
+
+###### Ordered Set (SSet)
+Only add and find are different.
+- `add(x)`: add element in sorted order
+- `find(x)`: Find smallest element y, such that y ≥ x. Return y or null if no such element exists.
+
+##### Containers
+Pointers to another object
+
+##### Graph
+
+### 1.3 Mathematical Background
+
+#### Exponentials
+
+#### Logarithms
+
+#### Factorials
+
+Stirling's Approximation
+
+#### Binomial Coefficients
+
+#### Sets and Set Membership
+
+* \(x \in A\): x is an element of A
+* \(B \subset A\): B is a subset of A
+
+#### Asymptotic Notation
+Upper and lower bounds of running time.
+Only takes into consideration the most powerful component.
+Any constant can be used to make the function larger or smaller to fit the bounds.
+
+Θ(g(n)) = {f(n): there exist positive constants \(c_1\) , \(c_1\), and \(n_0\) such that  
+\(c_2∙g(n) \geq f(n) \geq c_1∙g(n) \geq 0 for all n \geq n_0\)}
+- \(n_0\): minimum possible value
+- \(c_1\): constant that defines lower bound
+- \(c_2\): constant that defines upper bound
+
+Big O: Upper bound  
+Big \(\Omega\): Lower bound  
+Big \(\Theta\): Upper and lower bound  
+
+There are a few assumptions about the functions.
+
+- Asymptotically non-negative: only works in the positive quadrant
+
+Example of how to calculate constants & lower value: Intro to Alg(pg 46)
+
+$$
+c_{1}n^2 \leq \frac{1}{2}n^2 - 3n \leq c_{2}n^2
+$$
+
+For all \(n \geq n_0\). Dividing by n^2 yields
+
+$$
+c_{1} \leq \frac{1}{2} - \frac{3}{n} \leq c_{2}
+$$
+
+
+### 1.4 The Model of Computation
+TODO: apply a model of computation.
+
+#### RAM model (W-bit machine)
+
+Still don't understand how memory works in this model (w-bit word)
+
+How do we calculate algorithm costs?
+We use a model.
+The model is based on memory, operators, and pointers.
+
+1 processor: instructions are executed one after another  
+cells(RAM): holds a w-bit word  
+operations: arithmetic (add, subtract, multiply, divide, remainder, floor, ceiling)  
+- data movement (load, store, copy)
+- control (conditional and unconditional branch, subroutine call and return)
+
+Some of these assumptions are not true about computers, however, they are close enough to be useful without being overly complicated.
+The RAM model does not account for the memory hierarchy (cache, ram, drive)
+
+### 1.5 Properties used to analyse algorithms
+Algorithms are generally analysed based on Correctness, Time Complexity, and Space Complexity.
+TODO: apply correctness, time complexity, and space complexity to data structures and algorithms.
+
+#### Correctness
+Accuracy of the algorithm's result.  
+This is generally the highest concern of an algorithm since dependably calculating results is usually the most valuable feature of an algorithm. However, a less accurate algorithm may be useful for complicated problems where a accurate solution is too time consuming.
+
+#### Time Complexity
+The running time of an algorithm.  
+Next to accuracy, time complexity is the next most optimized property. Algorithms are most often compared based on this property since space is generally inexpensive, and correctness is usually assumed.
+
+- Worst-case running times
+: The slowest possible time an algorithm can take. ie. Bubble sorting a list that is in reverse sorted order.
+
+- Amortized running times
+: Worst case running time of a sequence of n actions.
+O(m) represents that if m operations are completed the total running time will not exceed O(m) even though a specific operation may be a larger order function.
+A good example of this is the resize operation within a deque, or list operation. Even though the resize operation is expensive it is performed in proportion to the number of other operations in the sequence.
+
+- Expected running times
+: A type of probabilistic analysis where a random dataset is used to determine an average running time based on randomized dataset.
+
+#### Space Complexity
+The amount of memory needed for an algorithm.  
+Except in specific cases space is not a large factor in the usefulness of an algorithm, since memory is relatively inexpensive compared to computing power and correctness.
 
 ## Unit 2: Array-Based Lists
 
-### Learning Outcomes
-
-After completing Unit 2, you should be able to
-
--   implement [List] interfaces.
--   implement [Queue] interfaces.
-
 ### Study Activities
+Study the following sections from Pat Morin's textbook:
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+#### 2.1 Array Stack
+Fast Stack Operations Using an Array
+FILO stack that is implemented using an array.
 
-2.1 ArrayStack: Fast Stack Operations Using an Array
+Add in the middle of an array:
+    1. check if array is long enough
+        1. resize if not big enough
+    1. move items over (for loop)
+    1. assign element
 
-2.2 FastArrayStack: An Optimized ArrayStack
+Remove for middle of array:
+    1. move items left starting at item right of the item to be removed (for loop)
+    1. check if array is too long
+        1. resize
 
-2.3 ArrayQueue: An Array-Based Queue
+2.2 FastArrayStack: An Optimized ArrayStack: 
+There are functions that are more efficient than for loops for copying and moving elements in an array.  
+C: `memcpy(d, s, n)` and `memmove(d, s, n)`  
+C++: `std :: copy(a0, a1, b)`  
+Java: `System.arraycopy(s,i,d,j,n)`  
 
-2.4 ArrayDeque: Fast Deque Operations Using an Array
+#### 2.3 Array Queue
+An Array-Based Queue
+FIFO queue implemented with an "unlimited" array.
+This array only ever has to be n elements long, where n is the number of items in the queue.
+This is accomplished by wrapping around the end point.
+This is accomplished using an integer to represent the first and last position of the queue.
+These positions are incremented and decremented as if they were part of an unlimitedly long queue.
+To find the index of first or last element a modulo over the size of the array is performed.
+Checking if the array is to large is accomplished by taking the delta of the first and last number and comparing it to the size of the array.
+The array is empty if the first and last positions are equal.
+Growing or shrinking the array is accomplished using by copying to a new array and resetting the index.
 
-2.5 DualArrayDeque: Building a Deque from Two Stacks
+#### 2.4 Array Deque
+Fast Deque Operations Using an Array
+By treating the Deque as an "unlimited length" array we can use the same wrapping technique to optimize the shifting by only every making the shortest shift.
+This is done by shifting on the left when the item to be shifted is on the left side and shifting on the right when the item is on the right side of centre.
+This optimizes for the smallest number of elements to be shifted.
 
-2.6 RootishArrayStack: A Space-Efficient Array Stack
+#### 2.5 Dual Array Deque
+Building a Deque from Two Stacks
 
-Go to Data Structure Visualizations at
-<http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
-the following:
+This is a fringe case that isn't actually useful in production. It is useful in order to show an implementation using two queues.
 
--   [Stack: Array Implementation](http://www.cs.usfca.edu/~galles/visualization/StackArray.html)
--   [Queue: Array Implementation](http://www.cs.usfca.edu/~galles/visualization/QueueArray.html)
+#### 2.6 RootishArrayStack: A Space-Efficient Array Stack
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the discussion and exercises at the end of Chapter 2; use the Unit 2 outcomes as a focus for your activities. Post to the Unit 2 discussion forum if you have questions. Check the Unit 2 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 1 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
+The benefit of this structure is reduced size.
+
+An array of array's n deep. Each sub-array has b elements where b is the block number.
+
+  | 123456
+--|-------
+0 | x
+1 | xx
+2 | xxx
+
+Because of the complicated structure finding any given item is more complicated since each index needs to be translated into a block and item index.
+
+The block and the item both require equations to find.
+
+### Questions
+
+TODO: ask about how to "Test the performance"
+    In Exercise 2.9 it says to "Test the performance of your implementation against the ArrayDeque." This has not been covered in the course so far and I'm wondering how/where to learn this.
+
+TODO: implement [List] interfaces.
+TODO: implement [Queue] interfaces.
+TODO: Go through the discussion and exercises at the end of Chapter 2; use the Unit 2 outcomes as a focus for your activities.
 
 ## Unit 3: Linked Lists
 
 ### Learning Outcomes
 
-After completing Unit 3, you should be able to
-
--   implement singly-linked lists.
--   implement doubly-linked lists.
--   implement space-efficient linked lists.
+- implement singly-linked lists.
+- implement doubly-linked lists.
+- implement space-efficient linked lists.
 
 ### Study Activities
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+#### 3.1 SLList: A Singly-Linked List
 
-3.1 SLList: A Singly-Linked List
+#### 3.2 DLList: A Doubly-Linked List
 
-3.2 DLList: A Doubly-Linked List
+#### 3.3 SEList: A Space-Efficient Linked List
 
-3.3 SEList: A Space-Efficient Linked List
-
+### Excercises
 Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Stack: Linked List Implementation](http://www.cs.usfca.edu/~galles/visualization/StackLL.html)
--   [Queues: Linked List Implementation](http://www.cs.usfca.edu/~galles/visualization/QueueLL.html)
--   Lists: Array Implementation (available in [Java](http://www.cs.usfca.edu/~galles/visualization/java/visualization.html) version)
--   Lists: Linked List Implementation (available in [Java](http://www.cs.usfca.edu/~galles/visualization/java/visualization.html) version)
+- [Stack: Linked List Implementation](http://www.cs.usfca.edu/~galles/visualization/StackLL.html)
+- [Queues: Linked List Implementation](http://www.cs.usfca.edu/~galles/visualization/QueueLL.html)
+- Lists: Array Implementation (available in [Java](http://www.cs.usfca.edu/~galles/visualization/java/visualization.html) version)
+- Lists: Linked List Implementation (available in [Java](http://www.cs.usfca.edu/~galles/visualization/java/visualization.html) version)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the discussion and exercises at the end of Chapter 3; use the Unit 3 outcomes as a focus for your activities. Post to the Unit 3 discussion forum if you have questions. Check the Unit 3 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 1 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
+### Review
+- Check the desired learning outcomes at the beginning of this unit. Go through the discussion and exercises at the end of Chapter 3; use the Unit 3 outcomes as a focus for your activities. Post to the Unit 3 discussion forum if you have questions. Check the Unit 3 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 1 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 4: Skiplists
 
 ### Learning Outcomes
 
-After completing Unit 4, you should be able to
-
--   implement skiplists.
+- implement skiplists.
 
 ### Study Activities
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+#### 4.1 The Basic Structure
 
-4.1 The Basic Structure
+#### 4.2 SkiplistSSet: An Efficient SSet
 
-4.2 SkiplistSSet: An Efficient SSet
+#### 4.3 SkiplistList: An Efficient Random-Access List
 
-4.3 SkiplistList: An Efficient Random-Access List
+#### 4.4 Analysis of Skiplists
 
-4.4 Analysis of Skiplists
-
--   Check the desired learning outcomes at the beginning of this unit. Go through the discussion and exercises at the end of Chapter 4; use the Unit 4 outcomes as a focus for your activities. Post to the Unit 4 discussion forum if you have questions. Check the Unit 4 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
+### Review
+- Check the desired learning outcomes at the beginning of this unit. Go through the discussion and exercises at the end of Chapter 4; use the Unit 4 outcomes as a focus for your activities. Post to the Unit 4 discussion forum if you have questions. Check the Unit 4 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
 
 ## Assignment 1 (due Dec 23rd, 2017)
+min 50%, worth 20%
 
-Assignment 1 is due.
+Answer question 1, question 2, and any other 2 questions from questions 3 to 6 – maximum 100 marks. You must score at least 50 to pass the assignment.
+
+1. (25 + 15 = 40 marks) You have learned some fundamental data structure concepts such as array, queue and priority queue, stack, list and linked list, sequence, and unordered set, and you understand the concept of interface or abstract data type that defines the set of operations supported by a data structure and the semantics, or meaning, of those operations. You can use the interface of one particular data structure to define or implement the operations of a different data structure.
+    a. (25 marks total) Describe the meaning of the essential methods add(x), deleteMin(), and size() that are supported by the priority queue interface (5 marks). Implement those methods using a singly-linked list (5 marks for each method). Analyze the running time of the add(x) and deletMin() operations based on this implementation (5 marks).
+    b. (15 marks total) Implement the stack methods push(x) and pop() using two queues (5 marks for each method). Analyze the running time of the push(x) and pop() operations based on this implementation (5 marks).
+2. (10 + 10 = 20 marks) Swap two adjacent elements in a list by adjusting only the links (and not the data) using
+    a. singly-linked list (10 marks).
+    b. doubly-linked list (10 marks).
+3. (20 marks) Exercise 1.5. Using a USet, implement a Bag. A Bag is like a USet—it supports the add(x), remove(x), and find(x) methods—but it allows duplicate elements to be stored. The find(x) operation in a Bag returns some element (if any) that is equal to x. In addition, a Bag supports the findAll(x) operation that returns a list of all elements in the Bag that are equal to x.
+4. (20 marks) Exercise 2.3. Design and implement a RandomQueue. This is an implementation of the Queue interface in which the remove() operation removes an element that is chosen uniformly at random among all the elements currently in the queue. (Think of a RandomQueue as a bag in which we can add elements or reach in and blindly remove some random element.) The add(x) and remove() operations in a RandomQueue should run in constant time per operation.
+5. (20 marks) Exercise 3.12. Write a method, reverse(), that reverses the order of elements in a DLList.
+6. (20 marks) Exercise 3.14. Design and implement a MinStack data structure that can store comparable elements and supports the stack operations push(x), pop(), and size(), as well as the min() operation, which returns the minimum value currently stored in the data structure. All operations should run in constant time.
 
 ## Unit 5: Hash Tables
 
@@ -427,14 +397,14 @@ Assignment 1 is due.
 
 After completing Unit 5, you should be able to
 
--   explain hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
--   estimate the effectiveness of hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
--   differentiate between various hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
--   recognize various collision resolution algorithms—open addressing (linear probing, quadratic probing, double hashing), separate chaining (normal, with list heads, with other data structures), coalesced hashing, robin hood hashing, cuckoo hashing, hopscotch hashing, dynamic resizing (resizing the whole, incremental resizing).
--   implement hash tables.
--   implement collision detection in hash tables.
--   analyze collision detection in hash tables.
--   develop hash codes.
+- explain hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
+- estimate the effectiveness of hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
+- differentiate between various hash functions (division, multiplication, folding, radix transformation, digit rearrangement, length-dependent, mid-square).
+- recognize various collision resolution algorithms—open addressing (linear probing, quadratic probing, double hashing), separate chaining (normal, with list heads, with other data structures), coalesced hashing, robin hood hashing, cuckoo hashing, hopscotch hashing, dynamic resizing (resizing the whole, incremental resizing).
+- implement hash tables.
+- implement collision detection in hash tables.
+- analyze collision detection in hash tables.
+- develop hash codes.
 
 ### Study Activities
 
@@ -462,7 +432,7 @@ In practice, hashing gives [*O*(1)] access time to a data item in
 the table, but in theory the worst case offers [*O*(n)] for
 access time.
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226) on key topics in
+Study the following sections from Pat Morin's textbook on key topics in
 hashing before looking at the more detailed notes below:
 
 5.1 ChainedHashTable: Hashing with Chaining
@@ -520,13 +490,13 @@ storage locations in the table. We’ll assume that the corresponding raw
 data would be stored in a separate array corresponding to these hash
 values.
 
-  --- --- --- --- --- --- --- --- --- --- ----
+  - -- --- --- --- --- --- --- --- --- --- ----
   0   1   2   3   4   5   6   7   8   9   10
-  --- --- --- --- --- --- --- --- --- --- ----
+  - -- --- --- --- --- --- --- --- --- --- ----
 
-  -------- -------- -------- ------- ------- -------- -------- -------- -------- -------- --------
+  - ------- -------- -------- ------- ------- -------- -------- -------- -------- -------- --------
   **33**   **56**   **24**   **2**   **4**   **45**   **−1**   **−1**   **19**   **−1**   **−1**
-  -------- -------- -------- ------- ------- -------- -------- -------- -------- -------- --------
+  - ------- -------- -------- ------- ------- -------- -------- -------- -------- -------- --------
 
 As you can see from the resulting table, keys 2 and 45 are not stored in
 slots suggested by the hash function because those slots were already
@@ -689,10 +659,10 @@ For example, if our key is 1234567, we might select the digits in
 positions 2 through 4, yielding 234. The manipulation can then take many
 forms:
 
--   reversing the digits – 432, resulting in a key of 1432567
--   performing a circular shift to the right – 423, resulting in a key of 1423567
--   performing a circular shift to the left – 342, resulting in a key of 1342567
--   swapping each pair of digits – 324, resulting in a key of 1324567.
+- reversing the digits – 432, resulting in a key of 1432567
+- performing a circular shift to the right – 423, resulting in a key of 1423567
+- performing a circular shift to the left – 342, resulting in a key of 1342567
+- swapping each pair of digits – 324, resulting in a key of 1324567.
 
 ### Length-Dependent Hashing
 
@@ -929,7 +899,7 @@ This web page also introduces you to coalesced hashing, Robin Hood
 hashing, cuckoo hashing, and hopscotch hashing, which may help you
 understand how they differ from each other.
 
--   Check the desired learning outcomes at the beginning of this unit. Using the Unit 5 outcomes for guidance, try writing out the definitions given in your own words without looking at the textbook. Go through the exercises at the end of Chapter 5; use the Unit 5 outcomes as a focus for your activities. Post to the Unit 5 discussion forum if you have questions. Check the Unit 5 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
+- Check the desired learning outcomes at the beginning of this unit. Using the Unit 5 outcomes for guidance, try writing out the definitions given in your own words without looking at the textbook. Go through the exercises at the end of Chapter 5; use the Unit 5 outcomes as a focus for your activities. Post to the Unit 5 discussion forum if you have questions. Check the Unit 5 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 6: Recursion
 
@@ -937,11 +907,11 @@ understand how they differ from each other.
 
 After completing Unit 6, you should be able to
 
--   define *recursion*.
--   inspect recursive programs.
--   create different types of recursive programs.
--   differentiate recursive solutions from iterative solutions.
--   estimate the time complexity of recursive programs.
+- define *recursion*.
+- inspect recursive programs.
+- create different types of recursive programs.
+- differentiate recursive solutions from iterative solutions.
+- estimate the time complexity of recursive programs.
 
 ### Study Activities
 
@@ -1229,11 +1199,11 @@ Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Recursive Factorial](http://www.cs.usfca.edu/~galles/visualization/RecFact.html)
--   [Recursive Reverse](http://www.cs.usfca.edu/~galles/visualization/RecReverse.html)
--   [Recursive N-Queens](http://www.cs.usfca.edu/~galles/visualization/RecQueens.html)
+- [Recursive Factorial](http://www.cs.usfca.edu/~galles/visualization/RecFact.html)
+- [Recursive Reverse](http://www.cs.usfca.edu/~galles/visualization/RecReverse.html)
+- [Recursive N-Queens](http://www.cs.usfca.edu/~galles/visualization/RecQueens.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Try the suggested activities. Post to the Unit 6 discussion forum if you have questions. Check the Unit 6 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
+- Check the desired learning outcomes at the beginning of this unit. Try the suggested activities. Post to the Unit 6 discussion forum if you have questions. Check the Unit 6 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2 on the course home page—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 7: Binary Trees
 
@@ -1241,15 +1211,15 @@ the following:
 
 After completing Unit 7, you should be able to
 
--   define *binary tree*.
--   define *binary search tree*.
--   examine a binary tree and binary search tree.
--   implement a binary tree and binary search tree.
--   define *AVL tree*.
+- define *binary tree*.
+- define *binary search tree*.
+- examine a binary tree and binary search tree.
+- implement a binary tree and binary search tree.
+- define *AVL tree*.
 
 ### Study Activities
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following sections from Pat Morin's textbook:
 
 6.1 BinaryTree: A Basic Binary Tree
 
@@ -1292,10 +1262,10 @@ Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Binary Search Tree](http://www.cs.usfca.edu/~galles/visualization/BST.html)
--   [AVL Tree (balanced binary search trees)](http://www.cs.usfca.edu/~galles/visualization/AVLtree.html)
+- [Binary Search Tree](http://www.cs.usfca.edu/~galles/visualization/BST.html)
+- [AVL Tree (balanced binary search trees)](http://www.cs.usfca.edu/~galles/visualization/AVLtree.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 6; use the Unit 7 outcomes as a focus for your activities. Post to the Unit 7 discussion forum if you have questions. Check the Unit 7 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2—how much can you do at this point? Plan to revise your attempts before your final submission.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 6; use the Unit 7 outcomes as a focus for your activities. Post to the Unit 7 discussion forum if you have questions. Check the Unit 7 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 2—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 8: Scapegoat Trees
 
@@ -1303,21 +1273,20 @@ the following:
 
 After completing Unit 8, you should be able to
 
--   define *scapegoat tree*.
--   examine a scapegoat tree.
--   implement a scapegoat tree.
+- define *scapegoat tree*.
+- examine a scapegoat tree.
+- implement a scapegoat tree.
 
 ### Study Activities
 
-Study the following chapter from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following chapter from Pat Morin’s textbook:
 
 Chapter 8 Scapegoat Trees
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 8; use the Unit 8 outcomes as a focus for your activities. Post to the Unit 8 discussion forum if you have questions. Check the Unit 8 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 8; use the Unit 8 outcomes as a focus for your activities. Post to the Unit 8 discussion forum if you have questions. Check the Unit 8 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
 
 ## Assignment 2 (due Dec 30th, 2017)
-
-Assignment 2 is due.
+min 50%, worth 20%
 
 ## Unit 9: Red–Black Trees
 
@@ -1325,13 +1294,13 @@ Assignment 2 is due.
 
 After completing Unit 9, you should be able to
 
--   define *red–black tree.*
--   examine a red–black tree.
--   implement a red–black tree.
+- define *red–black tree.*
+- examine a red–black tree.
+- implement a red–black tree.
 
 ### Study Activities
 
-Study the following chapter from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following chapter from Pat Morin’s textbook:
 
 Chapter 9 Red–Black Trees
 
@@ -1339,9 +1308,9 @@ Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Red–Black Tree](http://www.cs.usfca.edu/~galles/visualization/RedBlack.html)
+- [Red–Black Tree](http://www.cs.usfca.edu/~galles/visualization/RedBlack.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 9; use the Unit 9 outcomes as a focus for your activities. Post to the Unit 9 discussion forum if you have questions. Check the Unit 9 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission. It is important to understand and demonstrate the differences between AVL trees, red–black trees, and (2,4) trees in terms of the key properties of these trees; the process of adding or removing nodes in the trees while maintaining these key properties with appropriate operations; and running time or cost to maintain the properties.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 9; use the Unit 9 outcomes as a focus for your activities. Post to the Unit 9 discussion forum if you have questions. Check the Unit 9 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission. It is important to understand and demonstrate the differences between AVL trees, red–black trees, and (2,4) trees in terms of the key properties of these trees; the process of adding or removing nodes in the trees while maintaining these key properties with appropriate operations; and running time or cost to maintain the properties.
 
 ## Unit 10: Heaps
 
@@ -1349,11 +1318,11 @@ the following:
 
 After completing Unit 10, you should be able to
 
--   define *heap.*
--   examine a binary heap tree.
--   implement a binary heap tree.
--   define *meldable heap.*
--   examine a randomized meldable heap.
+- define *heap.*
+- examine a binary heap tree.
+- implement a binary heap tree.
+- define *meldable heap.*
+- examine a randomized meldable heap.
 
 ### Study Activities
 
@@ -1378,7 +1347,7 @@ properties.
 
 The *binary heap* is a special case of the d-ary heap in which d = 2.
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following sections from Pat Morin's textbook:
 
 10.1 BinaryTree: An Implicit Binary Tree
 
@@ -1388,13 +1357,13 @@ Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Min Heap](http://www.cs.usfca.edu/~galles/visualization/Heap.html)
--   [Binomial Queue](http://www.cs.usfca.edu/~galles/visualization/BinomialQueue.html)
--   [Fibonacci Heap](http://www.cs.usfca.edu/~galles/visualization/FibonacciHeap.html)
--   [Leftist Heap](http://www.cs.usfca.edu/~galles/visualization/LeftistHeap.html)
--   [Skew Heap](http://www.cs.usfca.edu/~galles/visualization/SkewHeap.html)
+- [Min Heap](http://www.cs.usfca.edu/~galles/visualization/Heap.html)
+- [Binomial Queue](http://www.cs.usfca.edu/~galles/visualization/BinomialQueue.html)
+- [Fibonacci Heap](http://www.cs.usfca.edu/~galles/visualization/FibonacciHeap.html)
+- [Leftist Heap](http://www.cs.usfca.edu/~galles/visualization/LeftistHeap.html)
+- [Skew Heap](http://www.cs.usfca.edu/~galles/visualization/SkewHeap.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 10; use the Unit 10 outcomes as a focus for your activities. Post to the Unit 10 discussion forum if you have questions. Check the Unit 10 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 10; use the Unit 10 outcomes as a focus for your activities. Post to the Unit 10 discussion forum if you have questions. Check the Unit 10 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 11: Sorting Algorithms
 
@@ -1402,13 +1371,13 @@ the following:
 
 After completing Unit 11, you should be able to
 
--   describe sorting algorithms (merge, quick, heap, counting, radix).
--   estimate the complexity of sorting algorithms.
--   compare sorting algorithms.
+- describe sorting algorithms (merge, quick, heap, counting, radix).
+- estimate the complexity of sorting algorithms.
+- compare sorting algorithms.
 
 ### Study Activities
 
-Study the following chapter from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following chapter from Pat Morin's textbook:
 
 Chapter 11 Sorting Algorithms
 
@@ -1416,19 +1385,19 @@ Go to Data Structure Visualizations at
 <http://www.cs.usfca.edu/~galles/visualization/Algorithms.html>, and try
 the following:
 
--   [Comparison Sorting Algorithms](http://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html)
-    -   Bubble Sort
-    -   Selection Sort
-    -   Insertion Sort
-    -   Shell Sort
-    -   Merge Sort
-    -   Quck Sort
--   [Bucket Sort](http://www.cs.usfca.edu/~galles/visualization/BucketSort.html)
--   [Counting Sort](http://www.cs.usfca.edu/~galles/visualization/CountingSort.html)
--   [Radix Sort](http://www.cs.usfca.edu/~galles/visualization/RadixSort.html)
--   [Heap Sort](http://www.cs.usfca.edu/~galles/visualization/HeapSort.html)
+- [Comparison Sorting Algorithms](http://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html)
+    - Bubble Sort
+    - Selection Sort
+    - Insertion Sort
+    - Shell Sort
+    - Merge Sort
+    - Quck Sort
+- [Bucket Sort](http://www.cs.usfca.edu/~galles/visualization/BucketSort.html)
+- [Counting Sort](http://www.cs.usfca.edu/~galles/visualization/CountingSort.html)
+- [Radix Sort](http://www.cs.usfca.edu/~galles/visualization/RadixSort.html)
+- [Heap Sort](http://www.cs.usfca.edu/~galles/visualization/HeapSort.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 11; use the Unit 11 outcomes as a focus for your activities. Post to the Unit 11 discussion forum if you have questions. Check the Unit 11 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 11; use the Unit 11 outcomes as a focus for your activities. Post to the Unit 11 discussion forum if you have questions. Check the Unit 11 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful. Look at Assignment 3—how much can you do at this point? Plan to revise your attempts before your final submission.
 
 ## Unit 12: Graphs
 
@@ -1436,15 +1405,15 @@ the following:
 
 After completing Unit 12, you should be able to
 
--   represent a graph by a matrix
--   represent a graph in adjacency lists
--   understand the execution process of the depth-first-search and bread-first-search algorithms for traversing a graph
--   analyze the performance of the depth-first-search and bread-first-search algorithms for traversing a graph
--   implement those search algorithms for traversing a graph in pseudo-code or other programming languages, such as Java, C, or C++, etc.
+- represent a graph by a matrix
+- represent a graph in adjacency lists
+- understand the execution process of the depth-first-search and bread-first-search algorithms for traversing a graph
+- analyze the performance of the depth-first-search and bread-first-search algorithms for traversing a graph
+- implement those search algorithms for traversing a graph in pseudo-code or other programming languages, such as Java, C, or C++, etc.
 
 ### Study Activities
 
-Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following sections from Pat Morin's textbook:
 
 12.1 AdjacencyMatrix: Representing a Graph by a Matrix
 
@@ -1454,17 +1423,17 @@ Study the following sections from [Pat Morin’s textbook](http://www.aupress.ca
 
 Go to Data Structure Visualizations at http://www.cs.usfca.edu/~galles/visualization/Algorithms.html, and try the following:
 
--   [Breadth-First Search](http://www.cs.usfca.edu/~galles/visualization/BFS.html)
--   [Depth-First Search](http://www.cs.usfca.edu/~galles/visualization/DFS.html)
--   [Connected Components](http://www.cs.usfca.edu/~galles/visualization/ConnectedComponent.html)
--   [Dijkstra Shortest Path](http://www.cs.usfca.edu/~galles/visualization/Dijkstra.html)
--   [Prim Minimum Cost Spanning Treeh](http://www.cs.usfca.edu/~galles/visualization/Prim.html)
--   [Topological Sort (Indegree)](http://www.cs.usfca.edu/~galles/visualization/TopoSortIndegree.html)
--   [Topological Sort (DFS)](http://www.cs.usfca.edu/~galles/visualization/TopoSortDFS.html)
--   [Floyd-Warshall All-Pairs Shortest Path](http://www.cs.usfca.edu/~galles/visualization/Floyd.html)
--   [Kruskal Minimum Cost Spanning Treeh](http://www.cs.usfca.edu/~galles/visualization/Kruskal.html)
+- [Breadth-First Search](http://www.cs.usfca.edu/~galles/visualization/BFS.html)
+- [Depth-First Search](http://www.cs.usfca.edu/~galles/visualization/DFS.html)
+- [Connected Components](http://www.cs.usfca.edu/~galles/visualization/ConnectedComponent.html)
+- [Dijkstra Shortest Path](http://www.cs.usfca.edu/~galles/visualization/Dijkstra.html)
+- [Prim Minimum Cost Spanning Treeh](http://www.cs.usfca.edu/~galles/visualization/Prim.html)
+- [Topological Sort (Indegree)](http://www.cs.usfca.edu/~galles/visualization/TopoSortIndegree.html)
+- [Topological Sort (DFS)](http://www.cs.usfca.edu/~galles/visualization/TopoSortDFS.html)
+- [Floyd-Warshall All-Pairs Shortest Path](http://www.cs.usfca.edu/~galles/visualization/Floyd.html)
+- [Kruskal Minimum Cost Spanning Treeh](http://www.cs.usfca.edu/~galles/visualization/Kruskal.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 12; use the Unit 12 outcomes as a focus for your activities. Post to the Unit 12 discussion forum if you have questions. Check the Unit 12 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 12; use the Unit 12 outcomes as a focus for your activities. Post to the Unit 12 discussion forum if you have questions. Check the Unit 12 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
 
 ## Unit 13: Binary Trie
 
@@ -1472,27 +1441,58 @@ Go to Data Structure Visualizations at http://www.cs.usfca.edu/~galles/visualiza
 
 After completing Unit 13, you should be able to
 
--   define *trie*. examine a binary trie.
--   explain binary trie.
+- define *trie*. examine a binary trie.
+- explain binary trie.
 
 ### Study Activities
 
-Study the following section from [Pat Morin’s textbook](http://www.aupress.ca/index.php/books/120226):
+Study the following section from Pat Morin's textbook:
 
 13.1 Binary Trie: A Digital Search Tree
 
 Go to Data Structure Visualizations at http://www.cs.usfca.edu/~galles/visualization/Algorithms.html, and try the following:
 
--   [B Trees](http://www.cs.usfca.edu/~galles/visualization/BTree.html)
--   [B+ Trees](http://www.cs.usfca.edu/~galles/visualization/BPlusTree.html)
+- [B Trees](http://www.cs.usfca.edu/~galles/visualization/BTree.html)
+- [B+ Trees](http://www.cs.usfca.edu/~galles/visualization/BPlusTree.html)
 
--   Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 13; use the Unit 13 outcomes as a focus for your activities. Post to the Unit 13 discussion forum if you have questions. Check the Unit 13 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
+- Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 13; use the Unit 13 outcomes as a focus for your activities. Post to the Unit 13 discussion forum if you have questions. Check the Unit 13 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
+
+## Interesting Algorithms
+### Fisher-Yates shuffle
+https://blog.codinghorror.com/the-danger-of-naivete/
+
+```java
+int[] cards = {1-n}; // cards from 1 to n
+
+for (int i = cards.Length - 1; i > 0; i--) {
+    int n = rand.Next(i + 1);
+    Swap(ref cards[i], ref cards[n]);
+}
+```
+
+Randomly swaps the last card with itself or any card smaller.
+Randomly swaps the second last card with itself or any card smaller.
+Continues until the second smallest card.
 
 ## Assignment 3 (due Jan 6th, 2017)
-
-It's time to submit Assignment 3.
+min 50%, worth 20%
 
 ## Final Exam (due Jan 23rd, 2017)
+min 50%, worth 40%
+So, I wrote the exam. It was fair and reasonably challenging. The sample exam is a good starting point to help you get started with your studying.
 
-It’s time to write the final exam. You may find it helpful to do the
-sample exam as practice.
+My preparation strategy was the following:
+
+1. Reviewed (re-read) all the chapters. It didn't take a whole lot of time the second time through because I didn't have to think through all the details this time, and, I was even better able to skip the mathematical proofs (the only thing I ever looked for was the running time information ;).
+
+2. Reviewed my three assignments. Of course, the way I did my assignments is that I wrote a paragraph (or more) for each question, every time. This meant that my assignments were suitable for studying purposes.
+
+3. Reviewed binary trees since the entire second half of the course used binary trees and the different types of traversal/search techniques.
+
+Oh, and I did of course spend some time looking at the sample exam.
+
+Caution: this worked for me. I make no guarantee that it'll work for you. Ultimately, the approach prepared me reasonably well (I think). The exam tests a multitude of things: your understanding of how to apply algorithms (not overly complicated ones, mind you but certainly ones that get to the heart of the concepts); your ability to describe the operation of an algorithm; your understanding of how some commonly used structures operate; and, of course, the obligatory knowledge and understanding factoids that an exam might test.
+
+In terms of the actual writing, time yourself. I've always been one to take a few moments and decide how much time to allot to each section on the exam. This one was no different. For example, based on points the multiple choice was worth 72 minutes. It took me the better part of 75 minutes to work my way through the multiple choice.
+
+Oh, bring a favourite collection of pens, pencils and erasers and ask for a few sheets of scrap paper to work on (obviously you can't bring your own paper). Unless you have absolutely amazing memory you will be up a creek without a paddle if you don't have paper to write on.

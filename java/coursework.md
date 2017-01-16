@@ -407,10 +407,13 @@ When two variables are assigned the same object they are assigned the same insta
 For primitives this means making a replica of the data point.
 For Objects this means making a replica of the **pointer**.<a name="object-assignment"></a>
 
-Declare constants using `final` modifier
+Declare constants using `final static` modifiers by default.
 
 ### Objects
 #### Class Modifiers
+
+Best practice: default to `private`, then `protected`, then `package-protected`, then `public`.
+
 Access control modifiers:
 - default without any modifier (package-private): restricts access to within the same package
 - public: an element with this modifier can be accessed from anywhere by any class or method
@@ -816,6 +819,21 @@ export CLASSPATH=.:/usr/local/java/lib:/usr/netscape/classes
 #### Adapter
 #### Position
 #### Iterator
+A nested that iterates through the elements of a class.
+
+The class needs to implement `java.util.Iterable`.
+Iterable has a method `iterable()` which returns an `java.util.Iterator`.
+`Iterator` is a class, usually a nested class that implements `java.util.Iterator`.
+
+This is a complicated way to reliably get an object on which you can call:
+```
+Obj<E> obj = new Obj;
+Iterator<E> objIter = obj.iterator();
+
+boolean nextExists = objIter.hasNext();
+E nextElement = obj.next();
+```
+
 #### Factory Method
 #### Comparator
 #### Locator
@@ -3896,13 +3914,10 @@ Compile, run, and analyze programs:
 ## Unit 10: Annotations and Java Documentation
 
 ### Unit Purpose
-This unit introduces annotation and metadata, Java
-documentation, and deployment issues of Java applications.
+This unit introduces annotation and metadata, Java documentation, and deployment issues of Java applications.
 
 ### Section 1: Annotations
-**Section goal**: This section explains a formalized way to add
-information to your Java codes so that you can use easily use the data
-later.
+**Section goal**: This section explains a formalized way to add information to your Java codes so that you can use easily use the data later.
 
 #### Learning Objective 1
 -   Discussthe basic idea and syntax of annotation.

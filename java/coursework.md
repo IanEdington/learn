@@ -907,74 +907,21 @@ public class clonableClass implements Cloneable {
 - 
 
 ## Unit 0: Introducing the Java Platform
-### Section 1: Annotations and Java Documentation
+### All assignments must:
+Java 6 was the current version of Java when this course was created.
+However, all assignments must compile and run with Java 5.
+If you want to use a feature of Java 6 (plus) you need to inform your tutor.
 
-**Section Goal and Notes:** Learn about the basics of Java versions and
-Java development environment.
+### The Java platform
+Completely abstracted hardware.
+The JVM is built for each environment but once it's built everything else runs on top of it.
 
-The current Java version is Java 6; however this course will require a
-minimum of Java version 5. Java 5 was originally called Java 1.5 and
-this causes some confusion; we will refer to this version of Java as
-Java 5 throughout the course. All programs you submit as assignments
-must compile and run with Java 5. In case you are planning to use
-features in Java 6, you must inform your tutor in advance. Although Java
-is backward compatible with earlier versions, deprecated (outdated)
-methods should not be used. You must get your approval from your tutor
-in case of absolute necessity.
-
-You must download [Java Development Kit (JDK)](http://scis.athabascau.ca/virtualhelpdesk/topics/java_help/) from
-Sun. Do not mix up JDK with JRE. While there are various other products
-on the market which *may* serve the purpose, it is your responsibility
-to ensure the platform you choose supports Java 5 features.
-
-If you are not familiar with the Java language, we recommend using JDK
-alone. For JDK the only tools that are absolutely necessary to complete
-the course are the javac compiler and the java interpreter. Both of them
-run in the command prompt.
-
-If you are planning to use an IDE (integrated design environment), do
-not expect your tutor to be able to support it. There are so many IDEs
-on the market that no one person is able to support all of them. You
-will find a list of a few popular IDEs in Unit 1 Section 2 for your
-reference. Remember, the primary purpose of this course is to learn the
-Java language, not IDEs.
-
-### Section 2: Java Language and Platform
-**Section Goal: ** Describe the Java language and the various components
-of the Java platform.
-
-#### Learning Objective 1: Describe the Java language and platform. and the Java platform.
-
-##### Readings
-**Required:**
--   [About the Java Technology](http://library.athabascau.ca/drr/redirect.php?id=8121)
-
-##### Exercises
-**Questions**
-1.  What buzzwords can be used to describe the Java language?
-2.  What is the Java platform?
-
-#### Learning Objective 2: Describe key features of the Java platform.
-
-##### Readings
-**Required:**
--   [What Can Java Technology Do? (1 page)](http://library.athabascau.ca/drr/redirect.php?id=8122)
-
-##### Exercises
-**Questions**
-1.  How does the Java API support many kinds of programs?
-
-#### Learning Objective 3: Outline the advantages of Java.
-
-##### Readings
-**Required:**
--   [How will Java technology change my life?](http://library.athabascau.ca/drr/redirect.php?id=8123)
-
-##### Exercises
-**Questions**
-1.  What are the advantages of Java?
-
-
+### Memory allocation
+Memory allocation and garbage collection is done using a multi-generational approach.
+Objects are allocated quickly by bumping a pointer by the fixed amount and returning the location.
+This is done in a "young" generation heap also called the nursery.
+Once the nursery is full objects that are still in use are moved to a second generation heap and the nursery pointer is returned to the start of the nursery.
+Since most objects are extremely short lived this strategy allows for quickly allocating and overwriting objects without much movement of objects.
 
 ## Unit 1: Getting Started with the Java Programming Language
 ### Unit Purpose

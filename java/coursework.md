@@ -924,161 +924,148 @@ Once the nursery is full objects that are still in use are moved to a second gen
 Since most objects are extremely short lived this strategy allows for quickly allocating and overwriting objects without much movement of objects.
 
 ## Unit 1: Getting Started with the Java Programming Language
-### Unit Purpose
-Design, develop, implement and run a simple
-Java application. This unit provides a bit of hands-on experience with
-Java programs especially for the complete novice before the course gets
-into the intricacies of Java programming.
+### Tools of the JDK
+javac - compiles code
+java - runs code
+javas- reveals source code
 
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended).
+Every java program starts with a main method: 
 
-### Digital Reading Room
--   [A Checklist](http://library.athabascau.ca/drr/redirect.php?id=11428) [A Checklist](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27614)
--   [Creating Your First Application](http://library.athabascau.ca/drr/redirect.php?id=11480)
-  [Creating Your First Application](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27615)
--   [A Closer Look at Hello World Application](http://library.athabascau.ca/drr/redirect.php?id=11482)
-  [A Closer Look at Hello World Application](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27616)
-0i-   [Getting Started with Applets](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27617)
-0i-i   [Applets](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27618)
--   [NetBeans IDE](http://library.athabascau.ca/drr/redirect.php?id=24566) [NetBeans IDE](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27619)
--   [JCreator](http://library.athabascau.ca/drr/redirect.php?id=24567) [JCreator](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27620)
--   [Borland JBuider](http://library.athabascau.ca/drr/redirect.php?id=24568) [Borland JBuider](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27621)
--   [BlueJ](http://library.athabascau.ca/drr/redirect.php?id=24569) [BlueJ](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27622)
--   [JGrasp](http://library.athabascau.ca/drr/redirect.php?id=24570) [JGrasp](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27623)
--   [Eclipse](http://library.athabascau.ca/drr/redirect.php?id=24571) [Eclipse](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27624)
-
-
-### Section 1: Java Applets and Applications
-**Section Goal:**  Compile and run a simple Java application using the
-Sun JDK.
-
-#### Learning Objective 1: Confirm that the necessary tools are in place for your first Java Application using the JDK.
-
-##### Readings
-**Required:**
--   [A Checklist](http://library.athabascau.ca/drr/redirect.php?id=11428)
-
-**Note**: The current version as posted by Sun is Java 6. Java 6 will
-not affect the content of the course and the textbook.
-
-##### Exercises
-Review the checklist and install the software if necessary.
-
-#### Learning Objective 2: Create, compile, and run your first Java application using the JDK.
-
-##### Readings
-**Required:**
--   [Creating Your First Application](http://library.athabascau.ca/drr/redirect.php?id=11480)
-
-##### Exercises
-Complete the reading instructions.
-
-#### Learning Objective 3: Review creating Java applications.
-
-##### Readings
-**Required:**
--   [A Closer Look at Hello World Application](http://library.athabascau.ca/drr/redirect.php?id=11482)
-
-##### Exercises
-**Questions**
-
-1.  What is the skeleton for any Java program?
-2.  What is the entry point for any Java application?
-3.  What is the function of the import statement?
-
-### Section 2: (Optional) Introduces popular Java IDEs
-**Section Goal and Note**: This section briefly describes the idea of an
-IDE. Notice that the use of an IDE is entirely optional in this course.
-As noted below it takes time to learn both an IDE and Java at the same
-time. Students is advised to use discretion choosing an IDE.
-
-IDE (Integrated Development Environment) is a software tool to assist in
-the development of a software product. An IDE normally consists of a
-source code editor, debugger and compiler/interpreter as well as many
-automated tools. It is usually a good idea to use an IDE for a software
-project as it will reduce coding time and helps to maintain a certain
-consistency of the software. However, just as with any other software
-tool, it takes time to learn to use an IDE. A student who plans to learn
-both Java and the IDE must allow sufficient time in the studies. Do not
-confuse features of an IDE with features of Java.
-
-You will find a list of IDEs at the end of Unit links.
-
+    public static void main(String[] args) {}
 
 ## Unit 2: Object Oriented Programming with Java
-### Unit Purpose
-Describe the basics of object-oriented programming
-with Java.
 
-### Conferencing
+### Languages in General
+All languages are abstraction
+    LISP: all problems can be broken down to lists
+    APL: all problems are ultimately algorythmic
+    OOP: all problems can be broken down to objects and actions
+    Functional: same as APL
+Downside is that each abstractions is bias.
 
-### Section 1: Methods and Parameters
-**Section Goal:** Introduce objects in the Java language.
+### OOP Theory
+An object has state, behavior and identity.
+- Everything is an object
+- Every object has a type.
+- Every object of a specific type can receive the same messages.
+- Objects can (have their own memory of | know about) other objects.
+- A program is a bunch of objects (telling eachother what to do | interacting with eachother).
 
-#### Learning Objective 1: Describe the process of abstraction in using objects, hiding implementation details, and re-using objects.
+#### Objects have an interface:
+A way for other Objects to interact with them. Accessible methods and members.
+There is also an implementation.
 
-##### Readings
-**Required:** Pages 23 to 38 of TIJ
+#### Object implementation:
+For every object interface there is an internal way that the object provides the answer.
 
-##### Exercises
-**Questions**
-1.  What are the five characteristics of an object-oriented approach to programming? (See TIJ pages 25 to 26.)
-2.  What are two reasons for controlling access to members of objects and how does Java implement control? (See TIJ page 31.)
-3.  What are two ways of re-using classes? (See TIJ pages 32 to 33.)
+#### Hiding of object implementation:
+The object should hide as much of the internal workings of the object as is reasonable.
+This reduces other programmers ability to abuse your classes and create dependencies on parts that will change in the future.
+What are two reasons for controlling access to members of objects and how does Java implement control? (See TIJ page 31.)
+- restricts possibility of external objects dependency on an objects implementation
+    - Keeps client programmers hands of parts they shouldn't touch
+    - Allows object designer to change internal working of object without affecting users of object
+- implementation: class and member modifiers
 
-#### Learning Objective 2: Explain the concept and use of polymorphism.
+#### Object as service provider:
+- You program provides services to a user
+- it does this by consuming services from other objects
 
-##### Readings
-**Required:** Pages 38 to 43 of TIJ
+#### Object oriented design:
+To solve the problem this way ask, "what objects, if they exist, would solve my problem right now".
 
-##### Exercises
-**Questions**
+#### Object Composition:
+Putting many objects together to form a whole. An icicle game is made up of many icicles, a player, a scoreboard, ect.
+Best expressed with a "has-a" relationship. A car has an engine.
+
+#### Object Reuse:
+Once an object is well designed it is possible to reuse it in other scenarios. A stick man in a falling icicles game could be reused in a running man game, IF it is well designed.
+This is much more difficult in practice than in theory.
+
+#### Object Inheritance:
+One class inherits from another type. Best expressed as an "is-a" or "is-like-a" relationship: a circle is a shape.
+The base class (shape) defines an interface and implementation. The derived class (circle) inherits the interface and implementation. It can change the implementation, and add to the interface (is-like-a), but can't remove from the interface.
+
+#### Object Polymorphism:
+An object can be treated as any of it's base types. A circle can be treated like a shape.
+This makes is easier to write programs because if you write a method that consumes a shape, instead of a circle, you can then extend the shape to be a square and the same method will work.
+**late binding:** This is accomplished using late binding. At the time of compiling the compiler doesn't know which methods and functions are going to be called. In C and other early languages compilers used to hard code the function that was going to be called (early binding). Late binding is in every language I've used.
+Late binding (aka dynamic binding). Instead of calling the function directly late binding calls an intermediary function that finds the function to call.
+Polymorphism extensively uses up-casting.
 
 1.  How does late binding enable upcasting and polymorphism? (See TIJ pages 38 to 43.)
+Late binding enables a language to delay specifying the exact function to be called until runtime. This is done using a function that determines based on runtime information which function to call based on the function signature. Since this is done at runtime, and the object who's function is being called is part of the signature, the function-caller function can call different functions based on which object is passed. If a circle object is passed to a shape Type, the circle object's function will be called instead of the base shape function because the function-caller is passed the circle object along with the rest of the signature.
 
-#### Learning Objective 3: Outline object hierarchy, containers, generics, and object lifetime in Java.
+#### Object Singly rooted hierarchy:
+Every Java object extends `java.lang.Object`
+C++ does not have this. This is technically more flexible but creates more complexity. They can have many base objects, which creates a need for multiple inheritance.
+It means every object has a base interface in common.
+    ie. Much easier to implement Garbage collection.
 
-##### Readings
-**Required:** Pages 43 to 48 of TIJ
+#### Containers (aka collection):
+An object that holds other objects. (map, list, set, trees)
 
-##### Exercises
-**Questions**
+Why so many containers?
+- Different interfaces: Not all containers implement the same interfaces. Sometimes it's worth changing containers for a different interface.
+- Different Performance: containers have different underlying data structures which preform tasks at different speeds.
+
 1.  What is a container? What is an advantage of using a container? (See TIJ page 44.)
-2.  What is 'parameterized types/generics'? Explain how it eliminates the need for downcasting. (See TIJ pages 45 to 46.)
+    - a container is a object that holds other objects. A container is useful because it helps programmers organize many of the same type of object. You often don't know how many objects you'll need and how long they will be needed. Containers provide a way to hold an arbitrary quantity of objects for an arbitrary amount of time.
+
+#### Generics
+1.  What is 'parameterized types/generics'? Explain how it eliminates the need for downcasting.
+
+Before SE5 containers help the Object object, which lead to a lot of down-casting.
+Down-casting is dangerous because it often leads to runtime errors when the wrong kind of object is stored in the container or the wrong kind cast is applied. These won't be caught by the compiler.
+
+The solution is called a "parameterized type" mechanism, aka generic.
+Instead of up-casting to Object, down-casting to Type, and tracking it all, you declare the container with a specific type.
+That Type is the only type a container can hold. It essentially gives a new base type for the container.
+
+#### Object Lifetime (Garbage Collection)
 3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
+    - All objects are created on the heap, specifically they are created in the nursery to begin with.
 
-#### Learning Objective 4: Explain how Java handles exceptions and concurrency.
-
-##### Readings
-**Required:** Pages 49 to 50 of TIJ
-
-##### Exercises
-**Questions**
+#### Exception handling
+Often not built into languages
+This is a core feature in Java.
 1.  What is function of exception handling and how does Java reinforce consistent use of handling exceptions? (See TIJ page 49.)
+    - seperate execution path
+    - enforced by language, if you don't use their system your exceptions won't work.
+    - can't be ignored
+    - able to recover from an error
+    - single acceptable way to report errors
+
+#### Concurrent Programing
+Breaking problems into multiple pieces works well in Java. However, there is still the issue of resource locking.
 2.  What are the functions of threads in single-processor and multi-processor environments? (See TIJ page 50.)
+    - In single-processor architectures, tasks or threads serve to break up the program into chunks that can be scheduled on a processor.
+    - In multi-processor architectures, these tasks can be scheduled to different processors and run concurrently. However, special care needs to be made when multiple threads need access to the same resource.
 
-#### Learning Objective 5: Explain the relationships between Java and the development of the Internet.
+#### Client/Server
+Client side: applet and Java Web Start
+- mostly useful in Intranet/Enterprise situations. Mostly replaced by JS.
+Server site: JSP's and Servlets
+- in wide use today.
 
-##### Readings
-**Required:** Pages 50 to 60 of TIJ
-
-##### Exercises
-**Questions**
 1.  What is the primary idea of a client/server system? (See TIJ page 51.)
+    - The state of a program resides on a central computer(server), and the user interface runs on computer local to the user(client). The logic of the program often resides mostly on the server side, however, many applications have a mix of both sever and client side logic.
 2.  How did Web serving lead to client-side programming? (See TIJ pages 52 to 53.)
+    - For a long time much of the web served static documents, however, as more and more people and companies started using it there was a demand for interactivity. HTML had some interactivity built in. However, the limited bandwidth, cost of servers, and the powerful clients, made the server workhorse paradigm less appealing. By off loading some of the tasks to 
 3.  What is CGI programming and what is its major shortcoming? (See TIJ pages 53 to 54.)
+    - Common Gateway Interface is a standard for command line programs to interact with a server in order to create html. Was the original way to generate html, often standalone programs written in perl, python, or other languages.
 4.  Why is client-side programming efficient for the Web? (See TIJ page 54.)
+    - reduces the load on servers, allows faster user experiences.
 5.  What is a plugin? (See TIJ page 54.)
+    - an add on program to a browser that lets arbitrary code run on your machine from a server.
 6.  What is a scripting language? (See TIJ page 55.)
+    - a language where it's possible to make very specific actions happen within a larger program. ECMAscript is the best example of this. Simple instructions can be inserted into a document to make very specific changes.
 7.  Compare scripting languages to Java for Web page needs. (See TIJ pages 56 to 57.)
+    - Java however, is a full OOP language and generally holds the entire program in one body of code.
 8.  What are the issues of Intranet versus Internet programming? (See TIJ page 58.)
+    - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
 9.  What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
-
-#### Learning Objective 6: Provide a summary of this section.
-
-##### Readings
-**Required:** Page 60 of TIJ
+    - 
 
 ### Section 2: Classes and Objects
 **Section Goal**: Describe and analyse the use of objects and classes in

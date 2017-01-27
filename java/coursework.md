@@ -6,7 +6,6 @@ Reserved names:
         true
         false
         null
-        void
     primitives
         boolean
         char
@@ -16,6 +15,7 @@ Reserved names:
         long
         float
         double
+        void
     control structures
         if
         else
@@ -65,8 +65,9 @@ synchronized
 transient
 volatile
 
-### indexing
+### Indexing
 Java is a zero indexed language.
+
 ### Comments
 Three types of comments
 
@@ -104,26 +105,46 @@ public class SomeClass {
 ### Base types (primitives)
 bool, char and 6 number types:
 
-`boolean`: a boolean value (`true` or `false`)
-`char`: a 16-bit unicode character value
-- denoted with single quotes: `i`
-`byte`: 8-bit signed two's compliment integer
-`short`: 16-bit signed two's compliment integer
-`int`: 32-bit signed two's compliment integer
-`long`: 64-bit signed two's compliment integer
-`float`: 32-bit floating point number
-`double`: 64-bit floating point number
+- `boolean`: a boolean value (`true` or `false`)
+- `char`: a 16-bit unicode character value
+    - denoted with single quotes: `i`
+- `byte`: 8-bit signed two's compliment integer
+- `short`: 16-bit signed two's compliment integer
+- `int`: 32-bit signed two's compliment integer
+- `long`: 64-bit signed two's compliment integer
+- `float`: 32-bit floating point number
+- `double`: 64-bit floating point number
+- `void`: nothing (used in methods)
 
-#### Wrapper Types
+Initial values:
+When a primitive is declared in a method, Java does not guarantee primitives values. A compile time error will occur if a primitive is used without being initialized.
+When a primitive is declared as a member of a class. The variable is initialized with an initial variable.
+
+Wrapper Types:
 Each primitive has a corresponding wrapper object type. This is because many datastructures and algorythems in Java are specifically designed for objects, not primitives.
 
-Automatic boxing and unboxing is the process of converting from primitive to wrapper and back.
+Autoboxing(SE5): Automatic boxing and unboxing is the process of converting from primitive to wrapper and back.
 The result is that you can use the primitive and wrapper class interchangeably.
 
-### Array
-TODO: what happens when you declare an array of objects? Are arrays limited to primivites?
+|Primitive|Wrapper Type|Class Initial Value|
+|--|--|--|
+|boolean|Boolean|false|
+|char|Character|‘\u0000’ (null)|
+|byte|Byte|(byte)0|
+|short|Short|(short)0|
+|int|Integer|0|
+|long|Long|0L|
+|float|Float|0.0f|
+|double|Double|0.0d|
 
+### Array
 Arrays are a special type of object with slightly different syntax.
+Array's are guaranteed to be initialized.
+    Array's of objects are initialized to the null object.
+    When they are assigned an array only the object reference is stored.
+    Array's of primitives are initialized by zeroing the memory for those arrays.
+
+It is impossible to access an array outside its range, unlike C & C++.
 
 Has final property `length` 
 
@@ -142,6 +163,24 @@ double[ ] measurements = new double[1000];
 
 // retreive length of array
 System.out.println(measurements.length);
+```
+
+### Scope
+Scope is determined by the placement of curly braces.
+Variables defined in an outer scope cannot be redefined in an inner scope.
+Since primitives are created on the stack they are destroyed when the scope ends. Objects however, can exist past the end of the scope by passing a reference back to the receiving function.
+```java
+{
+    int x = 12;
+    // Only x available
+    {
+        int q = 96;
+        // Both x & q available
+        int x = 96; // Illegal
+    }
+    // Only x available
+    // q is "out of scope"
+}
 ```
 
 ### Enum types
@@ -441,7 +480,7 @@ TODO: does `continue` execute the condition at the end of a do-while loop?
 
 #### return
 A method that is declared as returning a type must return that type!
-TODO: in a Java method defined as returning void can you `return void`?
+If you need to return from a void method you can `return;`.
 
 ### Variables, Objects and Assignment
 All variables must be declaired before they are used.
@@ -468,7 +507,7 @@ Access control modifiers:
     - sub-classes through inheritance
 
 static:
-Created and associated with class instead of instance.
+This field, method, or class is not tied to any particular instance of the enclosing class. Created and associated with class instead of instance.
 This means there is only one version for every instance to share.
 When methods are static they are usually called using the ClassName instead of the instanceName.
 
@@ -642,6 +681,36 @@ public class BoxedItem2 implements Insurable {
 }
 ```
 
+### Nested Classes
+Useful for keeping closely related classes together.
+
+```
+public class OuterName {
+    // declaring a nested class
+    public static class NestedName { /∗ class details omitted ∗/ }
+    private class NestedName2 {
+        public NestedName2(){
+            OuterName.this; // refers to outer class instance
+        }
+    }
+}
+
+public class Other {
+    public void main(String[] args) {
+        // Accessing nested class from outside outer class
+        OuterName.NestedName nested = new OuterName.NestedName();
+    }
+}
+```
+
+fully qualified name is OuterName.NestedName
+private nested class can be used by the outer class, but by no other classes
+
+A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
+The outer instance can be referenced from within the inner class using `OuterName.this`
+Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
+
+
 ### Casting
 Two types. Explicit and Implicit.
 Implicit casting happens when operations produce a larger object and that larger object is expected
@@ -719,37 +788,6 @@ Use `<E>` when refering to class. Use `E` when refering to element within class.
 
 #### Bounding Generic types
 
-### Nested Classes
-Useful for keeping closely related classes together.
-
-
-```
-public class OuterName {
-    // declaring a nested class
-    public static class NestedName { /∗ class details omitted ∗/ }
-    private class NestedName2 {
-        public NestedName2(){
-            OuterName.this; // refers to outer class instance
-        }
-    }
-}
-
-public class Other {
-    public void main(String[] args) {
-        // Accessing nested class from outside outer class
-        OuterName.NestedName nested = new OuterName.NestedName();
-    }
-}
-```
-
-fully qualified name is OuterName.NestedName
-private nested class can be used by the outer class, but by no other classes
-
-A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
-The outer instance can be referenced from within the inner class using `OuterName.this`
-Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
-
-
 ### Exceptions
 #### Checked vs Un-Checked exceptions
 TODO: understand and take notes on Checked vs Un-Checked exceptions
@@ -796,6 +834,8 @@ Create a new exception type by extending the Exception class or any of it's subc
 
 
 ### Package management
+In order to manage the global name space every library is contained in it's own package. This completely eliminates the namespace issues of C and C++.
+
 Group files containing Enums and Classes into packages by:
 - all located in directory _packagename_
 - first line of every file must be `package packagename;`
@@ -832,6 +872,27 @@ TODO: with a name collision using `import package.*` do you need to use the full
 import fully.qualified.package.*;
 ```
 
+Every file imports all the classes from `java.lang` equivalent to bellow
+https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
+
+    import java.lang.*;
+
+### JavaDocs
+Tags:
+@see "See Also" with link to another class
+
+    @see classname
+    @see fully-qualified-classname
+    @see fully-qualified-classname#method-name
+
+{@link package.class#member label}
+
+@since
+@param
+@return
+@throws fully-qualified-class-name description
+
+
 ### Compilation
 Class files will run cross platform. No need to compile on each system individually.
 Provides API for system functions - meaning it completely abstracts away the underlying hardware.
@@ -857,12 +918,23 @@ This variable defines an order of directories in which to search for the package
 export CLASSPATH=.:/usr/local/java/lib:/usr/netscape/classes
 ```
 
+## Builtin Objects
+
+### BigInteger and BigDecimal
+Same as int or float but arbitrarily accurate.
+
 ## Object Oriented Programming
+
 ### Design Patters
+
 #### Template method
+
 #### Composition
+
 #### Adapter
+
 #### Position
+
 #### Iterator
 A nested that iterates through the elements of a class.
 
@@ -880,7 +952,9 @@ E nextElement = obj.next();
 ```
 
 #### Factory Method
+
 #### Comparator
+
 #### Locator
 
 ### Clonable Interface
@@ -904,7 +978,6 @@ public class clonableClass implements Cloneable {
 ## Testing
 
 - zero, null, '', "", or empty value
-- 
 
 ## Unit 0: Introducing the Java Platform
 ### All assignments must:
@@ -917,6 +990,12 @@ Completely abstracted hardware.
 The JVM is built for each environment but once it's built everything else runs on top of it.
 
 ### Memory allocation
+What are the roles of registers, the stack, the heap, constant storage, and non-RAM storage in Java programming? (See TIJ pages 63 to 64.)
+    - registers: memory inside the CPU. Very fast and very limited. Java manages this for you.
+    - the stack: maintained in RAM, maintains the execution pointer primitives, and object references. Java needs to know at the time of running the program the exact size and lifetime of items in the stack.
+    - the heap: maintained in RAM. Holds objects. Much more flexible in the size and lifetime of items, however, this comes at the price of speed. This is slower than stack memory.
+    - constant storage: Sometimes put in ROM for embedded systems but usually kept in RAM.
+    - non-RAM storage: anything that will maintain state outside the object. Streamed objects and persistent storage are two examples.
 Memory allocation and garbage collection is done using a multi-generational approach.
 Objects are allocated quickly by bumping a pointer by the fixed amount and returning the location.
 This is done in a "young" generation heap also called the nursery.
@@ -1066,83 +1145,6 @@ Server site: JSP's and Servlets
     - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
 9.  What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
     - 
-
-### Section 2: Classes and Objects
-**Section Goal**: Describe and analyse the use of objects and classes in
-a Java program, and create Java documentation.
-
-#### Learning Objective 1: Describe the creation and use of objects and primitive types in programming with Java.
-
-##### Readings
-**Required:** Pages 61 to 69 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the difference between an object and its handle? (See TIJ page 61 to 62.)
-2.  What are the roles of registers, the stack, the heap, constant storage, and non-RAM storage in Java programming? (See TIJ pages 63 to 64.)
-3.  What are the nine primitive types supported by Java? (See TIJ page 65.)
-4.  What are two classes of high-precision numbers with no primitive analog? (See TIJ page 66.)
-5.  How does scope differ for primitives and objects? (See TIJ pages 68 to 69.)
-
-#### Learning Objective 2: Explain classes, fields, methods, arguments, and return values in Java.
-
-##### Readings
-**Required:** Pages 69 to 74 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are classes, fields and methods? (See TIJ pages 69 to 70.)
-2.  What is the difference between default values for primitive types as members of a class and local variables? (See TIJ page 71.)
-3.  What are the fundamental parts of a Java method? (See TIJ page 72.)
-
-#### Learning Objective 3: Outline these aspects of building a program in Java: namespaces, using other components, and the use of the static keyword.
-
-##### Readings
-**Required:** Pages 74 to 78 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the naming convention when creating Java libraries for public distribution? (See TIJ pages 74 to 75.)
-2.  What is the purpose of the import keyword? (See TIJ page 75.)
-3.  What are the functions of the static keyword? (See TIJ pages 76 to 78.)
-
-#### Learning Objective 4: Write, compile and run a Java program.
-
-##### Readings
-**Required:** Pages 78 to 81 of TIJ
-
-##### Exercises
-**Questions**
-1.  Explain how [HelloDate.java](http://scis.athabascau.ca/html/lo/repos/comp308/programs/c02/HelloDate.java) prints the date. (See TIJ page 78 to 79.)
-2.  Explain the lines (See TIJ page 79.)
-
-        Public static void main (string [] args)
-            public static void main (String[]) {
-
-3.  Why is **main** static? (see TIJ pages 79 to 80.)
-
-##### Programs
-Compile, run, and analyze [HelloDate.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/object/HelloDate.java).
-
-#### Learning Objective 5: Describe comments, documentation facilities, and coding style for Java.
-
-##### Readings
-**Required:** Pages 81 to 89 of TIJ
-
-##### Exercises
-**Questions**
-1.  In Java, what is the standard coding style for classes and methods? (See TIJ pages 88 to 89.)
-
-#### Learning Objective 6: Integrate the material covered in this section in writing programs.
-
-##### Readings
-**Required:** Page 89 of TIJ
-
-##### Exercises
-Exercise 10 on page 90 of TIJ
-
-##### Answers To Exercises
--   [Answer 10](http://scis.athabascau.ca/html/course/COMP308/Unit_2/Section_2/Ch3ex10.java)
 
 
 ## Quiz 1 (due Dec 16th, 2016)

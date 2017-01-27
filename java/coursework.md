@@ -128,6 +128,7 @@ Server site: JSP's and Servlets
     - Java however, is a full OOP language and generally holds the entire program in one body of code.
 8.  What are the issues of Intranet versus Internet programming? (See TIJ page 58.)
     - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
+
 TODO: What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
 
 ## The Java platform
@@ -1136,16 +1137,39 @@ public class clonableClass implements Cloneable {
 
 - zero, null, '', "", or empty value
 
-## Unit 0: Introducing the Java Platform
+## Java for Programmers COMP308
+
+### Tutor Questions:
+1. What are the turn around times for assignment marking?
+2. Can I use Java 8 for assignments?
+3. Is there a marking rubric for the assignments
+4. Is there information about what will be tested for on the final exam?
+
 ### All assignments must:
 Java 6 was the current version of Java when this course was created.
 However, all assignments must compile and run with Java 5.
 If you want to use a feature of Java 6 (plus) you need to inform your tutor.
 
-## Quiz 1 (due Dec 16th, 2016)
-Complete and return Electronic Quiz 1.
+Guidelines Submitting all TME's
+- You must submit all the files for the TME in either windows zip or unix/linux gzip format. Please zip all files and submit as one zip file. The zip file must unzip into a directory structure that can be used to compile and run the programs without further file management. Please use a relative directory structure and include only those directory levels needed. 
+- Solutions to the TME exercises must be contained in one single directory, and must compile from that directory with the standard Sun Java SDK for the course using the command "javac *.java". Failure to follow this guideline will result in your TME being returned to you for correction. If you re-submit code that does not compile with the Java SDK using the simple command outlined above, you will receive a mark of 0 on that exercise.
+- Programs must compile correctly, run with the specified JDK for the course,and be fully test prior to submission. 
+- Applets will be tested using the appletviewer in JDK. Please include the appropriate .html file. 
+- A test plan must be submitted indicating the tests done, their purpose, and the test results. You must submit all the files necessary for testing the program along with the necessary directions. Where necessary, a program should also include a test driver. Please see testplan.html for a sample test plan. 
+- Test for both valid and error conditions - error conditions need reporting the program user in an appropriate way. 
+- All program source files must be text files. Class files need not be submitted. 
+- Design and testing documentation should be submitted as separate text or as MSWord files. 
+- Program documentation should be inline. This should include:
+    - Problem description and detailed requirements - this can be adapted from the TME problem description
+    - Documentation header block identifying the program, your name, student ID date written , statement of the overall program purpose.
+    - Compiling and running instructions
+    - Documentation of purpose of individual methods you have written.
+    - Documentation of algorithms of complex logic, when not obvious from reading the code
+    - Purpose of main names used for variables, methods
+- Where a TME suggests developing a program in stages, document and submit the final deliverable only, not the intermediate stages. 
+- Please include examples, code fragments, etc to illustrate your points in your answers to the unit questions. 
 
-Quiz 1 is scored out of 100 and contributes to 3% of your final grade.
+## Quiz 1: 100% / 3 percent
 
 ## Unit 3: Program Control
 
@@ -1954,8 +1978,40 @@ Exercise 1 on page 315, exercise 18 on page 342, and exercise 24 on page
 ## Tutor Marked Exercise 1 (due Dec 23rd, 2017)
 Please complete TME 1 and submit it by electronic mail.
 
-Tutor Marked Exercise 1 is scored out of 100 and contributes to 5% of
-your final grade.
+Tutor Marked Exercise 1 is scored out of 100 and contributes to 5% of your final grade.
+
+### Marking Scheme (5 percent of final grade)
+See Guidelines for guidance on submitting TMEs and marking scheme.
+Each program in this TME will be weighted equally in your final mark. The total for the programs will be 95% of the TME.
+You are also required to select one of the questions for one objective from each of Units 1, 2, and 3. Submit your answers to your tutor as part of this TME. The answers to the review questions have a weight of 5 per cent of your TME mark. A total of 3 questions are required.
+Your submission should include all source files, a separate test plan for all 4 programs and a separate document on the objective questions. Do not submit class files.
+
+
+### Programs
+
+#### Program 1
+Write a class called Circle which has two constructors. The first constructor (default constructor) does not take any parameter and supplies default values for the coordinates and the radius. The second constructor takes three doubles as parameters corresponding to the X and Y coordinates and the radius. The class must include these methods:
+
+public double circumference()  returns the circumference of the circle.
+public double area()  returns the area of the circle.
+public void setRadius(double r)  is called in the constructor and checks the radius against a maximum. If the radius is greater than the maximum, setRadius resets it to the maximum (using the ternary conditional operator). You may set your own maximum value.
+public void printAttributes()  prints the coordinates, the radius, the circumference, and the area.
+public boolean isInside(double x, double y)  return true if a point represented in the parameters falls inside the circle, false otherwise.
+public void move(int x, int y)  moves the origin by a specified amount.
+
+#### Program 2
+Write a class called FullName that represents a person full name. It must have separate fields for title (e.g., Mr., Mrs., Ms.), first name, middle name, and last name. Override the toString() method to return a nicely formatted name. Create as many methods as you think necessary.
+Write a class called MailingAddress that represents a mailing address. It must have separate fields for a FullName object, street address, city, province and postal code. Other than FullName all other fields are Strings. Override the toString() method to return a nicely formatted address. Create as many methods as you think necessary.
+Write a class called ShippingLabel that consists of ship-from and ship-to MailingAddress objects. Write a single method that prints the label to the console. Use these statements in the method:
+ShippingLabel label = new ShippingLabel(... your parameter list ...);
+System.out.println(label);
+Write a simple test program in the main method of ShippingLabel to test the above classes.
+
+#### Program 3
+Complete exercise 5 on page 286 of TIJ.
+
+#### Program 4
+Complete exercise 10 on page 320 of TIJ.
 
 ## Unit 5: Collections, Arrays, Exceptions and Strings
 

@@ -1,4 +1,161 @@
 # Course Handbook
+## OOP Theory
+An object has state, behavior and identity.
+- Everything is an object
+- Every object has a type.
+- Every object of a specific type can receive the same messages.
+- Objects can (have their own memory of | know about) other objects.
+- A program is a bunch of objects (telling eachother what to do | interacting with eachother).
+
+### Languages in General
+All languages are abstraction
+    LISP: all problems can be broken down to lists
+    APL: all problems are ultimately algorythmic
+    OOP: all problems can be broken down to objects and actions
+    Functional: same as APL
+Downside is that each abstractions is bias.
+
+### Objects have an interface:
+A way for other Objects to interact with them. Accessible methods and members.
+There is also an implementation.
+
+### Object implementation:
+For every object interface there is an internal way that the object provides the answer.
+
+### Hiding of object implementation:
+The object should hide as much of the internal workings of the object as is reasonable.
+This reduces other programmers ability to abuse your classes and create dependencies on parts that will change in the future.
+What are two reasons for controlling access to members of objects and how does Java implement control? (See TIJ page 31.)
+- restricts possibility of external objects dependency on an objects implementation
+    - Keeps client programmers hands of parts they shouldn't touch
+    - Allows object designer to change internal working of object without affecting users of object
+- implementation: class and member modifiers
+
+### Object as service provider:
+- You program provides services to a user
+- it does this by consuming services from other objects
+
+### Object oriented design:
+To solve the problem this way ask, "what objects, if they exist, would solve my problem right now".
+
+### Object Composition:
+Putting many objects together to form a whole. An icicle game is made up of many icicles, a player, a scoreboard, ect.
+Best expressed with a "has-a" relationship. A car has an engine.
+
+### Object Reuse:
+Once an object is well designed it is possible to reuse it in other scenarios. A stick man in a falling icicles game could be reused in a running man game, IF it is well designed.
+This is much more difficult in practice than in theory.
+
+### Object Inheritance:
+One class inherits from another type. Best expressed as an "is-a" or "is-like-a" relationship: a circle is a shape.
+The base class (shape) defines an interface and implementation. The derived class (circle) inherits the interface and implementation. It can change the implementation, and add to the interface (is-like-a), but can't remove from the interface.
+
+### Object Polymorphism:
+An object can be treated as any of it's base types. A circle can be treated like a shape.
+This makes is easier to write programs because if you write a method that consumes a shape, instead of a circle, you can then extend the shape to be a square and the same method will work.
+**late binding:** This is accomplished using late binding. At the time of compiling the compiler doesn't know which methods and functions are going to be called. In C and other early languages compilers used to hard code the function that was going to be called (early binding). Late binding is in every language I've used.
+Late binding (aka dynamic binding). Instead of calling the function directly late binding calls an intermediary function that finds the function to call.
+Polymorphism extensively uses up-casting.
+
+1.  How does late binding enable upcasting and polymorphism? (See TIJ pages 38 to 43.)
+Late binding enables a language to delay specifying the exact function to be called until runtime. This is done using a function that determines based on runtime information which function to call based on the function signature. Since this is done at runtime, and the object who's function is being called is part of the signature, the function-caller function can call different functions based on which object is passed. If a circle object is passed to a shape Type, the circle object's function will be called instead of the base shape function because the function-caller is passed the circle object along with the rest of the signature.
+
+### Object Singly rooted hierarchy:
+Every Java object extends `java.lang.Object`
+C++ does not have this. This is technically more flexible but creates more complexity. They can have many base objects, which creates a need for multiple inheritance.
+It means every object has a base interface in common.
+    ie. Much easier to implement Garbage collection.
+
+### Containers (aka collection):
+An object that holds other objects. (map, list, set, trees)
+
+Why so many containers?
+- Different interfaces: Not all containers implement the same interfaces. Sometimes it's worth changing containers for a different interface.
+- Different Performance: containers have different underlying data structures which preform tasks at different speeds.
+
+1.  What is a container? What is an advantage of using a container? (See TIJ page 44.)
+    - a container is a object that holds other objects. A container is useful because it helps programmers organize many of the same type of object. You often don't know how many objects you'll need and how long they will be needed. Containers provide a way to hold an arbitrary quantity of objects for an arbitrary amount of time.
+
+### Generics
+1.  What is 'parameterized types/generics'? Explain how it eliminates the need for downcasting.
+
+Before SE5 containers help the Object object, which lead to a lot of down-casting.
+Down-casting is dangerous because it often leads to runtime errors when the wrong kind of object is stored in the container or the wrong kind cast is applied. These won't be caught by the compiler.
+
+The solution is called a "parameterized type" mechanism, aka generic.
+Instead of up-casting to Object, down-casting to Type, and tracking it all, you declare the container with a specific type.
+That Type is the only type a container can hold. It essentially gives a new base type for the container.
+
+### Object Lifetime (Garbage Collection)
+3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
+    - All objects are created on the heap, specifically they are created in the nursery to begin with.
+
+### Exception handling
+Often not built into languages
+This is a core feature in Java.
+1.  What is function of exception handling and how does Java reinforce consistent use of handling exceptions? (See TIJ page 49.)
+    - seperate execution path
+    - enforced by language, if you don't use their system your exceptions won't work.
+    - can't be ignored
+    - able to recover from an error
+    - single acceptable way to report errors
+
+### Concurrent Programing
+Breaking problems into multiple pieces works well in Java. However, there is still the issue of resource locking.
+2.  What are the functions of threads in single-processor and multi-processor environments? (See TIJ page 50.)
+    - In single-processor architectures, tasks or threads serve to break up the program into chunks that can be scheduled on a processor.
+    - In multi-processor architectures, these tasks can be scheduled to different processors and run concurrently. However, special care needs to be made when multiple threads need access to the same resource.
+
+### Client/Server
+Client side: applet and Java Web Start
+- mostly useful in Intranet/Enterprise situations. Mostly replaced by JS.
+Server site: JSP's and Servlets
+- in wide use today.
+
+1.  What is the primary idea of a client/server system? (See TIJ page 51.)
+    - The state of a program resides on a central computer(server), and the user interface runs on computer local to the user(client). The logic of the program often resides mostly on the server side, however, many applications have a mix of both sever and client side logic.
+2.  How did Web serving lead to client-side programming? (See TIJ pages 52 to 53.)
+    - For a long time much of the web served static documents, however, as more and more people and companies started using it there was a demand for interactivity. HTML had some interactivity built in. However, the limited bandwidth, cost of servers, and the powerful clients, made the server workhorse paradigm less appealing. By off loading some of the tasks to 
+3.  What is CGI programming and what is its major shortcoming? (See TIJ pages 53 to 54.)
+    - Common Gateway Interface is a standard for command line programs to interact with a server in order to create html. Was the original way to generate html, often standalone programs written in perl, python, or other languages.
+4.  Why is client-side programming efficient for the Web? (See TIJ page 54.)
+    - reduces the load on servers, allows faster user experiences.
+5.  What is a plugin? (See TIJ page 54.)
+    - an add on program to a browser that lets arbitrary code run on your machine from a server.
+6.  What is a scripting language? (See TIJ page 55.)
+    - a language where it's possible to make very specific actions happen within a larger program. ECMAscript is the best example of this. Simple instructions can be inserted into a document to make very specific changes.
+7.  Compare scripting languages to Java for Web page needs. (See TIJ pages 56 to 57.)
+    - Java however, is a full OOP language and generally holds the entire program in one body of code.
+8.  What are the issues of Intranet versus Internet programming? (See TIJ page 58.)
+    - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
+TODO: What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
+
+## The Java platform
+Completely abstracted hardware.
+The JVM is built for each environment but once it's built everything else runs on top of it.
+
+### Memory allocation
+What are the roles of registers, the stack, the heap, constant storage, and non-RAM storage in Java programming? (See TIJ pages 63 to 64.)
+    - registers: memory inside the CPU. Very fast and very limited. Java manages this for you.
+    - the stack: maintained in RAM, maintains the execution pointer primitives, and object references. Java needs to know at the time of running the program the exact size and lifetime of items in the stack.
+    - the heap: maintained in RAM. Holds objects. Much more flexible in the size and lifetime of items, however, this comes at the price of speed. This is slower than stack memory.
+    - constant storage: Sometimes put in ROM for embedded systems but usually kept in RAM.
+    - non-RAM storage: anything that will maintain state outside the object. Streamed objects and persistent storage are two examples.
+Memory allocation and garbage collection is done using a multi-generational approach.
+Objects are allocated quickly by bumping a pointer by the fixed amount and returning the location.
+This is done in a "young" generation heap also called the nursery.
+Once the nursery is full objects that are still in use are moved to a second generation heap and the nursery pointer is returned to the start of the nursery.
+Since most objects are extremely short lived this strategy allows for quickly allocating and overwriting objects without much movement of objects.
+
+### Tools of the JDK
+javac - compiles code
+java - runs code
+javas- reveals source code
+
+Every java program starts with a main method: 
+
+    public static void main(String[] args) {}
+
 ## Language Constructs
 ### Reserved names
 Reserved names:
@@ -984,168 +1141,6 @@ public class clonableClass implements Cloneable {
 Java 6 was the current version of Java when this course was created.
 However, all assignments must compile and run with Java 5.
 If you want to use a feature of Java 6 (plus) you need to inform your tutor.
-
-### The Java platform
-Completely abstracted hardware.
-The JVM is built for each environment but once it's built everything else runs on top of it.
-
-### Memory allocation
-What are the roles of registers, the stack, the heap, constant storage, and non-RAM storage in Java programming? (See TIJ pages 63 to 64.)
-    - registers: memory inside the CPU. Very fast and very limited. Java manages this for you.
-    - the stack: maintained in RAM, maintains the execution pointer primitives, and object references. Java needs to know at the time of running the program the exact size and lifetime of items in the stack.
-    - the heap: maintained in RAM. Holds objects. Much more flexible in the size and lifetime of items, however, this comes at the price of speed. This is slower than stack memory.
-    - constant storage: Sometimes put in ROM for embedded systems but usually kept in RAM.
-    - non-RAM storage: anything that will maintain state outside the object. Streamed objects and persistent storage are two examples.
-Memory allocation and garbage collection is done using a multi-generational approach.
-Objects are allocated quickly by bumping a pointer by the fixed amount and returning the location.
-This is done in a "young" generation heap also called the nursery.
-Once the nursery is full objects that are still in use are moved to a second generation heap and the nursery pointer is returned to the start of the nursery.
-Since most objects are extremely short lived this strategy allows for quickly allocating and overwriting objects without much movement of objects.
-
-## Unit 1: Getting Started with the Java Programming Language
-### Tools of the JDK
-javac - compiles code
-java - runs code
-javas- reveals source code
-
-Every java program starts with a main method: 
-
-    public static void main(String[] args) {}
-
-## Unit 2: Object Oriented Programming with Java
-
-### Languages in General
-All languages are abstraction
-    LISP: all problems can be broken down to lists
-    APL: all problems are ultimately algorythmic
-    OOP: all problems can be broken down to objects and actions
-    Functional: same as APL
-Downside is that each abstractions is bias.
-
-### OOP Theory
-An object has state, behavior and identity.
-- Everything is an object
-- Every object has a type.
-- Every object of a specific type can receive the same messages.
-- Objects can (have their own memory of | know about) other objects.
-- A program is a bunch of objects (telling eachother what to do | interacting with eachother).
-
-#### Objects have an interface:
-A way for other Objects to interact with them. Accessible methods and members.
-There is also an implementation.
-
-#### Object implementation:
-For every object interface there is an internal way that the object provides the answer.
-
-#### Hiding of object implementation:
-The object should hide as much of the internal workings of the object as is reasonable.
-This reduces other programmers ability to abuse your classes and create dependencies on parts that will change in the future.
-What are two reasons for controlling access to members of objects and how does Java implement control? (See TIJ page 31.)
-- restricts possibility of external objects dependency on an objects implementation
-    - Keeps client programmers hands of parts they shouldn't touch
-    - Allows object designer to change internal working of object without affecting users of object
-- implementation: class and member modifiers
-
-#### Object as service provider:
-- You program provides services to a user
-- it does this by consuming services from other objects
-
-#### Object oriented design:
-To solve the problem this way ask, "what objects, if they exist, would solve my problem right now".
-
-#### Object Composition:
-Putting many objects together to form a whole. An icicle game is made up of many icicles, a player, a scoreboard, ect.
-Best expressed with a "has-a" relationship. A car has an engine.
-
-#### Object Reuse:
-Once an object is well designed it is possible to reuse it in other scenarios. A stick man in a falling icicles game could be reused in a running man game, IF it is well designed.
-This is much more difficult in practice than in theory.
-
-#### Object Inheritance:
-One class inherits from another type. Best expressed as an "is-a" or "is-like-a" relationship: a circle is a shape.
-The base class (shape) defines an interface and implementation. The derived class (circle) inherits the interface and implementation. It can change the implementation, and add to the interface (is-like-a), but can't remove from the interface.
-
-#### Object Polymorphism:
-An object can be treated as any of it's base types. A circle can be treated like a shape.
-This makes is easier to write programs because if you write a method that consumes a shape, instead of a circle, you can then extend the shape to be a square and the same method will work.
-**late binding:** This is accomplished using late binding. At the time of compiling the compiler doesn't know which methods and functions are going to be called. In C and other early languages compilers used to hard code the function that was going to be called (early binding). Late binding is in every language I've used.
-Late binding (aka dynamic binding). Instead of calling the function directly late binding calls an intermediary function that finds the function to call.
-Polymorphism extensively uses up-casting.
-
-1.  How does late binding enable upcasting and polymorphism? (See TIJ pages 38 to 43.)
-Late binding enables a language to delay specifying the exact function to be called until runtime. This is done using a function that determines based on runtime information which function to call based on the function signature. Since this is done at runtime, and the object who's function is being called is part of the signature, the function-caller function can call different functions based on which object is passed. If a circle object is passed to a shape Type, the circle object's function will be called instead of the base shape function because the function-caller is passed the circle object along with the rest of the signature.
-
-#### Object Singly rooted hierarchy:
-Every Java object extends `java.lang.Object`
-C++ does not have this. This is technically more flexible but creates more complexity. They can have many base objects, which creates a need for multiple inheritance.
-It means every object has a base interface in common.
-    ie. Much easier to implement Garbage collection.
-
-#### Containers (aka collection):
-An object that holds other objects. (map, list, set, trees)
-
-Why so many containers?
-- Different interfaces: Not all containers implement the same interfaces. Sometimes it's worth changing containers for a different interface.
-- Different Performance: containers have different underlying data structures which preform tasks at different speeds.
-
-1.  What is a container? What is an advantage of using a container? (See TIJ page 44.)
-    - a container is a object that holds other objects. A container is useful because it helps programmers organize many of the same type of object. You often don't know how many objects you'll need and how long they will be needed. Containers provide a way to hold an arbitrary quantity of objects for an arbitrary amount of time.
-
-#### Generics
-1.  What is 'parameterized types/generics'? Explain how it eliminates the need for downcasting.
-
-Before SE5 containers help the Object object, which lead to a lot of down-casting.
-Down-casting is dangerous because it often leads to runtime errors when the wrong kind of object is stored in the container or the wrong kind cast is applied. These won't be caught by the compiler.
-
-The solution is called a "parameterized type" mechanism, aka generic.
-Instead of up-casting to Object, down-casting to Type, and tracking it all, you declare the container with a specific type.
-That Type is the only type a container can hold. It essentially gives a new base type for the container.
-
-#### Object Lifetime (Garbage Collection)
-3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
-    - All objects are created on the heap, specifically they are created in the nursery to begin with.
-
-#### Exception handling
-Often not built into languages
-This is a core feature in Java.
-1.  What is function of exception handling and how does Java reinforce consistent use of handling exceptions? (See TIJ page 49.)
-    - seperate execution path
-    - enforced by language, if you don't use their system your exceptions won't work.
-    - can't be ignored
-    - able to recover from an error
-    - single acceptable way to report errors
-
-#### Concurrent Programing
-Breaking problems into multiple pieces works well in Java. However, there is still the issue of resource locking.
-2.  What are the functions of threads in single-processor and multi-processor environments? (See TIJ page 50.)
-    - In single-processor architectures, tasks or threads serve to break up the program into chunks that can be scheduled on a processor.
-    - In multi-processor architectures, these tasks can be scheduled to different processors and run concurrently. However, special care needs to be made when multiple threads need access to the same resource.
-
-#### Client/Server
-Client side: applet and Java Web Start
-- mostly useful in Intranet/Enterprise situations. Mostly replaced by JS.
-Server site: JSP's and Servlets
-- in wide use today.
-
-1.  What is the primary idea of a client/server system? (See TIJ page 51.)
-    - The state of a program resides on a central computer(server), and the user interface runs on computer local to the user(client). The logic of the program often resides mostly on the server side, however, many applications have a mix of both sever and client side logic.
-2.  How did Web serving lead to client-side programming? (See TIJ pages 52 to 53.)
-    - For a long time much of the web served static documents, however, as more and more people and companies started using it there was a demand for interactivity. HTML had some interactivity built in. However, the limited bandwidth, cost of servers, and the powerful clients, made the server workhorse paradigm less appealing. By off loading some of the tasks to 
-3.  What is CGI programming and what is its major shortcoming? (See TIJ pages 53 to 54.)
-    - Common Gateway Interface is a standard for command line programs to interact with a server in order to create html. Was the original way to generate html, often standalone programs written in perl, python, or other languages.
-4.  Why is client-side programming efficient for the Web? (See TIJ page 54.)
-    - reduces the load on servers, allows faster user experiences.
-5.  What is a plugin? (See TIJ page 54.)
-    - an add on program to a browser that lets arbitrary code run on your machine from a server.
-6.  What is a scripting language? (See TIJ page 55.)
-    - a language where it's possible to make very specific actions happen within a larger program. ECMAscript is the best example of this. Simple instructions can be inserted into a document to make very specific changes.
-7.  Compare scripting languages to Java for Web page needs. (See TIJ pages 56 to 57.)
-    - Java however, is a full OOP language and generally holds the entire program in one body of code.
-8.  What are the issues of Intranet versus Internet programming? (See TIJ page 58.)
-    - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
-9.  What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
-    - 
-
 
 ## Quiz 1 (due Dec 16th, 2016)
 Complete and return Electronic Quiz 1.

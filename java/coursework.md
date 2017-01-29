@@ -86,10 +86,6 @@ The solution is called a "parameterized type" mechanism, aka generic.
 Instead of up-casting to Object, down-casting to Type, and tracking it all, you declare the container with a specific type.
 That Type is the only type a container can hold. It essentially gives a new base type for the container.
 
-### Object Lifetime (Garbage Collection)
-3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
-    - All objects are created on the heap, specifically they are created in the nursery to begin with.
-
 ### Exception handling
 Often not built into languages
 This is a core feature in Java.
@@ -131,6 +127,38 @@ Server site: JSP's and Servlets
 
 TODO: What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
 
+### Design Patters
+
+#### Template method
+
+#### Composition
+
+#### Adapter
+
+#### Position
+
+#### Iterator
+A nested that iterates through the elements of a class.
+
+The class needs to implement `java.util.Iterable`.
+Iterable has a method `iterable()` which returns an `java.util.Iterator`.
+`Iterator` is a class, usually a nested class that implements `java.util.Iterator`.
+
+This is a complicated way to reliably get an object on which you can call:
+```
+Obj<E> obj = new Obj;
+Iterator<E> objIter = obj.iterator();
+
+boolean nextExists = objIter.hasNext();
+E nextElement = obj.next();
+```
+
+#### Factory Method
+
+#### Comparator
+
+#### Locator
+
 ## The Java platform
 Completely abstracted hardware.
 The JVM is built for each environment but once it's built everything else runs on top of it.
@@ -148,16 +176,43 @@ This is done in a "young" generation heap also called the nursery.
 Once the nursery is full objects that are still in use are moved to a second generation heap and the nursery pointer is returned to the start of the nursery.
 Since most objects are extremely short lived this strategy allows for quickly allocating and overwriting objects without much movement of objects.
 
+#### Garbage Collection
+Many Garbage collection methods exist, each with +ves, and -ves.
+
+##### Mark and Sweep
+1. Go through storage, marking items that are in use.
+2. Stop program
+3. compact only items at the top of memory
+
+Good when objects are stable (don't have to move large, stable objects)
+
+##### Stop and Copy
+cons:
+- 2x heaps needed (one for origin other for copy too)
+- Needs to copy entire block even if it's mostly stable objects
+
+Not good when objects are relatively stable
+
+##### Adaptive generational stop-and-copy mark-and-sweep
+Best of both worlds, maintains information about how a M&S or S&C is working and switches between them for more efficiency.
+
+3.  Where in memory does Java create objects? (See TIJ pages 47 to 48.)
+
 ### Tools of the JDK
 javac - compiles code
 java - runs code
 javas- reveals source code
 
-Every java program starts with a main method: 
+### JIT (Just in time compiler)
+Partially or fully converts to machine code so the JVM doesn't need to interpret the code.
 
-    public static void main(String[] args) {}
+Lazy Evaluation
+- only compile parts when they are needed
+HotSpot Technology
+- compile a piece of code a little better every time it runs
 
-## Language Constructs
+## Language Basics
+
 ### Reserved names
 Reserved names:
     special values
@@ -223,8 +278,71 @@ synchronized
 transient
 volatile
 
-### Indexing
-Java is a zero indexed language.
+### Variable Declaration
+All variables must be declared before they are used.
+There are two main types of variables; primitives and objects.
+Objects are actually pointers(references) to a data structure, whereas a primitives is the data.
+
+### Assignment
+
+```
+    = //straight assignment
+    op= //assignment while performing operation (op)
+        //x op= 2 is equivalent to x = x op 2
+```
+
+For primitives the data is copied to another memory location.
+For objects only the pointer is copied.
+
+For Objects this means making a replica of the **pointer**.<a name="object-assignment"></a>
+
+### Casting
+Two types. Explicit and Implicit.
+Implicit casting happens when operations produce a larger object and that larger object is expected
+
+```
+int i = 42;
+double d = i; // implicit casting from int to double
+i = d; // implicit cast results in loss of precision; compile error is thrown
+```
+
+Explicit casting can be done anywhere there is implicit casting however it is necessary where a casting would result in loss of precision. `(type) exp` is the general form.
+
+```
+i = (int)d; // forces the casting and loss of precision;
+```
+
+Strings break this rule. Explicit casting to a string is not allowed.
+
+```
+String s = 22; // this is wrong!
+String s = Integer.toString(22); // this is good
+String t = (String) 4.5; // this is wrong!
+String t = "" + 4.5; // correct, but poor style
+String u = "Value = " + (String) 13; // this is wrong!
+String u = "Value = " + 13; // this is good
+```
+
+#### Casting object and interfaces
+Moving to a more generic datatype does not need an Explicit type cast. (widening conversion)
+    - correctness can be checked by compiler
+Moving to a more specific datatype needs an Explicit type cast. (narrowing conversion)
+    - must be tested by java run time environment
+    - throws ClassCastException if not the correct type
+
+```
+// example of widening conversion
+CreditCard card = new PredatoryCreditCard(...);
+// example of narrowing conversion with explicit cast
+PredatoryCreditCard pcard = (PredatoryCreditCard) card;
+```
+
+A narrowing conversion happens when a type T is converted into type S given:
+- S is a subclass of T
+- S is a subinterface of T
+- S is a class that implements the interface T
+
+**instanceof is a useful operator when working with object casting**
 
 ### Comments
 Three types of comments
@@ -260,7 +378,7 @@ public class SomeClass {
 }
 ```
 
-### Base types (primitives)
+### Primitive types (Base Types)
 bool, char and 6 number types:
 
 - `boolean`: a boolean value (`true` or `false`)
@@ -323,6 +441,30 @@ double[ ] measurements = new double[1000];
 System.out.println(measurements.length);
 ```
 
+Array initialization
+
+```
+int[] a1;
+int a2[];
+a1 = { 1, 2, 3, 4, 5 };
+a2 = a1; //reference
+int[] a3 = { 1, 2, 3, 4, 5 };
+int[] a4 = new int[3]; //initialize empty array with 3 items
+a3 = new int[8];
+int[] b = new int[]{
+        new Integer(1),
+        3, // Autoboxing
+    };
+int[] c = { // only useful at declaration
+        new Integer(1),
+        3, // Autoboxing
+    };
+```
+
+
+### Indexing
+Java is a zero indexed language.
+
 ### Scope
 Scope is determined by the placement of curly braces.
 Variables defined in an outer scope cannot be redefined in an inner scope.
@@ -341,7 +483,518 @@ Since primitives are created on the stack they are destroyed when the scope ends
 }
 ```
 
+### Expression Literals
+Constants in the expression
+
+- **null**: only object literal, allowed to be any object type.
+- Boolean: **true** and **false**.
+- Integer: whole number, `1`, `23984`
+- Long: number with trailing L, `1L`, `1l`
+    - lowercase l looks like 1, use uppercase L by convention
+- Floating point: number with trailing f, `23f`, `23.00239F`
+- Double: number with dot, or trailing d, `23.23`, `23d`
+- Octal: leading zero, `01771`
+- Hexadecimal: leading 0x, `0x23af`
+- Exponential: `1.39e-43` defaults to double, add `f` for float
+
+- Character: surrounded by single quotes
+    - '\n' (newline)
+    - '\b' (backspace)
+    - '\f' (form feed)
+    - '\'' (single quote)
+    - '\t' (tab)
+    - '\r' (return)
+    - '\\' (backslash)
+    - '\"' (double quote)
+- Strings: surrounded by double quotes
+
+### Operators
+
+#### Arithmetic (mathematical)
+
+```
+    - unary minus: reverses sign of number (* -1)
+    ∗ multiplication
+    / division (int division truncates rather than rounds)
+    + addition
+    − subtraction
+    % the modulo operator
+```
+
+#### Increment and decrement
+
+```
+    ++i : add 1 to i then preform expression i is involved in
+    i++ : preform expression i is involved in then increment i
+    --i :
+    i-- :
+
+    // given
+    i = 1;
+    j = 5;
+
+    j = i++; // is equivalent to
+    j = i;
+    i += 1;
+
+    j = ++i; // is equivalent to
+    i += 1;
+    j = i;
+```
+
+TODO: what happens when there's multiple ++ operators in a single line? Follows the operator order.
+ie:
+
+```
+    a[5] = 10;
+    j = 5;
+    a[j++] = a[j++] + 2;
+```
+
+#### String Concatenation
+
+```
+    + string concatenation
+```
+
+#### Relational
+```
+    < less than
+    <= less than or equal to == equal to
+    != not equal to
+    >= greater than or equal to
+    > greater than
+    == equal, for objects this compares references only.
+```
+
+#### Logical
+Can ONLY take boolean values, unlike python, JS and others.
+
+- ! not (prefix)
+- && conditional and
+- || conditional or
+- boolean-exp ? exp-0 : exp-1;
+    - see Ternary Operator
+
+#### Bitwise (for boolean and integer variables)
+
+```
+    ∼ bitwise complement (prefix unary operator)
+    & bitwise and : 1 if (1,1) else 0
+    | bitwise or : 0 if (0,0) else 1
+    ˆ bitwise exclusive-or: 1 if (1,0) or (0,1) else 0
+    << shift bits left, filling in with zeros
+    >> shift bits right, filling in with sign bit
+    >>> shift bits right, filling in with zeros
+```
+
+### Operator precedence
+
+Operators on the same line are evaluated in left-to-right order.
+Except for assignment which is done in right-to-left order.
+
+Operation Precedence Reference table:
+
+|Operator Precedence|
+|-|-|-|
+| | Type | Symbols |
+|1| array index method call dot operator | [] () . |
+|2| postfix ops <br/> prefix ops <br/> cast | exp++ exp−− <br/> ++exp −−exp +exp −exp  ̃exp !exp <br/>(type) exp
+|3| mult./div. | ∗ / % |
+|4| add./subt. | + - |
+|5| shift | << >> >>> |
+|6| comparison | < <= > >= instanceof |
+|7| equality | == != |
+|8| bitwise-and | & |
+|9| bitwise-xor | ^ |
+|10| bitwise-or | \| |
+|11| and | && |
+|12| or | \|\| |
+|13| conditional | booleanExpression ? valueIfTrue : valueIfFalse |
+|14| assignment | = += −= ∗= /= %= <<= >>= >>>= &= ^= \|= |
+
+### Logical Control Flow
+
+#### Ternary Operator
+
+    boolean-exp ? exp-0 : exp-1;
+
+Returns exp-0 if true, exp-1 if false.
+
+This is both a control structure and an operator:
+- Control Structure: Allows different execution paths based on logic expression (Does not evaluate the other expression).
+- Operator: Returns the value of the evaluated expression.
+
+    Type var = boolean-exp ? exp-0 : exp-1;
+
+Both expressions must return the same type.
+
+#### If
+Single statement bodies don't need curly braces
+
+```java
+if (firstBooleanExpression)
+    firstBody
+else if (secondBooleanExpression) {
+    secondBody
+    withTwoLines
+} else
+    thirdBody
+```
+
+#### Switch
+Evaluates expression which must result in an integer, string, or Enum.
+Jumps to case that matches that result, or the default expression.
+Brake statement must be used to exit the switch once the code is finished.
+
+- especially useful with Enum types
+- no curly braces are needed
+
+```
+switch (expression) {
+    case result1:
+    case result2:
+        System.out.println("This is tough.");
+        break;
+    case result3:
+        System.out.println("This is getting better.");
+        break;
+    default:
+        System.out.println("Day off!");
+}
+```
+
+### Loop Control Flow
+
+#### While Loop
+
+```
+while (booleanExpression)
+    loopBody
+```
+
+This example advances through an array data until it finds the value target or reaches the end of the array and exits.
+```java
+int[] data = {1,2,3,4,5};
+int target = 3;
+int j = 0;
+while ((j < data.length) && (data[j] != target))
+    j++;
+```
+
+#### Do While
+Same as While but executes body once before evaluating.
+Most useful where the condition is dependent on the body code.
+
+```
+do
+    loopBody
+while (booleanExpression)
+```
+
+#### For
+```
+for (initialization; booleanCondition; increment)
+    loopBody
+
+for (int i = 0, j = 5; i < length; i++, j += 2) {
+    loopBody
+}
+```
+- variables define in initialization step are only available in loop scope
+- booleanCondition is checked at beginning of loop
+- increment is executed after the loopBody and can be any valid statement including empty.
+- Multiple variables of the same type can be initiated and iterated over using the comma operator
+
+#### For each (JE5)
+
+```
+for (elementType containerElement : container)
+    loopBody
+```
+
+- container must either be an array of `elementType` or a collection that implements the Iterable interface.
+- containerElement is assigned next element in the container and is scoped to the loop
+    - regular assignment rules apply as per [object-assignment](#object-assignment)
+
+### Breaking Control flow (continue, break, and label)
+`continue` moves flow of control to the end of the loopBody
+TODO: does `continue` execute the condition at the end of a do-while loop?
+`break` moves flow of control out of a switch, for, while, or do-while
+If you need to break out of multiple loops you can use a label. 
+
+```
+label1:
+outer-iteration {
+    inner-iteration {
+        break; // only breaks out of inner-iteration
+        continue; // continues the inner-iteration
+        continue label1; // continues the labeled iteration
+        break label1; // breaks out of the labeled iteration
+    }
+}
+```
+
+## Object Basics
+
+### Class Modifiers
+Best practice: default to `private`, then `protected`, then `package-protected`, then `public`.
+
+Access control modifiers:
+- default without any modifier (package-private): restricts access to within the same package
+- public: an element with this modifier can be accessed from anywhere by any class or method
+- private: ONLY accessible to the class itself
+- protected: restricts access to a class, method or variable to:
+    - classes that are part of the same package
+    - sub-classes through inheritance
+
+#### static
+Declare constants using `final static` modifiers by default.
+
+This field, method, or class is not tied to any particular instance of the enclosing class. Created and associated with class instead of instance.
+This means there is only one version for every instance to share.
+When methods are static they are usually called using the ClassName instead of the instanceName.
+
+#### abstract
+Define only the Method Signature.
+This allows for public classes to be completely abstracted from the user.
+
+#### final
+Final version of that element:
+- final variable is similar to a constant, and usually has static (uses less space)
+Final method or class: Only relevant for inheritance
+- a final method cannot be overriden by a subclass
+    - TODO: is this specific to the name of the method or to the method signature?
+- a final class cannot be have a subclass
+
+
+### Initialization
+
+#### Field initialization
+Methods can be called in the initialization phase.
+Fields can be initialized based on parameters in the constructor or based on literals in the initialization statement
+
+#### Initialization Block
+An entire execution area of the method can be called wrapped in braces to execute with initialization.
+Initialization blocks can either be static or non-static
+
+```
+class Teaset() {
+    static Cup cup;
+    static Cup cup2;
+    static {
+        cup = new Cup();
+        cup2 = methodCup();
+    }
+    Cup cup3;
+    Cup cup4;
+    {
+        cup3 = new Cup(3);
+        cup4 = methodCup();
+    }
+    methodCup() {
+        return new Cup();
+    }
+}
+```
+
+### Methods
+Method Signature: Method name with the number and types of its parameters
+An object can have multiple methods with the same name so long as they return the same type(because type isn't part of the "Method Signature").
+Type isn't part of the Method Signature because of calling a method for it's side effect. If you call a method an ignore it's return value the compiler has no way of knowing which method to call.
+When multiple methods are present, the JVM uses the first method that matches the number and type of parameters being called.
+
+Method Overloading: multiple methods can have the same name in Java. They just need to have unique Method Signatures.
+
+#### Arguments
+Arguments are a list of Type Arg-name pairs.
+
+    (Type name, Type2 name2, Type3, name3)
+
+VarArgs: It is also possible to use a variable length array as an argument:
+
+    (Type... argName)
+
+varargs complicates overloading methods since it can create many ambiguous situations.
+
+#### Declaring methods
+Declaring a class (static) or instance (without static) variable
+
+    [modifiers] type identifier_1[=initialValue1], identifier_2[=initialValue2];
+
+Declaring a Method signature and method body
+
+    [modifiers] returnType methodName(type_1 param_1, ..., type_n param_n) {
+        // method body ...
+    }
+
+`returnType`: Must return a valid Type either a primitive or defined type.
+If multiple items must be returned:
+- return a compound object
+- modify the internal state of an existing object
+
+Parameters: Primitives are passed as copies of the original value using assignment, objects are passed as references to the original object. see [object-assignment](#object-assignment)
+
+#### The main Method
+Every java program starts with a main method:
+
+```java
+public static void main(String[ ] args) {
+    // main method body...
+}
+```
+
+#### return
+A method that is declared as returning a type must return that type!
+If you need to return from a void method you can `return;`.
+
+#### Constructor Method
+Define a constructor method by naming it after the class.  
+Default constructor: `public NameOfClass()`.
+If there is no constructor Java will creat a blank default constructor.
+
+1. cannot be static, abstract, or final
+1. cannot specify a `returnType`
+
+Constructing a `new` object with variables initiated.  
+1. new object is allocated in memory on the heap (dynamically)
+1. instance variables are initialized
+1. the constructor method is called
+1. returns a (reference | memory address | pointer) to the newly created object
+
+Call constructor from inside a constructor
+    super();
+    this();
+
+#### finalize() Garbage Collection
+This method will be called instead of being garbage collected the first time. On the following garbage collection the object will be collected.
+
+Your object might never be garbage collected.
+The object does not get destroyed, it get released.
+
+Use Cases:
+    - Cleaning storage allocated by native methods
+        - better to use a C or C++ destroy paradigm
+    - Error handling
+
+### this
+Static pointer to the class instance from within an instance method (nonstatic).
+- instance variables can be accessed from within a method, however, `this` allows differentiation between instance variables and local variables
+- allows calling other instance methods from within an instance method `this.method()`
+- allows calling one constructor from within another constructor `this()`
+
+Method scope is inherited from class so `this` is not required to reference instance variables.
+
+### Object equality
+TODO: how is equality determined in Java?
+
+object.equals(); // for object equivalence.
+Default is to compare references (==).
+
+### Clonable Interface
+Seems to be a concessus that clonable is broken. 
+http://www.artima.com/intv/bloch13.html
+
+Cloning is a secondary object creation path that does not use the object constructors and instead relies on class creators to implement a clone method.
+This method starts by calling the `supper.clone()` method on the object in order to get a hierarchically cloned object. This intoduces room for errors since there are now two object creation paths to maintain.
+
+```java
+public class clonableClass implements Cloneable {
+    public clonableClass clone() throws CloneNotSupportedException {
+        // Call all previous clonning steps in order to clone any private elements from super classes.
+        clonableClass other = (clonableClass) super.clone();
+        // preform cloning process for the current class.
+        return other;
+    }
+}
+```
+
+### Object Lifetime
+
+#### Initialization
+
+First time Class is used
+
+1. Java locates *.class file in the $CLASSPATH
+1. Class memory is allocated on the heap
+1. Static methods are stored
+1. Static fields declarations and initializations are executed in sequential order
+
+For each new instance:
+1. Object memory is allocated on the heap
+1. Memory is wiped to zero's
+1. fields declarations and initializations are executed in sequential order
+2. constructor is called
+
+All objects are created on the heap, specifically they are created in the nursery to begin with.
+
+#### Cleanup
+Sometimes it's useful to cleanup an object when it's ready to be abandoned.
+- external resources have been allocated
+- expensive garbage collections will interrupt realtime processes
+
+Calling a method when an item is no longer needed.
+Similar to managing your own destruction in C/C++, however, there is no standard way to do this.
+
+#### Garbage Collection
+See finalize()
+
+
+### Package management
+In order to manage the global name space every library is contained in it's own package. This completely eliminates the namespace issues of C and C++.
+
+Group files containing Enums and Classes into packages by:
+- all located in directory _packagename_
+- first line of every file must be `package packagename;`
+
+By convention:
+- packages are lowercase
+- classes are camel case
+You immediately know if referring to a package or a class within a package.
+
+Reverse URL package names are recommended to avoid name collision.
+ie. com.ianedington.comp308.tpa1
+
+#### Importing Packages
+It is possible to refer to a class or enum within a package directly:
+
+```
+fully.qualified.package.ClassName object = new fully.qualified.package.Class();
+```
+
+but this gets long and so we use `import`
+
+import a specific Class or Enum from a package:
+- name collision will throw error
+
+```
+import fully.qualified.package.ClassName;
+```
+
+import an entire package:
+- name collision will force you to use the qualified package name `package.ClassName`
+TODO: with a name collision using `import package.*` do you need to use the fully qualified or partially qualified package name?
+
+```
+import fully.qualified.package.*;
+```
+
+Every file imports all the classes from `java.lang` equivalent to bellow
+https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
+
+    import java.lang.*;
+
+## Special Object Structures
+
 ### Enum types
+Enums are static classes with some default behaviour.
+Constructors, initializes and everything about a static class is also available to an enum.
+
+Automatically provided with the ENUM
+    ordinal(): returns 0-index order of enum
+    toString(): returns name of enum
+    static values(): an array of values
+
 Useful for representing groups of constants like the days of the week.
 
 modifier enum name { valueName0 , valueName1 , . . . , valueNamen−1 };
@@ -405,6 +1058,112 @@ public enum Planet {
 }
 ```
 
+### Nested Classes
+Useful for keeping closely related classes together.
+
+```
+public class OuterName {
+    // declaring a nested class
+    public static class NestedName { /∗ class details omitted ∗/ }
+    private class NestedName2 {
+        public NestedName2(){
+            OuterName.this; // refers to outer class instance
+        }
+    }
+}
+
+public class Other {
+    public void main(String[] args) {
+        // Accessing nested class from outside outer class
+        OuterName.NestedName nested = new OuterName.NestedName();
+    }
+}
+```
+
+fully qualified name is OuterName.NestedName
+private nested class can be used by the outer class, but by no other classes
+
+A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
+The outer instance can be referenced from within the inner class using `OuterName.this`
+Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
+
+
+### Generics
+Introduced in Java 5.
+Used to create type independent methods.
+```java
+public class Pair<A,B> {
+    A first;
+    B second;
+
+    // constructor
+    public Pair(A a, B b) {
+        first = a;
+        second = b;
+    }
+
+    // getters for a and b
+    public A getFirst() { return first; }
+    public B getSecond() { return second;}
+}
+```
+
+By default every type within this declaration is the completely generic Object type. However there are many ways to narrow these types which makes this framework more useful.
+Use `<E>` when refering to class. Use `E` when refering to element within class.
+
+#### Arrays and Generics
+
+#### Generic Methods
+
+#### Bounding Generic types
+
+### Exceptions
+#### Checked vs Un-Checked exceptions
+TODO: understand and take notes on Checked vs Un-Checked exceptions
+
+#### Add Exceptions to a method
+```java
+// method definition with throws and throw
+modifiers returnType methodName(parameters) throws exceptionType1, exceptionType2 {
+    throw new exceptionType1(parameters);
+    throw new exceptionType2(parameters);
+}
+```
+
+`throws`: defines a method as possibly throwing an exception.
+- all checked exceptions that might propagate upward from a method must be explicitly declared in its signature.
+- Can be thrown in the method itself or in one of the methods it calls.
+- Multiple exceptionTypes can be separated by commas.
+- Can designate a super-class of the exception thrown instead.
+- does not negate the need for @throws javadoc
+
+#### Throwing Exceptions
+`throw`: from within a method, throw an exception
+
+Usually when throwing an exception a new exception object is created with optional constructor parameters.
+
+#### Catching
+```java
+try {
+    guardedBody
+} catch (exceptionType1 variable1) {
+    remedyBody1
+} catch (exceptionType2 | exceptionType3 variable2) {
+    remedyBody2
+} catch ...
+```
+
+exceptionType: valid exception type extending the Exception class
+|: separates multiple exceptions
+variable: valid java variable name holding the execption object
+
+#### Creating new Exception types
+An exception is a special class extended from the Exception class.
+Create a new exception type by extending the Exception class or any of it's subclasses.
+
+
+## Java Standard Library Objects
+
 ### Strings
 Java has a built in string class denoted by double quotes
 
@@ -418,330 +1177,6 @@ the String class is immutable
 For a mutable string use the StringBuilder class.
 
 
-
-### Expressions
-#### Literals
-Constants in the expression
-
-- **null**: only object literal, allowed to be any object type.
-- Boolean: **true** and **false**.
-- Integer & Floating point: Literal number
-- Character: surrounded by single quotes
-        '\n' (newline)
-        '\b' (backspace)
-        '\f' (form feed)
-        '\'' (single quote)
-        '\t' (tab)
-        '\r' (return)
-        '\\' (backslash)
-        '\"' (double quote)
-- Strings: surrounded by double quotes
-
-#### Operators
-
-Arithmetic
-
-```
-    + addition
-    − subtraction
-    ∗ multiplication / division
-    % the modulo operator
-    -- unary minus: reverses sign of number (* -1)
-```
-
-Increment and decrement
-
-```
-    ++i : add 1 to i then preform expression i is involved in
-    i++ : preform expression i is involved in then increment i
-    --i :
-    i-- :
-
-    // given
-    i = 1;
-    j = 5;
-
-    j = i++; // is equivalent to
-    j = i;
-    i += 1;
-
-    j = ++i; // is equivalent to
-    i += 1;
-    j = i;
-```
-
-TODO: what happens when there's multiple ++ operators in a single line?
-ie:
-
-```
-    a[5] = 10;
-    j = 5;
-    a[j++] = a[j++] + 2;
-```
-
-String
-
-```
-    + string concatenation
-```
-
-Logic
-
-```
-    < less than
-    <= less than or equal to == equal to
-    != not equal to
-    >= greater than or equal to
-    > greater than
-
-    ! not (prefix)
-    && conditional 
-    || conditional or
-```
-
-Bitwise (for boolean and integer variables)
-
-```
-    ∼ bitwise complement (prefix unary operator)
-    & bitwise and | bitwise or
-    ˆ bitwise exclusive-or
-    << shift bits left, filling in with zeros
-    >> shift bits right, filling in with sign bit
-    >>> shift bits right, filling in with zeros
-```
-
-Assignment
-
-```
-    = straight assignment
-    op= : assignment while performing operation (op)
-
-    x op= 2 is equivalent to x = x op 2
-```
-
-#### Operator precedence
-
-Operators on the same line are evaluated in left-to-right order.
-Except for assignment which is done in right-to-left order.
-
-Operation Precedence Reference table:
-
-|Operator Precedence|
-|-|-|-|
-| | Type | Symbols |
-|1| array index method call dot operator | [] () . |
-|2| postfix ops <br/> prefix ops <br/> cast | exp++ exp−− <br/> ++exp −−exp +exp −exp  ̃exp !exp <br/>(type) exp
-|3| mult./div. | ∗ / % |
-|4| add./subt. | + - |
-|5| shift | << >> >>> |
-|6| comparison | < <= > >= instanceof |
-|7| equality | == != |
-|8| bitwise-and | & |
-|9| bitwise-xor | ˆ |
-|10| bitwise-or | &#124; |
-|11| and | && |
-|12| or | &#124;&#124; |
-|13| conditional | booleanExpression ? valueIfTrue : valueIfFalse |
-|14| assignment | = += −= ∗= /= %= <<= >>= >>>= &= ˆ= &#124;= |
-
-#### Control Flow
-- single statement bodies don't need curly braces
-
-##### If
-
-```java
-if (firstBooleanExpression)
-    firstBody
-else if (secondBooleanExpression) {
-    secondBody
-    withTwoLines
-} else
-    thirdBody
-```
-
-##### Switch
-Evaluates expression which must result in an integer, string, or Enum.
-Jumps to case that matches that result, or the default expression.
-This is the only explicit jump, therefor a brake statement must be used to exit the switch once the code is finished or it will continue evaluating the next expression.
-
-- especially useful with Enum types
-- no curly braces are needed
-
-```
-switch (expression) {
-    case result1:
-        System.out.println("This is tough.");
-        break;
-    case result2:
-        System.out.println("This is getting better.");
-        break;
-    default:
-        System.out.println("Day off!");
-}
-```
-
-##### While Loop
-
-```
-while (booleanExpression)
-    loopBody
-```
-
-This example advances through an array data until it finds the value target or reaches the end of the array and exits.
-```java
-int[] data = {1,2,3,4,5};
-int target = 3;
-int j = 0;
-while ((j < data.length) && (data[j] != target))
-    j++;
-```
-
-##### Do While
-Same as While but executes body once before evaluating.
-Most useful where the condition is dependent on the body code.
-
-```
-do
-    loopBody
-while (booleanExpression)
-```
-
-##### For
-```
-for (initialization; booleanCondition; increment)
-    loopBody
-
-for (int i = 0; i < length; i++) {
-    loopBody
-}
-```
-- variables define in initialization step are only available in loop scope
-- booleanCondition is checked at beginning of loop
-- increment is executed after the loopBody and can be any valid statement.
-
-##### For each
-introduced in java 5
-
-```
-for (elementType containerElement : container)
-    loopBody
-```
-
-- container must either be an array of `elementType` or a collection that implements the Iterable interface.
-- containerElement is assigned next element in the container and is scoped to the loop
-    - regular assignment rules apply as per [object-assignment](#object-assignment)
-
-##### Explicit Control flow (continue and break)
-`break` moves flow of control out of a switch, for, while, or do-while
-`continue` moves flow of control to the end of the loopBody
-TODO: does `continue` execute the condition at the end of a do-while loop?
-
-#### return
-A method that is declared as returning a type must return that type!
-If you need to return from a void method you can `return;`.
-
-### Variables, Objects and Assignment
-All variables must be declaired before they are used.
-There are two main types of variables; primivites and objects.
-Objects are actually pointers(references) to a datastructure, whereas a primitives is the data.
-
-When two variables are assigned the same object they are assigned the same instance of that object.
-For primitives this means making a replica of the data point.
-For Objects this means making a replica of the **pointer**.<a name="object-assignment"></a>
-
-Declare constants using `final static` modifiers by default.
-
-### Objects
-#### Class Modifiers
-
-Best practice: default to `private`, then `protected`, then `package-protected`, then `public`.
-
-Access control modifiers:
-- default without any modifier (package-private): restricts access to within the same package
-- public: an element with this modifier can be accessed from anywhere by any class or method
-- private: ONLY accessible to the class itself
-- protected: restricts access to a class, method or variable to:
-    - classes that are part of the same package
-    - sub-classes through inheritance
-
-static:
-This field, method, or class is not tied to any particular instance of the enclosing class. Created and associated with class instead of instance.
-This means there is only one version for every instance to share.
-When methods are static they are usually called using the ClassName instead of the instanceName.
-
-abstract:
-Define only the Method Signature.
-This allows for public classes to be completely abstracted from the user.
-
-final:
-Final version of that element:
-- final variable is similar to a constant, and usually has static (uses less space)
-Final method or class: Only relevant for inheritance
-- a final method cannot be overriden by a subclass
-    - TODO: is this specific to the name of the method or to the method signature?
-- a final class cannot be have a subclass
-
-#### Methods
-Method Signature: Method name with the number and types of its parameters
-An object can have multiple methods with the same name so long as they return the same type(because type isn't part of the "Method Signature").
-When multiple methods are present, the JVM uses the first method that matches the number and type of parameters being called.
-
-#### Declaring methods and variables
-Declaring a class (static) or instance (without static) variable
-$$$
-[modifiers] type identifier_1[=initialValue1], identifier_2[=initialValue2];
-$$$
-
-Declaring a Method signature and method body
-$$$
-[modifiers] returnType methodName(type_1 param_1, ..., type_n param_n) {
-    // method body ...
-}
-$$$
-
-Void is a valid `returnType`.
-Method must return a value of type `returnType`.
-If multiple items must be returned:
-- return a compound object
-- modify the internal state of an existing object
-
-Parameters are passed as copies of the original value using assignment. see [object-assignment](#object-assignment)
-- objects passed can be modified
-
-#### Constructor Method
-Define a constructor method by naming it after the class.  
-Default: `public nameOfClass() { }`. If you override the default the default signature won't be available.
-
-1. cannot be static, abstract, or final
-1. cannot specify a `returnType`
-
-Constructing a `new` object with variables initiated.  
-1. new object is allocated in memory on the heap (dynamically)
-1. instance variables are initialized
-1. the constructor method is called
-1. returns a (reference | memory address | pointer) to the newly created object
-
-#### this
-Static pointer to the class instance from within an instance method (nonstatic).
-- instance variables can be accessed from within a method, however, `this` allows differentiation between instance variables and local variables
-- allows calling other instance methods from within an instance method `this.method()`
-- allows calling one constructor from within another constructor `this()`
-
-Method scope is inherited from class so `this` is not required to reference instance variables.
-
-#### The main Method
-must be declared as follows:
-
-```java
-public static void main(String[ ] args) {
-    // main method body...
-}
-```
-
-
-
-#### Object equality
-TODO: how is equality determined in Java?
 
 #### Inheritence
 `extend` is used to create a sub-class in java
@@ -839,203 +1274,13 @@ public class BoxedItem2 implements Insurable {
 }
 ```
 
-### Nested Classes
-Useful for keeping closely related classes together.
+### BigInteger and BigDecimal
+Same as int or float but arbitrarily accurate.
 
-```
-public class OuterName {
-    // declaring a nested class
-    public static class NestedName { /∗ class details omitted ∗/ }
-    private class NestedName2 {
-        public NestedName2(){
-            OuterName.this; // refers to outer class instance
-        }
-    }
-}
+### Random
+Psudo random number generator
 
-public class Other {
-    public void main(String[] args) {
-        // Accessing nested class from outside outer class
-        OuterName.NestedName nested = new OuterName.NestedName();
-    }
-}
-```
-
-fully qualified name is OuterName.NestedName
-private nested class can be used by the outer class, but by no other classes
-
-A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
-The outer instance can be referenced from within the inner class using `OuterName.this`
-Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
-
-
-### Casting
-Two types. Explicit and Implicit.
-Implicit casting happens when operations produce a larger object and that larger object is expected
-
-```
-int i = 42;
-double d = i; // implicit casting from int to double
-i = d; // implicit cast results in loss of precision; compile error is thrown
-```
-
-Explicit casting can be done anywhere there is implicit casting however it is necessary where a casting would result in loss of precision. `(type) exp` is the general form.
-
-```
-i = (int)d; // forces the casting and loss of precision;
-```
-
-Strings break this rule. Explicit casting to a string is not allowed.
-
-```
-String s = 22; // this is wrong!
-String s = Integer.toString(22); // this is good
-String t = (String) 4.5; // this is wrong!
-String t = "" + 4.5; // correct, but poor style
-String u = "Value = " + (String) 13; // this is wrong!
-String u = "Value = " + 13; // this is good
-```
-
-#### Casting object and interfaces
-Moving to a more generic datatype does not need an Explicit type cast. (widening conversion)
-    - correctness can be checked by compiler
-Moving to a more specific datatype needs an Explicit type cast. (narrowing conversion)
-    - must be tested by java run time environment
-    - throws ClassCastException if not the correct type
-
-```
-// example of widening conversion
-CreditCard card = new PredatoryCreditCard(...);
-// example of narrowing conversion with explicit cast
-PredatoryCreditCard pcard = (PredatoryCreditCard) card;
-```
-
-A narrowing conversion happens when a type T is converted into type S given:
-- S is a subclass of T
-- S is a subinterface of T
-- S is a class that implements the interface T
-
-**instanceof is a useful operator when working with object casting**
-
-### Generics
-Introduced in Java 5.
-Used to create type independent methods.
-```java
-public class Pair<A,B> {
-    A first;
-    B second;
-
-    // constructor
-    public Pair(A a, B b) {
-        first = a;
-        second = b;
-    }
-
-    // getters for a and b
-    public A getFirst() { return first; }
-    public B getSecond() { return second;}
-}
-```
-
-By default every type within this declaration is the completely generic Object type. However there are many ways to narrow these types which makes this framework more useful.
-Use `<E>` when refering to class. Use `E` when refering to element within class.
-
-#### Arrays and Generics
-
-#### Generic Methods
-
-#### Bounding Generic types
-
-### Exceptions
-#### Checked vs Un-Checked exceptions
-TODO: understand and take notes on Checked vs Un-Checked exceptions
-
-#### Add Exceptions to a method
-```java
-// method definition with throws and throw
-modifiers returnType methodName(parameters) throws exceptionType1, exceptionType2 {
-    throw new exceptionType1(parameters);
-    throw new exceptionType2(parameters);
-}
-```
-
-`throws`: defines a method as possibly throwing an exception.
-- all checked exceptions that might propagate upward from a method must be explicitly declared in its signature.
-- Can be thrown in the method itself or in one of the methods it calls.
-- Multiple exceptionTypes can be separated by commas.
-- Can designate a super-class of the exception thrown instead.
-- does not negate the need for @throws javadoc
-
-#### Throwing Exceptions
-`throw`: from within a method, throw an exception
-
-Usually when throwing an exception a new exception object is created with optional constructor parameters.
-
-#### Catching
-```java
-try {
-    guardedBody
-} catch (exceptionType1 variable1) {
-    remedyBody1
-} catch (exceptionType2 | exceptionType3 variable2) {
-    remedyBody2
-} catch ...
-```
-
-exceptionType: valid exception type extending the Exception class
-|: separates multiple exceptions
-variable: valid java variable name holding the execption object
-
-#### Creating new Exception types
-An exception is a special class extended from the Exception class.
-Create a new exception type by extending the Exception class or any of it's subclasses.
-
-
-### Package management
-In order to manage the global name space every library is contained in it's own package. This completely eliminates the namespace issues of C and C++.
-
-Group files containing Enums and Classes into packages by:
-- all located in directory _packagename_
-- first line of every file must be `package packagename;`
-
-By convention:
-- packages are lowercase
-- classes are camel case
-You immediately know if referring to a package or a class within a package.
-
-Reverse URL package names are recommended to avoid name collision.
-ie. com.ianedington.comp308.tpa1
-
-#### Importing Packages
-It is possible to refer to a class or enum within a package directly:
-
-```
-fully.qualified.package.ClassName object = new fully.qualified.package.Class();
-```
-
-but this gets long and so we use `import`
-
-import a specific Class or Enum from a package:
-- name collision will throw error
-
-```
-import fully.qualified.package.ClassName;
-```
-
-import an entire package:
-- name collision will force you to use the qualified package name `package.ClassName`
-TODO: with a name collision using `import package.*` do you need to use the fully qualified or partially qualified package name?
-
-```
-import fully.qualified.package.*;
-```
-
-Every file imports all the classes from `java.lang` equivalent to bellow
-https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
-
-    import java.lang.*;
-
-### JavaDocs
+## JavaDocs
 Tags:
 @see "See Also" with link to another class
 
@@ -1050,8 +1295,7 @@ Tags:
 @return
 @throws fully-qualified-class-name description
 
-
-### Compilation
+## Compilation
 Class files will run cross platform. No need to compile on each system individually.
 Provides API for system functions - meaning it completely abstracts away the underlying hardware.
 
@@ -1068,69 +1312,12 @@ p=>end: End
 f1(right)->o1(right)->f2(right)->o2(right)->p(right)
 ```
 
-#### ClassPath
+### ClassPath
 Calling `java program.class` the runtime environment locates the packages and class according to a special operating system environment variable named “CLASSPATH”.
 This variable defines an order of directories in which to search for the package or class.
 
 ```
 export CLASSPATH=.:/usr/local/java/lib:/usr/netscape/classes
-```
-
-## Builtin Objects
-
-### BigInteger and BigDecimal
-Same as int or float but arbitrarily accurate.
-
-## Object Oriented Programming
-
-### Design Patters
-
-#### Template method
-
-#### Composition
-
-#### Adapter
-
-#### Position
-
-#### Iterator
-A nested that iterates through the elements of a class.
-
-The class needs to implement `java.util.Iterable`.
-Iterable has a method `iterable()` which returns an `java.util.Iterator`.
-`Iterator` is a class, usually a nested class that implements `java.util.Iterator`.
-
-This is a complicated way to reliably get an object on which you can call:
-```
-Obj<E> obj = new Obj;
-Iterator<E> objIter = obj.iterator();
-
-boolean nextExists = objIter.hasNext();
-E nextElement = obj.next();
-```
-
-#### Factory Method
-
-#### Comparator
-
-#### Locator
-
-### Clonable Interface
-Seems to be a concessus that clonable is broken. 
-http://www.artima.com/intv/bloch13.html
-
-Cloning is a secondary object creation path that does not use the object constructors and instead relies on class creators to implement a clone method.
-This method starts by calling the `supper.clone()` method on the object in order to get a hierarchically cloned object. This intoduces room for errors since there are now two object creation paths to maintain.
-
-```java
-public class clonableClass implements Cloneable {
-    public clonableClass clone() throws CloneNotSupportedException {
-        // Call all previous clonning steps in order to clone any private elements from super classes.
-        clonableClass other = (clonableClass) super.clone();
-        // preform cloning process for the current class.
-        return other;
-    }
-}
 ```
 
 ## Testing
@@ -1169,229 +1356,15 @@ Guidelines Submitting all TME's
 - Where a TME suggests developing a program in stages, document and submit the final deliverable only, not the intermediate stages. 
 - Please include examples, code fragments, etc to illustrate your points in your answers to the unit questions. 
 
+### Example Programs
+
+Shows assignment of objects vs primitives: [Assignment.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Assignment.java)  
+Shows passing objects: [PassObject.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/PassObject.java)  
+
 ## Quiz 1: 100% / 3 percent
 
-## Unit 3: Program Control
 
-### Unit Purpose
-Describe and use the elements of program control in
-Java.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended.)
-
-##### Programs
-**Note**: The objectives **Programs** examples are intended to clarify
-any problems you have understanding these programs in the text. You do
-not have to compile and run every program if you are sure you understand
-the function of the programs.
-
-### Section 1: Java Operators
-**Section Goal**: Describe Java operators.
-
-#### Learning Objective 1: Use the assignment operator.
-
-##### Readings
-**Required:** Pages 93 to 98 of TIJ
-
-##### Exercises
-**Questions**
-
-1.  What is the precedence among arithmetic operators? (See TIJ page 95.)
-2.  What is the difference in assignment between primitives and objects? (See TIJ pages 95 to 97.)
-3.  What is aliasing? (See TIJ pages 97 to 98.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Assignment.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Assignment.java)
-[PassObject.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/PassObject.java)
-
-#### Learning Objective 2: Use the common Java operators.
-
-##### Readings
-**Required:** Pages 98 to 111 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the mathematical operators? (See <span>TIJ</span> pages 98 to 101.)
-2.  How do auto pre-increment, pre-decrement, post-increment, and post-decrement work? (See <span>TIJ</span> pages 101 to 103.)
-3.  What are the relational operators? (See <span>TIJ</span> page 103.)
-4.  How does one test for object equivalence? (See <span>TIJ</span> pages 103 to 105.)
-5.  What are the logical operators? (See <span>TIJ</span> pages 105 to 106.)
-6.  What is short-circuiting? (See <span>TIJ</span> pages 106 to 108.)
-7.  How are literals used to specify type in Java? (See <span>TIJ</span> pages 108 to 109.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[MathOps.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/MathOps.java)
-[AutoInc.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/AutoInc.java)
-[Equivalence.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Equivalence.java)
-[EqualsMethod.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/EqualsMethod.java)
-[EqualsMethod2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/EqualsMethod2.java)
-[Bool.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Bool.java)
-[ShortCircuit.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/ShortCircuit.java)
-
-#### Learning Objective 3: Describe the Java bitwise operators.
-
-##### Readings
-**Required:** Pages 111 to 116 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the bitwise operators? (See TIJ pages 111 to 112.)
-2.  What is the shift operator? (See TIJ pages 112 to 113.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[URShift.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/URShift.java)
-[BitManipulation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/BitManipulation.java)
-
-#### Learning Objective 4: Describe other operators used in Java.
-
-##### Readings
-**Required:** Pages 116 to 119 of TIJ
-
-##### Exercises
-**Questions**
-1.  How does the ternary **if-else** operator work? (See TIJ pages 116 to 118.)
-2.  What is the function of the **string** + operator? (See TIJ pages 118 to 119.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[TerneryIfElse.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/TernaryIfElse.java)
-[StringOperators.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/StringOperators.java)
-
-#### Learning Objective 5: Use Java operators in various situations.
-
-##### Readings
-**Required:** Pages 118 to 133 of TIJ
-
-##### Exercises
-**Questions**
-1.  How does explicit casting work in Java? (See TIJ pages 120 to 121.)
-
-##### Programs
-Compile, run, and analyse programs:
-
-[CastingNumbers.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/CastingNumbers.java)
-[Literals.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Literals.java)
-[AllOps.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/AllOps.java)
-[Overflow.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Overflow.java)
-
-#### Learning Objective 6: Apply the material covered in this section to the writing of your Java programs.
-
-##### Readings
-**Required:** Pages 133 of TIJ
-
-##### Exercises
-Exercises 5 and 6 on page 105 of TIJ.
-
-##### Answers To Exercises
--   [Answers 5 and 6](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_1/Ch4ex5ex6.java)
-
-### Section 2: Execution Control
-**Section Goal:**  Describe execution control in Java programming.
-
-#### Learning Objective 1: Describe execution control using the **if-else** commands.
-
-##### Readings
-**Required:** Pages 135 to 137 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the two basic forms of **if**? (See TIJ pages 135 to 136.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[IfElse.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/IfElse.java)
-[IfElse2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/IfElse2.java)
-
-#### Learning Objective 2: Describe execution control using iteration constructs.
-
-##### Readings
-**Required:** Pages 137 to 151 of TIJ
-
-##### Exercises
-**Questions**
-1.  How does **while** differ from **do-while**? (See TIJ pages 137 to 138.)
-2.  What is unique to the **for** statement in regard to defining variables? (See TIJ pages 138 to 139.)
-3.  What is the function of the comma operator? (See TIJ page 140.)
-4.  What is the equivalence of a **for** loop in *foreach syntax*? (See TIJ page 141).
-5.  What are the purposes of the **return** keyword? (See TIJ page 143).
-6.  How are **break** and **continue** used in Java? (See TIJ pages 144 to 146.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[WhileTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/WhileTest.java)
-[ListCharacters.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/ListCharacters.java)
-[CommaOperator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/CommaOperator.java)
-[BreakAndContinue.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/BreakAndContinue.java)
-[LabeledFor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/LabeledFor.java)
-[LabeledWhile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/LabeledWhile.java)
-
-#### Learning Objective 3: Describe execution control using the **switch** statement.
-
-##### Readings
-**Required:** Pages 151 to 154 of TIJ
-
-##### Exercises
-**Questions**
-1.  How is **break** used within **switch**? (See TIJ page 151 to 152.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[VowelsAndConsonants.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/control/VowelsAndConsonants.java)
-
-#### Learning Objective 4: Apply the material covered in this section to the writing of your Java programs.
-
-##### Readings
-**Required:** Page 154 of TIJ
-
-##### Exercises
-Exercise 1 on page 139, exercise 7 on page 146 and exercise 8 on page
-153 of TIJ
-
-##### Answers To Exercises
--   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex1.java)
--   [Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex7.java)
--   [Answer 8a](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8a.java)
--   [Answer 8b](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8b.java)
-
-### Section 3: Initialization and Clean-up
-**Section Goal:** Describe *initialization* and *clean up * in Java
-programming.
-
-#### Learning Objective 1: Describe the creation of objects with constructors and overloading.
-
-##### Readings
-**Required:** Pages 155 to 172 of TIJ
-
-2. **Note: Cascade**
-
-The Leaf.java program uses a form called cascade in the line
-
-x.increment)..increment)..increment)..print).;
-
-With cascade syntax, the output of each method is passed to the next
-method in the cascade.
-
-##### Exercises
-**Questions**
-1.  What is the purpose of a constructor? (See TIJ page 155.)
-2.  How are overloaded methods distinguished from each other? (See TIJ pages 160 to 161.)
-3.  What is a default constructor? (See TIJ pages 166 to 167.)
-4.  How is the keyword **this** used in Java? (See TIJ pages 167 to 168.)
-
-##### Programs
-Compile, run, and analyze programs:
-
+## Program
 [SimpleConstructor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor.java)
 [SimpleConstructor2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor2.java)
 [Overloading.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Overloading.java)
@@ -1402,60 +1375,13 @@ Compile, run, and analyze programs:
 [NoSynthesis.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/NoSynthesis.java)
 [Leaf.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Leaf.java)
 [Flower.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Flower.java)
-
-#### Learning Objective 2: Describe finalization, garbage collection, and cleaning up in Java.
-
-##### Readings
-**Required:** Pages 173 to 181 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the purpose of **finalize**? (See TIJ pages 173 to 174.)
-2.  Why is **finalize** not good as a destructor? (See TIJ pages 173 to 175.)
-3.  Why must one perform clean up? (See TIJ page 175.)
-
-##### Programs
-Compile, run, and analyze programs:
-
 [TerminationCondition.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/TerminationCondition.java)
-
-#### Learning Objective 3: Outline and use the process of member initialization.
-
-##### Readings
-**Required:** Pages 181 to 193 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the initial values of primitives that are encapsulated in an object, and what are the initial values of primitives that are not encapsulated in an object? (See TIJ pages 181 to 183.)
-2.  What is the advantage of constructor initialization? (See TIJ page 185.)
-3.  When are variables in an object initialized? (See TIJ pages 185 to 186.)
-4.  What are the steps in the process of creating an object? (See TIJ page 189.)
-5.  What is explicit **static** initialization? (See TIJ pages 190 to 191.)
-6.  What is non-**static** instance initialization? (See TIJ pages 191 to 193.)
-
-##### Programs
-Compile, run, and analyze programs:
-
 [InitialValues.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/InitialValues.java)
 [InitialValues2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/InitialValues2.java)
 [OrderOfInitialization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OrderOfInitialization.java)
 [StaticInitialization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/StaticInitialization.java)
 [ExplicitStatic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ExplicitStatic.java)
 [Mugs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Mugs.java)
-
-#### Learning Objective 4: Explain how to initialize arrays.
-
-##### Readings
-**Required:** Pages 193 to 204 of TIJ
-
-##### Exercises
-**Questions:**
-1.  What is the advantage of bounds checking? (See TIJ pages 194 to 195.)
-2.  What is an array of handles? (See TIJ pages 196 to 197.)
-
-##### Programs
-Compile, run and analyse programs
-
 [ArrayOfPrimitives.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArraysOfPrimitives.java)
 [ArrayNew.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArrayNew.java)
 [ArrayClassObj.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArrayClassObj.java)
@@ -1464,32 +1390,24 @@ Compile, run and analyse programs
 [VarArgs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/VarArgs.java)
 [NewVarArgs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/NewVarArgs.java)
 [OverloadingVarargs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OverloadingVarargs.java)
-
-#### Learning Objective 5: Explain how to use enumerated types.
-
-##### Readings
-**Required:** Pages 204 to 207 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the features or methods created automatically when you create an **enum**? (See TIJ page 205.)
-
-##### Programs
-Compile, run, and analyze programs:
-
 [EnumOrder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/EnumOrder.java)
 [Burrito.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Burrito.java)
 
-#### Learning Objective 6: Apply material covered in this section to the writing of your Java programs.
+## Exercises
+Exercise 1 on page 139, exercise 7 on page 146 and exercise 8 on page 153 of TIJ
+[Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex1.java)
+[Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex7.java)
+[Answer 8a](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8a.java)
+[Answer 8b](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8b.java)
 
-##### Readings
-**Required:** Pages 207 to 208 of TIJ
-
-##### Exercises
 Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
 19 on page 204 of TIJ
+-   [Answers 3 and 4](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex3ex4.java)
+-   [Answers 10 and 11](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex10ex11.java)
+-   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)
 
-##### Answers To Exercises
+Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
+19 on page 204 of TIJ
 -   [Answers 3 and 4](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex3ex4.java)
 -   [Answers 10 and 11](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex10ex11.java)
 -   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)

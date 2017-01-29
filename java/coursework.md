@@ -202,6 +202,7 @@ Best of both worlds, maintains information about how a M&S or S&C is working and
 javac - compiles code
 java - runs code
 javas- reveals source code
+jar archiver
 
 ### JIT (Just in time compiler)
 Partially or fully converts to machine code so the JVM doesn't need to interpret the code.
@@ -740,13 +741,24 @@ outer-iteration {
 ### Class Modifiers
 Best practice: default to `private`, then `protected`, then `package-protected`, then `public`.
 
-Access control modifiers:
-- default without any modifier (package-private): restricts access to within the same package
-- public: an element with this modifier can be accessed from anywhere by any class or method
-- private: ONLY accessible to the class itself
-- protected: restricts access to a class, method or variable to:
-    - classes that are part of the same package
+#### Access control modifiers:
+
+##### private
+Methods, fields are ONLY accessible within the immediate class
+    - Also JVM with with concurrency
+    - Doesn't make sense to have a private Class.
+
+##### package-private
+Class, Method or Field is accessible to other classes within the same package.
+    - Default without any modifier
+
+##### protected
+Class, Method or Field is accessible to:
+    - classes within the same package
     - sub-classes through inheritance
+
+##### public
+Class, Method or Field can be accessed from anywhere by any class or method
 
 #### static
 Declare constants using `final static` modifiers by default.
@@ -949,11 +961,27 @@ Group files containing Enums and Classes into packages by:
 
 By convention:
 - packages are lowercase
-- classes are camel case
+- classes are upper camel case
 You immediately know if referring to a package or a class within a package.
 
 Reverse URL package names are recommended to avoid name collision.
 ie. com.ianedington.comp308.tpa1
+
+#### Compilation Unit
+Each \*.java file is a "compilation unit"
+Each \*.java file can have a public class with the same name as the file.
+This is the only public class allowed in a compilation unit
+
+#### Class Path
+The entire JAR path must be added to the Class Path.
+
+The JVM searches for the package by converting the package name into a path and searching each element in the $CLASSPATH for the \*.class at that file location.
+ie. If the import statement is `import com.ianedington.comp308.HelloWorld;` and the class path is `/java:/usr/local/java/:/home/ie.jar:.`. the JVM will look to see if a `HelloWorld.class` file exists at the following locations:
+
+    /java/com/ianedington/comp308/HelloWorld.class
+    /usr/local/java/com/ianedington/comp308/HelloWorld.class
+    /home/ie.jar/com/ianedington/comp308/HelloWorld.class
+    ./com/ianedington/comp308/HelloWorld.class
 
 #### Importing Packages
 It is possible to refer to a class or enum within a package directly:
@@ -983,6 +1011,12 @@ Every file imports all the classes from `java.lang` equivalent to bellow
 https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
 
     import java.lang.*;
+
+
+#### Collision
+
+If you * import multiple packages you might import two classes with the same name.
+In this case if you use the explicit class name it will work.
 
 ## Special Object Structures
 
@@ -1324,6 +1358,13 @@ export CLASSPATH=.:/usr/local/java/lib:/usr/netscape/classes
 
 - zero, null, '', "", or empty value
 
+### Stub classes / packages
+Maintain a wrapper class in a sub-package. Use `import package.*;` for the deployment version, and use `import package.debug.*;` when debugging.
+
+### debug wrapper methods
+It is possible to write wrapper methods that pass calls to the real method and add functionality.
+
+
 ## Java for Programmers COMP308
 
 ### Tutor Questions:
@@ -1413,108 +1454,6 @@ Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
 -   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)
 
 ## Unit 4: Object Oriented Programming and Re-usability
-
-### Unit Purpose
-Describe and use the core object-oriented features of
-Java.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
-
-### Section 1: Access Control
-**Section Goal**: Use the capabilities for organizing, protecting, and
-encapsulating classes in Java.
-
-#### Learning Objective 1: Describe and use packages.
-
-##### Readings
-**Required:** Pages 209 to 217 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the four levels of access specification in Java? (See TIJ page 210.)
-2.  What is a compilation unit in Java? (See TIJ page 211.)
-3.  What is the meaning of a **package** statement? (See TIJ page 212.)
-4.  What is the naming convention for packages? (See TIJ pages 214 to 215.)
-5.  How does CLASSPATH work with packages? (See TIJ pages 214 to 215.)
-6.  How does CLASSPATH work with JAR files? (See TIJ page 215.)
-7.  What is the pitfall of Java's collision detection? (See TIJ page 217.)
-8.  How does Java handle collisions between classes in packages? (See TIJ page 217.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[FullQualification.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/FullQualification.java)
-[LibTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/LibTest.java)
-[QualifiedMyClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/QualifiedMyClass.java)
-
-#### Learning Objective 2: Explain more advanced issues in using packages.
-
-##### Readings
-**Required:** Pages 217 to 221 in TIJ
-
-##### Exercises
-**Questions**
-1.  How can packages be used to mimic conditional compilation? (See TIJ page 220.)
-2.  What is the package caveat? (See TIJ page 220.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[PrintTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/PrintTest.java)
-
-#### Learning Objective 3: Describe in detail, and use, the access levels.
-
-##### Readings
-**Required:** Pages 221 to 228 in TIJ
-
-##### Exercises
-**Questions**
-1.  What is **package** access? (See TIJ pages 221 to 222.)
-2.  What is **public** access? (See TIJ pages 222 to 224.)
-3.  What is **private** access? (See TIJ pages 224 to 225.)
-4.  What is **protected** access? (See TIJ page 225 to 227.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Cookie.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/cookie2/Cookie.java)
-[Dinner.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/Dinner.java)
-[Cake.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/Cake.java)
-[Pie.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/Pie.java)
-[IceCream.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/IceCream.java)
-[ChocolateChip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/ChocolateChip.java)
-[ChocolateChip2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/ChocolateChip2.java)
-
-#### Learning Objective 4: Discuss issues of access in implementation when using Java's protection levels.
-
-##### Readings
-**Required:** Pages 228 to 233 in TIJ
-
-##### Exercises
-**Questions**
-1.  What is the convention for ordering variables by access level? (See TIJ pages 228 to 229.)
-2.  What are the constraints on using the **public** access level? (See TIJ pages 229 to 230.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Lunch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/access/Lunch.java)
-
-#### Learning Objective 5: Integrate and summarize the material on Java as the object-oriented programming language of the Internet.
-
-##### Readings
-**Required:** Pages 233 to 235 of TIJ
-
-##### Exercises
-Exercises 5 and 6 on pages 227 to 228, exercise 9 on page 233 of TIJ
-(open question)
-
-**Question**
-1.  What are the two main reasons for access control? (See TIJ page 234.)
-
-##### Answers To Exercises
--   [Answers 5 and 6](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_1/Ch7ex5ex6.java)
 
 ### Section 2: Composition and Inheritance
 **Section Goal:**  Use composition and inheritance to design re-usable

@@ -129,6 +129,13 @@ TODO: What is the role of Java in server-side programming? (See TIJ pages 59 to 
 
 ### Design Patters
 
+#### Delegation
+Delegation is when one object delegates members to another object.
+
+A space ship control panel is a delegation mechanism. Anything you do to the control panel is actually delegated to the spaceship to perform.
+
+In java you would:
+
 #### Template method
 
 #### Composition
@@ -324,7 +331,7 @@ String u = "Value = " + (String) 13; // this is wrong!
 String u = "Value = " + 13; // this is good
 ```
 
-#### Casting object and interfaces
+#### Casting types, object and interfaces
 Moving to a more generic datatype does not need an Explicit type cast. (widening conversion)
     - correctness can be checked by compiler
 Moving to a more specific datatype needs an Explicit type cast. (narrowing conversion)
@@ -461,7 +468,6 @@ int[] c = { // only useful at declaration
         3, // Autoboxing
     };
 ```
-
 
 ### Indexing
 Java is a zero indexed language.
@@ -736,9 +742,36 @@ outer-iteration {
 }
 ```
 
+## Object Lifetime
+
+### Initialization
+
+Unlike other languages java files are not loaded until they are needed. They are needed when the first method is called (constructor or static).
+
+Static Initialization, First time Class is used:
+
+1. Java locates \*.class file in the $CLASSPATH
+1. Class memory is allocated on the heap
+1. Static methods are stored
+1. Static fields declarations and initializations are executed in sequential order
+
+Instance Initialization, For each new instance:
+1. Object memory is allocated on the heap
+1. Memory is wiped to zero's
+1. fields declarations and initializations are executed in sequential order
+2. constructor is called
+
+All objects are created on the heap, specifically they are created in the nursery to begin with.
+
+### Cleanup
+When using external resources sometimes objects need to be cleaned up. Since there is no destructor in Java this needs to be done manually with a method. Similar to managing memory in C/C++, but without a destructor. `dispose()` seems to be a loose convention.
+
+### Garbage Collection
+See finalize()
+
 ## Object Basics
 
-### Class Modifiers
+### Class, Method, and Field Modifiers
 Best practice: default to `private`, then `protected`, then `package-protected`, then `public`.
 
 #### Access control modifiers:
@@ -772,19 +805,47 @@ Define only the Method Signature.
 This allows for public classes to be completely abstracted from the user.
 
 #### final
-Final version of that element:
+Final version of that element (this can not be changed):
+Primitives
+    - non-static: creates an unmodifiable instance field
+    - static: creates a constant for the class
+Objects / Arrays
+    - Makes a reference final but the object is still mutable
+Method Arguments
+    - Within a method you can make an argument final
+
+        void methodName(final int i) {
+            i = 5; // this will fail
+        }
+
+Methods
+    - explicitly prevents overriding method in sub-classes
+Classes
+    - explicitly prevents inheritance from this class.
+
+Finals can be unique for the instance.
+Finals can be initialized in the constructor. (blank final fields)
+
 - final variable is similar to a constant, and usually has static (uses less space)
 Final method or class: Only relevant for inheritance
 - a final method cannot be overriden by a subclass
     - TODO: is this specific to the name of the method or to the method signature?
 - a final class cannot be have a subclass
 
+Be careful with final. Use with extreme caution.
 
 ### Initialization
 
 #### Field initialization
 Methods can be called in the initialization phase.
 Fields can be initialized based on parameters in the constructor or based on literals in the initialization statement
+
+#### Object field initialization
+Since some objects are quite large, special consideration should be given to when they should be initialized.
+1. when defined
+2. in the instance initialization
+3. in the constructor
+4. right before they are needed, (lazy initialization)
 
 #### Initialization Block
 An entire execution area of the method can be called wrapped in braces to execute with initialization.
@@ -921,37 +982,6 @@ public class clonableClass implements Cloneable {
 }
 ```
 
-### Object Lifetime
-
-#### Initialization
-
-First time Class is used
-
-1. Java locates *.class file in the $CLASSPATH
-1. Class memory is allocated on the heap
-1. Static methods are stored
-1. Static fields declarations and initializations are executed in sequential order
-
-For each new instance:
-1. Object memory is allocated on the heap
-1. Memory is wiped to zero's
-1. fields declarations and initializations are executed in sequential order
-2. constructor is called
-
-All objects are created on the heap, specifically they are created in the nursery to begin with.
-
-#### Cleanup
-Sometimes it's useful to cleanup an object when it's ready to be abandoned.
-- external resources have been allocated
-- expensive garbage collections will interrupt realtime processes
-
-Calling a method when an item is no longer needed.
-Similar to managing your own destruction in C/C++, however, there is no standard way to do this.
-
-#### Garbage Collection
-See finalize()
-
-
 ### Package management
 In order to manage the global name space every library is contained in it's own package. This completely eliminates the namespace issues of C and C++.
 
@@ -1012,11 +1042,136 @@ https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
 
     import java.lang.*;
 
-
 #### Collision
 
-If you * import multiple packages you might import two classes with the same name.
+If you \* import multiple packages you might import two classes with the same name.
 In this case if you use the explicit class name it will work.
+
+## Object Reuse
+
+### Composition
+Using one or more objects inside another object.
+"has-a" relationship.
+This is accomplished by creating an object and assigning it to a field in the composed object.
+
+Useful when you want the features of one or more existing class inside your class but not it's interface.
+
+### Inheritance
+Using everything from the initial class with the option of overriding members. This allows you to use another class as a template for a new class.
+"is-a" or "is-a-type-of" relationship
+
+Very useful when you want a specialized version of an existing class, want to maintain the interface of the base-class.
+
+Uses the key word `extends`.
+The resulting MyClass is a "sub-class" of YourClass.
+
+    class MyClass extends YourClass {};
+
+`super` is like `this` but refers to the super-class.
+
+In Java, each class can extend exactly one other class. Because of this property, Java is said to allow only single inheritance among classes.
+
+Initialization:
+Constructor methods are never inherited in java.
+
+You can think of an extended class as a wrapper around each a base class. The base class exists underneath.
+This means that when an extended object is initialized on object for every class in the inheritance hierarchy is initialized.
+Java starts with the basest of the base classes and works it's way down the inheritance.
+
+By default the constructor of the extended class will call the constructor of it's base before executing the rest of it's body.
+However, it's often useful to call it explicitly.
+`super()` is used to call a method from within the sub-class constructor.
+If it exists, `super(*args)` needs to be the first line of the constructor.
+If `super(*args)` is not found an implicit call to `super()` is made before a sub-classes constructor.
+
+#### Overriding base Methods
+It it possible to both override and overload methods from a base-class. This distinction is dangerous since it is easy to do one when you meant to do the other.
+For this reason there is a @override annotation that throws a compile time error if the method does not override a base method.
+
+### Polymorphism
+Variables in java are **polymorphic**: A variable declared as a super-class can hold a sub-class but are limited to the interface of the super-class.
+```java
+// If PredatoryCreditCard is a subclass of CreditCard this assignment with work.
+CreditCard card;
+card = new PredatoryCreditCard();
+```
+
+"dynamic dispatch" is how java calls the sub-class methods instead of the super-class methods for a given instance.
+
+`instanceof` tests at runtime if a variable is an instance of a specific class or any of it's sub-classes.
+```java
+CreditCard card1 = new CreditCard();
+CreditCard card2 = new PredatoryCreditCard();
+
+print(card1 instanceof CreditCard); // will return true
+print(card2 instanceof CreditCard); // will return true
+print(card1 instanceof PredatoryCreditCard); // will return false
+print(card2 instanceof PredatoryCreditCard); // will return true
+```
+
+### Abstract Class
+A class that is partially defined in that you can mix methods with method signatures.
+`abstact` modifier must be used for abstract classes or methods within an abstact class.
+- can extend another class
+- can implement an interface
+- can not produce object
+- Sub-classes that do not implement all abstract methods are themselves abstract
+
+Useful in many design patterns.
+
+```
+public abstract class AbstractProgression {
+    /** Constuctors can be created and called using super() */
+    public AbstractProgression() { this(0); }
+    public AbstractProgression(long start) { current = start; }
+
+    /** Concreat methods can be created */
+    public long nextValue() { /* code goes here */ }
+
+    /** so to can abstract methods */
+    protected abstract void advance();
+}
+```
+
+### Interface
+
+`interface` defines an interface. Same modifiers as class but without method body.
+`implements` keyword is used to declare a class as implementing an interface.
+- a class can implement multiple interfaces
+- an interface can extend multiple other interfaces
+
+```java
+public interface Sellable {
+    public String description();
+    public int listPrice();
+    public int lowestPrice();
+}
+
+/∗∗ Class extending an interface ∗/
+public class Photograph implements Sellable {
+    // MUST implement all interface methods!
+}
+
+public interface Transportable {
+    public int weight();
+    public boolean isHazardous();
+}
+
+/∗∗ Class extending multiple interfaces ∗/
+public class BoxedItem implements Sellable, Transportable {
+    // MUST implement all interfaces methods!
+}
+
+/∗∗ interface extending multiple interfaces ∗/
+public interface Insurable extends Sellable, Transportable {
+    public int insuredValue();
+}
+
+/** class extending Insurable interface */
+public class BoxedItem2 implements Insurable {
+    // MUST implement all interfaces methods!
+}
+```
 
 ## Special Object Structures
 
@@ -1121,7 +1276,6 @@ A nonstatic nested class (inner class) can only be created from within a nonstat
 The outer instance can be referenced from within the inner class using `OuterName.this`
 Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
 
-
 ### Generics
 Introduced in Java 5.
 Used to create type independent methods.
@@ -1195,7 +1349,6 @@ variable: valid java variable name holding the execption object
 An exception is a special class extended from the Exception class.
 Create a new exception type by extending the Exception class or any of it's subclasses.
 
-
 ## Java Standard Library Objects
 
 ### Strings
@@ -1209,104 +1362,6 @@ char[ ] msg = original.toCharArray();
 indexing by character
 the String class is immutable
 For a mutable string use the StringBuilder class.
-
-
-
-#### Inheritence
-`extend` is used to create a sub-class in java
-`super` is like `this` but refers to the super-class.
-
-In Java, each class can extend exactly one other class. Because of this property, Java is said to allow only single inheritance among classes.
-
-The constructor methods are never inherited in java.
-`super()` is used to call a method from within the sub-class constructor.
-If `super(*args)` is not found an implicit call to `super()` is made before a sub-classes constructor.
-
-
-#### Polymorphism
-Variables in java are **polymorphic**: A variable declared as a super-class can hold a sub-class but are limited to the interface of the super-class.
-```java
-// If PredatoryCreditCard is a subclass of CreditCard this assignment with work.
-CreditCard card;
-card = new PredatoryCreditCard();
-```
-
-"dynamic dispatch" is how java calls the sub-class methods instead of the super-class methods for a given instance.
-
-`instanceof` tests at runtime if a variable is an instance of a specific class or any of it's sub-classes.
-```java
-CreditCard card1 = new CreditCard();
-CreditCard card2 = new PredatoryCreditCard();
-
-print(card1 instanceof CreditCard); // will return true
-print(card2 instanceof CreditCard); // will return true
-print(card1 instanceof PredatoryCreditCard); // will return false
-print(card2 instanceof PredatoryCreditCard); // will return true
-```
-
-#### Abstract Class
-A class that is partially defined in that you can mix methods with method signatures.
-`abstact` modifier must be used for abstract classes or methods within an abstact class.
-- can extend another class
-- can implement an interface
-- can not produce object
-- Sub-classes that do not implement all abstract methods are themselves abstract
-
-Useful in many design patterns.
-
-```
-public abstract class AbstractProgression {
-    /** Constuctors can be created and called using super() */
-    public AbstractProgression() { this(0); }
-    public AbstractProgression(long start) { current = start; }
-
-    /** Concreat methods can be created */
-    public long nextValue() { /* code goes here */ }
-
-    /** so to can abstract methods */
-    protected abstract void advance();
-}
-```
-
-#### Interface
-
-`interface` defines an interface. Same modifiers as class but without method body.
-`implements` keyword is used to declare a class as implementing an interface.
-- a class can implement multiple interfaces
-- an interface can extend multiple other interfaces
-
-```java
-public interface Sellable {
-    public String description();
-    public int listPrice();
-    public int lowestPrice();
-}
-
-/∗∗ Class extending an interface ∗/
-public class Photograph implements Sellable {
-    // MUST implement all interface methods!
-}
-
-public interface Transportable {
-    public int weight();
-    public boolean isHazardous();
-}
-
-/∗∗ Class extending multiple interfaces ∗/
-public class BoxedItem implements Sellable, Transportable {
-    // MUST implement all interfaces methods!
-}
-
-/∗∗ interface extending multiple interfaces ∗/
-public interface Insurable extends Sellable, Transportable {
-    public int insuredValue();
-}
-
-/** class extending Insurable interface */
-public class BoxedItem2 implements Insurable {
-    // MUST implement all interfaces methods!
-}
-```
 
 ### BigInteger and BigDecimal
 Same as int or float but arbitrarily accurate.
@@ -1364,7 +1419,6 @@ Maintain a wrapper class in a sub-package. Use `import package.*;` for the deplo
 ### debug wrapper methods
 It is possible to write wrapper methods that pass calls to the real method and add functionality.
 
-
 ## Java for Programmers COMP308
 
 ### Tutor Questions:
@@ -1404,7 +1458,6 @@ Shows passing objects: [PassObject.java](https://triton2.athabascau.ca/html/cour
 
 ## Quiz 1: 100% / 3 percent
 
-
 ## Program
 [SimpleConstructor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor.java)
 [SimpleConstructor2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor2.java)
@@ -1434,6 +1487,31 @@ Shows passing objects: [PassObject.java](https://triton2.athabascau.ca/html/cour
 [EnumOrder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/EnumOrder.java)
 [Burrito.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Burrito.java)
 
+[SprinklerSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SprinklerSystem.java)
+[Bath.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Bath.java)
+
+[Detergent.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Detergent.java)
+[Cartoon.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Cartoon.java)
+[Chess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Chess.java)
+
+[SpaceShip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShip.java)
+[SpaceShipDelegation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShipDelegation.java)
+
+[PlaceSetting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/PlaceSetting.java)
+[CADSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/CADSystem.java)
+[Hide.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Hide.java)
+[Car.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Car.java)
+[Orc.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Orc.java)
+[Wind.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Wind.java)
+
+[FinalData.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalData.java)
+[BlankFinal.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/BlankFinal.java)
+[FinalArguments.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalArguments.java)
+[FinalOverridingIllusion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalOverridingIllusion.java)
+[Jurassic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Jurassic.java)
+
+[Beetle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Beetle.java)
+
 ## Exercises
 Exercise 1 on page 139, exercise 7 on page 146 and exercise 8 on page 153 of TIJ
 [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex1.java)
@@ -1453,139 +1531,17 @@ Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
 -   [Answers 10 and 11](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex10ex11.java)
 -   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)
 
-## Unit 4: Object Oriented Programming and Re-usability
+Exercises 5 and 6 on pages 227 to 228, exercise 9 on page 233 of TIJ
+1.  What are the two main reasons for access control? (See TIJ page 234.)
+[Answers 5 and 6](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_1/Ch7ex5ex6.java)
 
-### Section 2: Composition and Inheritance
-**Section Goal:**  Use composition and inheritance to design re-usable
-classes.
-
-#### Learning Objective 1 Describe and use composition.
-
-##### Readings
-**Required:** Pages 237 to 241 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is composition? (See TIJ page 237.)
-2.  Where can handles be initialized? (See TIJ pages 239 to 241.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SprinklerSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SprinklerSystem.java)
-[Bath.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Bath.java)
-
-#### Learning Objective 2 Describe and use inheritance.
-
-##### Readings
-**Required:** Pages 241 to 246 of TIJ
-
-##### Exercises
-**Questions**
-1.  What does the keyword **extends** accomplish? (See TIJ pages 241 to 243.)
-2.  How does the base class get initialized in the case of default constructors? (See TIJ page 244 to 246.)
-3.  How does the base class get initialized in the case of constructors with arguments? (See TIJ pages 245 to 246.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Detergent.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Detergent.java)
-[Cartoon.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Cartoon.java)
-[Chess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Chess.java)
-
-#### Learning Objective 3: Explain and use *delegation*.
-
-##### Readings
-**Required:** Pages 246 to 248 of TIJ
-
-##### Exercises
-**Questions**
-
-1.  What is delegation in relation to composition and inheritance? (See TIJ pages 246 to 248.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SpaceShip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShip.java)
-[SpaceShipDelegation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShipDelegation.java)
-
-#### Learning Objective 4: Demonstrate, contrast, and compare inheritance and composition.
-
-##### Readings
-**Required:** Pages 249 to 262 of TIJ
-
-##### Exercises
-**Questions**
-
-1.  Why would a programmer write a clean up method? (See TIJ page 251.)
-2.  How does a method in a derived class affect a method in a base class with the same name but a different signature? (See TIJ pages 255 to 256.)
-3.  When is composition used compared to when inheritance is used? (See TIJ pages 256 to 258.)
-4.  How does **protected** work with inheritance? (See TIJ pages 258 to 259.)
-5.  What is the advantage of upcasting? (See TIJ pages 260 to 261.)
-6.  What is a good rule for deciding between inheritance and composition? (See TIJ page 261 to 262.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[PlaceSetting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/PlaceSetting.java)
-[CADSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/CADSystem.java)
-[Hide.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Hide.java)
-[Car.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Car.java)
-[Orc.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Orc.java)
-[Wind.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Wind.java)
-
-#### Learning Objective 5: Explain and use **final** in various contexts.
-
-##### Readings
-**Required:** Pages 262 to 272 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are two ways of setting a **final** primitive value? (See page 262 of TIJ.)
-2.  What is the difference between **static final** versus **final**? (See pages 262 to 263 of TIJ.)
-3.  What is the effect of **final** on objects? (See page 263 to 265 of TIJ.)
-4.  What is the advantage of using a blank **final**? (See page 265 to 266 of TIJ.)
-5.  How does a **final** argument function? (See pages 266 to 268 of TIJ.)
-6.  Why should one be cautious in using **final** method? (See page 270 of TIJ.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[FinalData.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalData.java)
-[BlankFinal.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/BlankFinal.java)
-[FinalArguments.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalArguments.java)
-[FinalOverridingIllusion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalOverridingIllusion.java)
-[Jurassic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Jurassic.java)
-
-#### Learning Objective 6: Explain the process of initialization and class loading.
-
-##### Readings
-**Required:** Pages 272 to 274 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the ordering of events in initialization and class loading? (See pages 272 to 274 of TIJ.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Beetle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Beetle.java)
-
-#### Learning Objective 7: Integrate and summarize the material in this section.
-
-##### Readings
-**Required:** Pages 274 to 275 of TIJ
-
-##### Exercises
-Exercise 5 on page 245, exercise 7 on page 246, exercises 16 and 17 on
-page 262 of TIJ
-
-##### Answers To Exercises
+Exercise 5 on page 245, exercise 7 on page 246, exercises 16 and 17 on page 262 of TIJ
 -   [Answer 5](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex5.java)
 -   [Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex7.java)
 -   [Answer 16](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex16.java)
 -   [Answer 17](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex17.java)
 
+## Unit 4: Object Oriented Programming and Re-usability
 ### Section 3: Polymorphism
 **Section Goal**: Use polymorphism in advanced Java programming.
 
@@ -1842,7 +1798,6 @@ See Guidelines for guidance on submitting TMEs and marking scheme.
 Each program in this TME will be weighted equally in your final mark. The total for the programs will be 95% of the TME.
 You are also required to select one of the questions for one objective from each of Units 1, 2, and 3. Submit your answers to your tutor as part of this TME. The answers to the review questions have a weight of 5 per cent of your TME mark. A total of 3 questions are required.
 Your submission should include all source files, a separate test plan for all 4 programs and a separate document on the objective questions. Do not submit class files.
-
 
 ### Programs
 
@@ -2331,13 +2286,11 @@ Please complete TME 2 and submit it by electronic mail.
 Tutor Marked Exercise 2 is scored out of 100 and contributes to 10 per
 cent of your final grade.
 
-
 ## Unit 6: Types, Generics and Containers
 
 ### Unit Purpose
 Discuss Types and Types related features in
 Java.
-
 
 ### Conferencing
 Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
@@ -2934,7 +2887,6 @@ Exercise 4 on page 1027 of TIJ
 ### Unit Purpose
 Discuss and use Java IO and Java Networking features.
 
-
 ### Conferencing
 Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
 
@@ -3161,7 +3113,6 @@ files.
 **Questions**
 1.  Define a Socket.
 
-
 ### Digital Reading Room
 Unit 7 Section 2 Links:
 -   [On cloning and object immutability](http://library.athabascau.ca/drr/redirect.php?id=8129)
@@ -3177,7 +3128,6 @@ cent of your final grade.
 ### Unit Purpose
 Design, develop, and implement GUIs and
 simple graphical effects.
-
 
 ### Conferencing
 Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
@@ -3374,7 +3324,6 @@ Compile, run, and analyze programs:
 #### Learning Objective 5
 -   Summarize the materials in this section and finish the exercises.
 
-
 ### Digital Reading Room
 Unit 8 Section 2 Links
 -   [Apache ANT](http://library.athabascau.ca/drr/redirect.php?id=8133)
@@ -3496,7 +3445,6 @@ Compile, run, and analyze programs:
 
 ### Unit Purpose
 Explain and use Java support of concurrency.
-
 
 ### Conferencing
 Post any questions or comments to the CMC system (conferencing is optional, but is recommended)

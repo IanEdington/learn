@@ -54,7 +54,7 @@ The base class (shape) defines an interface and implementation. The derived clas
 An object can be treated as any of it's base types. A circle can be treated like a shape.
 This makes is easier to write programs because if you write a method that consumes a shape, instead of a circle, you can then extend the shape to be a square and the same method will work.
 **late binding:** This is accomplished using late binding. At the time of compiling the compiler doesn't know which methods and functions are going to be called. In C and other early languages compilers used to hard code the function that was going to be called (early binding). Late binding is in every language I've used.
-Late binding (aka dynamic binding). Instead of calling the function directly late binding calls an intermediary function that finds the function to call.
+Late binding (aka dynamic binding). Instead of calling the method directly late binding calls a method-call mechanism which finds the function to call, based on the object.
 Polymorphism extensively uses up-casting.
 
 1.  How does late binding enable upcasting and polymorphism? (See TIJ pages 38 to 43.)
@@ -126,45 +126,6 @@ Server site: JSP's and Servlets
     - Intranet you generally have more control over what clients are in use. Because of this control it's possible to implement client server apps that would have large barriers to entry for general use.
 
 TODO: What is the role of Java in server-side programming? (See TIJ pages 59 to 60.)
-
-### Design Patters
-
-#### Delegation
-Delegation is when one object delegates members to another object.
-
-A space ship control panel is a delegation mechanism. Anything you do to the control panel is actually delegated to the spaceship to perform.
-
-In java you would:
-
-#### Template method
-
-#### Composition
-
-#### Adapter
-
-#### Position
-
-#### Iterator
-A nested that iterates through the elements of a class.
-
-The class needs to implement `java.util.Iterable`.
-Iterable has a method `iterable()` which returns an `java.util.Iterator`.
-`Iterator` is a class, usually a nested class that implements `java.util.Iterator`.
-
-This is a complicated way to reliably get an object on which you can call:
-```
-Obj<E> obj = new Obj;
-Iterator<E> objIter = obj.iterator();
-
-boolean nextExists = objIter.hasNext();
-E nextElement = obj.next();
-```
-
-#### Factory Method
-
-#### Comparator
-
-#### Locator
 
 ## The Java platform
 Completely abstracted hardware.
@@ -351,6 +312,9 @@ A narrowing conversion happens when a type T is converted into type S given:
 - S is a class that implements the interface T
 
 **instanceof is a useful operator when working with object casting**
+
+#### RTTI Runtime type identification
+Downcasting sometimes causes errors. There is type checking during runtime on downcasts. If the wrong type of object occurs an error with be thrown.
 
 ### Comments
 Three types of comments
@@ -751,20 +715,24 @@ Unlike other languages java files are not loaded until they are needed. They are
 Static Initialization, First time Class is used:
 
 1. Java locates \*.class file in the $CLASSPATH
-1. Class memory is allocated on the heap
-1. Static methods are stored
+1. All methods are stored
+1. Class memory is allocated on the heap and whipped to zero
+1. Object field memory is allocated on the heap and wiped to zero's
+1. recursive: If extending a class the base object/class gets initialized here.
 1. Static fields declarations and initializations are executed in sequential order
-
-Instance Initialization, For each new instance:
-1. Object memory is allocated on the heap
-1. Memory is wiped to zero's
 1. fields declarations and initializations are executed in sequential order
-2. constructor is called
+1. constructor is called see \<init\> methods
+
+TODO: make proof class for this initialization sequence
 
 All objects are created on the heap, specifically they are created in the nursery to begin with.
 
 ### Cleanup
 When using external resources sometimes objects need to be cleaned up. Since there is no destructor in Java this needs to be done manually with a method. Similar to managing memory in C/C++, but without a destructor. `dispose()` seems to be a loose convention.
+
+If you override `dispose()` you should call the base-class dispose using `super.dispose();`
+
+Objects should be disposed of in reverse order of creation, for dependency management.
 
 ### Garbage Collection
 See finalize()
@@ -1058,7 +1026,9 @@ Useful when you want the features of one or more existing class inside your clas
 
 ### Inheritance
 Using everything from the initial class with the option of overriding members. This allows you to use another class as a template for a new class.
-"is-a" or "is-a-type-of" relationship
+"is-a" or "is-like-a" relationship
+ "is-a": only has the same methods as the super-class
+ "is-like-a": extends the super-class with other methods
 
 Very useful when you want a specialized version of an existing class, want to maintain the interface of the base-class.
 
@@ -1071,7 +1041,9 @@ The resulting MyClass is a "sub-class" of YourClass.
 
 In Java, each class can extend exactly one other class. Because of this property, Java is said to allow only single inheritance among classes.
 
-Initialization:
+Interfaces can be nested within classes. This leads to interesting results.
+
+#### Initialization
 Constructor methods are never inherited in java.
 
 You can think of an extended class as a wrapper around each a base class. The base class exists underneath.
@@ -1084,9 +1056,17 @@ However, it's often useful to call it explicitly.
 If it exists, `super(*args)` needs to be the first line of the constructor.
 If `super(*args)` is not found an implicit call to `super()` is made before a sub-classes constructor.
 
+If calling an over ridden method in a constructor there might be weird bugs that happen. It will call the method but objects might not be initialized. Of course this can happen in a base class, but with inheritance being about to call base class fields at runtime makes this more complicated.
+Methods in the super-class constructor might call a method from the sub-class, which isn't initialized yet.
+
+**Good guildline is to do as little as possible in the constructor and try not to call methods.**
+
 #### Overriding base Methods
 It it possible to both override and overload methods from a base-class. This distinction is dangerous since it is easy to do one when you meant to do the other.
 For this reason there is a @override annotation that throws a compile time error if the method does not override a base method.
+
+Covariant return types: In a sub-class it's possible for a method to return a type that is a sub-type of the overridden method.
+A method can return a downstream type of it's overridden method's return type.
 
 ### Polymorphism
 Variables in java are **polymorphic**: A variable declared as a super-class can hold a sub-class but are limited to the interface of the super-class.
@@ -1109,12 +1089,20 @@ print(card1 instanceof PredatoryCreditCard); // will return false
 print(card2 instanceof PredatoryCreditCard); // will return true
 ```
 
+Polymorphism makes it possible to write less code since the code can be generalized to a general type of object and will run on any object that has the general type as an ancestor.
+
+Extensible because you are able to extend a class without reworking all the code. This is a powerful separation of things that change from things that stay the same when creating new classes of objects.
+
+Not everything is Polymorphic. No fields are, which means they are all set at compile time.
+**If a sub-class and super-class have a field with the same name, and a sub-class object is cast into it's super-type, a request for the field will go to the super-class.**
+**Static Methods don't behave polymorphically either.**
+
 ### Abstract Class
 A class that is partially defined in that you can mix methods with method signatures.
 `abstact` modifier must be used for abstract classes or methods within an abstact class.
 - can extend another class
 - can implement an interface
-- can not produce object
+- can not produce object `new AbstractClass();` will fail.
 - Sub-classes that do not implement all abstract methods are themselves abstract
 
 Useful in many design patterns.
@@ -1139,6 +1127,13 @@ public abstract class AbstractProgression {
 `implements` keyword is used to declare a class as implementing an interface.
 - a class can implement multiple interfaces
 - an interface can extend multiple other interfaces
+
+A useful interface is a set of methods that stand alone and complete a useful amount of work together, but are not to big to exclude other classes.
+
+Interfaces are always public.
+It is possible to extend an interface, the result is another interface.
+Collision can occur when inheriting from multiple interfaces if they both define a method.
+It's possible to nest interfaces within classes, classes within interfaces, ect.
 
 ```java
 public interface Sellable {
@@ -1247,8 +1242,31 @@ public enum Planet {
 }
 ```
 
-### Nested Classes
+### Inner and Nested Classes
+
+Why Inner classes?
+Each inner-class can inherit/implement multiple interfaces/base-classes, while maintaining access to the outer-class instance.
+This allows for:
+- sudo-multi-inheritance
+- Closures
+
+1. The inner class can have multiple instances, each with its own state information that is independent of the information in the outer-class object.
+2. In a single outer class you can have several inner classes, each of which implements the same interface or inherits from the same class in a different way.
+3. The point of creation of the inner-class object is not tied to the creation of the outer-class object.
+4. There is no potentially confusing "is-a" relationship with the inner class; it’s a separate entity.
+
+Inner class relies on an outer object. Nested class (static) does not, but is inside another class.
+
+Inner-classes cannot:
+- have static Fields
+- have Nested (static) Inner-classes
+Nested (static) Inner-classes can!
+
 Useful for keeping closely related classes together.
+
+OuterClass.this: like this but refers to outer class instance.
+outerInstance.new: creates a new inner-class linked to that instance of the outerclass
+These work multiple levels deep.
 
 ```
 public class OuterName {
@@ -1269,12 +1287,38 @@ public class Other {
 }
 ```
 
+Inner-classes are very powerful for information hiding when they implement a base-class or interface. It's possible to create an object with a type and pass it back as an interface or base-type without ever knowing the full underlying type.
+
 fully qualified name is OuterName.NestedName
 private nested class can be used by the outer class, but by no other classes
 
 A nonstatic nested class (inner class) can only be created from within a nonstatic method of the outer class. The inner instance becomes associated with the outer instance that creates it.
 The outer instance can be referenced from within the inner class using `OuterName.this`
 Inner instance has private access to all members of its associated outer instance, and can rely on the formal type parameters of the outer class, if generic.
+
+upcasting
+
+anonymous class
+
+TODO: lots more about inner-classes. Do more reading about use cases.
+Use case for:
+- annonymous inner-classes.
+    - Factory method?
+- inner-classes within arbitrary scope
+
+Inheriting from an inner-class:
+You need to do a few special things to makes sure you have an outer class initialized.
+
+    InheritInnerConstructor(OuterClass oC) {
+        oC.super();
+    }
+
+5.  How do inner classes create a situation that looks like multiple inheritance? (See TIJ pages 378 to 382.)
+    Two inner classes can extend different classes, but still have access to the members of the outer class.
+
+1.  What is a local inner class and what are its features? (See TIJ 385.)
+2.  How are inner classes identified? (See TIJ page 387.)
+    using $ between outer and inner class name.
 
 ### Generics
 Introduced in Java 5.
@@ -1368,6 +1412,56 @@ Same as int or float but arbitrarily accurate.
 
 ### Random
 Psudo random number generator
+
+## Design Patters
+
+### Delegation
+Delegation is when one object delegates members to another object.
+
+A space ship control panel is a delegation mechanism. Anything you do to the control panel is actually delegated to the spaceship to perform.
+
+In java you would:
+
+### Template method
+ie. application framework
+
+A general template that pretty much works the way it should but needs to be customized.
+Instead of creating new objects you simply extend the existing objects with the customization and leave the heavy lifting to the template/framework.
+
+The template stays the same and the methods are what change.
+
+#### Control framework
+Event driven framework.
+Inner-classes are all the different types of events.
+
+### Composition
+
+### Adapter
+
+### Position
+
+### Iterator
+A nested that iterates through the elements of a class.
+
+The class needs to implement `java.util.Iterable`.
+Iterable has a method `iterable()` which returns an `java.util.Iterator`.
+`Iterator` is a class, usually a nested class that implements `java.util.Iterator`.
+
+This is a complicated way to reliably get an object on which you can call:
+```
+Obj<E> obj = new Obj;
+Iterator<E> objIter = obj.iterator();
+
+boolean nextExists = objIter.hasNext();
+E nextElement = obj.next();
+```
+
+### Factory Method
+Can be implemented using Interfaces
+
+### Comparator
+
+### Locator
 
 ## JavaDocs
 Tags:
@@ -1541,249 +1635,12 @@ Exercise 5 on page 245, exercise 7 on page 246, exercises 16 and 17 on page 262 
 -   [Answer 16](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex16.java)
 -   [Answer 17](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex17.java)
 
-## Unit 4: Object Oriented Programming and Re-usability
-### Section 3: Polymorphism
-**Section Goal**: Use polymorphism in advanced Java programming.
-
-#### Learning Objective 1: Describe the role of upcasting in polymorphism.
-
-##### Readings
-**Required:** Pages 277 to 289 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the advantage of upcasting? (See TIJ pages 278 to 281.)
-2.  What is the role of *late binding* in polymorphism? (See TIJ pages 281 to 282.)
-3.  How is extensibility supported by polymorphism? (See TIJ pages 286 to 289.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Wind.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/music/Wind.java)
-[Music.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/music/Music.java)
-[Music2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/music/Music2.java)
-[Shape.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/shape/Shape.java)
-[Circle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/shape/Circle.java)
-[Square.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/shape/Square.java)
-[Triangle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/shape/Triangle.java)
-[RandomShapeGenerator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/shape/RandomShapeGenerator.java)
-[Music3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/music3/Music3.java)
-[StaticPolymorphism.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/StaticPolymorphism.java)
-
-#### Learning Objective 2: Describe the use of constructors in the context of polymorphism.
-
-##### Readings
-**Required:** Pages 293 to 303 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the order of constructor calls for base and derived classes? (See TIJ pages 293 to 295.)
-2.  What is the order of **finalize** for base and derived classes? (See TIJ pages 295 to 299.)
-3.  What is a good rule for using polymorphic methods within a constructor? (See TIJ pages 301 to 303.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Sandwich.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/Sandwich.java)
-[Frog.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/Frog.java)
-[ReferenceCounting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/ReferenceCounting.java)
-[PolyConstructors.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/PolyConstructors.java)
-
-#### Learning Objective 3: Explain and use covariant return types.
-
-##### Readings
-**Required:** Pages 303 to 304 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is a *covariant return type*? (See TIJ pages 303 to 304.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[CovariantReturn.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/CovariantReturn.java)
-
-#### Learning Objective 4: Design re-usable programs.
-
-##### Readings
-**Required:** Pages 304 to 310 of TIJ
-
-##### Exercises
-**Questions**
-1.  What advantage does composition have over inheritance? (See TIJ pages 304 to 306.)
-2.  How can upcasting be ineffective with extension? (See TIJ pages 306 to 308.)
-3.  How is upcasting safe and downcasting not safe with extension? (See TIJ page 308.)
-4.  What is RTTI and how does it work with downcasting? (See TIJ pages 308 to 310.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Transmogrify.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/Transmogrify.java)
-[RTTI.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/polymorphism/RTTI.java)
-
-#### Learning Objective 5: Integrate and summarize the material on polymorphism in Java.
-
-##### Readings
-**Required:** Pages 310 of TIJ
-
-##### Exercises
-Exercise 9 on page 289 of TIJ and exercise 12 on pages 298 to 299 of
-TIJ.
-
-##### Answers To Exercises
+Exercise 9 on page 289 of TIJ and exercise 12 on pages 298 to 299 of TIJ.
 -   [Answer 9](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_3/Ch9ex9.java)
 -   [Answer 12](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_3/Ch9ex12.java)
 
-### Section 4: Interfaces and Inner Classes
-**Section Goal**: Discuss and use interfaces and inner classes in
-advanced Java programming.
-
-#### Learning Objective 1: Explain the use of abstract classes in Java.
-
-##### Readings
-**Required:** Pages 311 to 315 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are abstract classes and abstract methods? (See TIJ pages 311 to 312.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Music4.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/music4/Music4.java)
-
-#### Learning Objective 2: Explain the use of interfaces in Java.
-
-##### Readings
-**Required:** Pages 316 to 334 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the format of a Java interface? (See TIJ pages 316 to 317.)
-2.  Describe an example of how an interface can be applied to multiple different implementations. (See TIJ pages 320 to 326.)
-3.  How is multiple inheritance dealt with by interfaces? (See TIJ pages 326 to 327.)
-4.  How does **extend** differ for interfaces? (See TIJ pages 329 to 330.)
-5.  Can a class implement multiple interfaces? (See TIJ pages 330 to 331.)
-6.  What is one common use of interface? (See TIJ page 332.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Music5.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/music5/Music5.java)
-[Apply.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/classprocessor/Apply.java)
-[LowPass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/filters/LowPass.java)
-[HighPass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/filters/HighPass.java)
-[BandPass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/filters/BandPass.java)
-[FilterProcessor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/interfaceprocessor/FilterProcessor.java)
-[HorrorShow.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/HorrorShow.java)
-[RandomWords.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/RandomWords.java)
-[RandomDoubles.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/RandomDoubles.java)
-
-#### Learning Objective 3: Discuss other features of Java interface.
-
-##### Readings
-**Required:** Pages 335 to 343 of TIJ
-
-##### Exercises
-**Questions**
-1.  Can an interface be nested within another interface? (See TIJ page 339.)
-2.  What is a *Factory Method* design pattern and how does it relate to interface? (See TIJ page 339).
-3.  What is the appropriate guideline for choosing between classes and interfaces? (See TIJ page 343).
-
-##### Programs
-Compile, run, and analyze programs:
-
-[RandVals.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/RandVals.java)
-[NestingInterfaces.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/nesting/NestingInterfaces.java)
-[Factories.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/Factories.java)
-[Games.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/interfaces/Games.java)
-
-#### Learning Objective 4: Describe the use of inner classes.
-
-##### Readings
-**Required:** Pages 345 to 368 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is an inner class? (See TIJ page 345 to 346.)
-2.  What access do inner classes have to the containing class variables and methods? (See TIJ pages 347 to 349.)
-3.  What are the meanings of **.this** and **.new&lt;/&gt; in the context of an inner class? (See TIJ pages 350 to 351.)**
-4.  **What is the advantage of upcasting to an interface with inner classes? (See TIJ pages 352 to 353.)**
-5.  **What is the advantage of defining a class within a method or a scope? (See TIJ pages 354 to 355.)**
-6.  **What is an anonymous class? (See TIJ page 357.)**
-7.  **How do you initialize fields within an anonymous class? (See TIJ pages 358 to 360.)**
-8.  **What is instance initialization? (See TIJ page 361.)**
-9.  **What are characteristics of static inner classes? (See TIJ pages 364 to 365.)**
-10. How can you use **static** inner classes for testing? (See TIJ pages 366 to 367.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Parcel1.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel1.java)
-[Parcel2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel2.java)
-[Sequence.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Sequence.java)
-[TestParcel.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/TestParcel.java)
-[Parcel5.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel5.java)
-[Parcel6.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel6.java)
-[Parcel7.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel7.java)
-[Parcel8.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel8.java)
-[Parcel9.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel9.java)
-[AnonymousConstructor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/AnonymousConstructor.java)
-[Parcel10.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel10.java)
-[Parcel11.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Parcel11.java)
-[ClassInInterface.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/ClassInInterface.java)
-[MultiNestingAccess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/MultiNestingAccess.java)
-
-#### Learning Objective 5: Discuss the design issues of inner classes.
-
-##### Readings
-**Required:** Pages 369 to 383 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the one compelling reason for using an inner class? (See TIJ page 369.)
-2.  What is an *application framework*? (See TIJ page 375.)
-3.  What is a *control framework*? (See TIJ page 375.)
-4.  What are two advantages of inner classes for control frameworks? (See TIJ page 377.)
-5.  How do inner classes create a situation that looks like multiple inheritance? (See TIJ pages 378 to 382.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[MultiInterfaces.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/MultiInterfaces.java)
-[MultiImplementation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/MultiImplementation.java)
-[Callbacks.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/Callbacks.java)
-[Controller.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/controller/Controller.java)
-[GreenhouseControls.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/GreenhouseControls.java)
-[InheritInner.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/InheritInner.java)
-
-#### Learning Objective 6: Discuss other issues of inner classes.
-
-##### Readings
-**Required:** Pages 369 to 383 of TIJ.
-
-##### Exercises
-**Questions**
-1.  What is a local inner class and what are its features? (See TIJ 385.)
-2.  How are inner classes identified? (See TIJ page 387.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[BigEgg.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/BigEgg.java)
-[BigEgg2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/BigEgg2.java)
-[LocalInnerClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/innerclasses/LocalInnerClass.java)
-
-#### Learning Objective 7: Integrate and summarize the material on interface and inner class in Java.
-
-##### Readings
-**Required:** Pages 349 and 388 of TIJ
-
-##### Exercises
 Exercise 1 on page 315, exercise 18 on page 342, and exercise 24 on page
 382 of TIJ
-
-##### Answers To Exercises
 -   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch10ex1.java)
 -   [Answer 18](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch10ex18.java)
 -   [Answer 24](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch11ex24.java)

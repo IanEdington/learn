@@ -1010,6 +1010,8 @@ https://docs.oracle.com/javase/7/docs/api/java/lang/package-summary.html
 
     import java.lang.*;
 
+**static import** imports static members of a class
+
 #### Collision
 
 If you \* import multiple packages you might import two classes with the same name.
@@ -1517,9 +1519,26 @@ It is possible to write wrapper methods that pass calls to the real method and a
 
 ### Tutor Questions:
 1. What are the turn around times for assignment marking?
-2. Can I use Java 8 for assignments?
-3. Is there a marking rubric for the assignments
 4. Is there information about what will be tested for on the final exam?
+
+Topics I'm having a hard time understanding:
+2. Anonymous inner-classes. What are they useful for?
+
+### Tutor Answers:
+#### Questions about assignment 1
+1. I have Java 8 installed on my machine. Can I submit assignments that work in this version?
+>> Yes
+2. Is there a marking rubric for the assignments? I have found the submission guide, however, it does not talk about what you are looking for when you mark the assignments. For example:
+- Will the assignments be marked based on most efficient implementation or based on readability and maintainability.
+>> No, design is more important
+- Will there be marks given for documentation or simply for functionality?
+>> Documentation will take up 10% of the marks, functionality 50%, coding/design 20%, testing 15%, the rest 5% is for the answers to the objective questions.
+- How in depth do the tests need to be?
+>> It is more on the coverage. Of course we need to cover all requirements, but we also need to test for abnormal cases.
+3. Can I submit the objective questions as a plain text file or markdown file?
+>> Text file is fine. 
+4. Programs 1, 3, and 4 do not ask for tests to be written. Does this mean they do not need tests?
+>> We need to test all programs. Program 3 and 4 doesn't have user input, so a listing of the output will be fine. There are several methods required for Program 1 (Circle), some needs more than 1 tests (e.g., isInside). 
 
 ### All assignments must:
 Java 6 was the current version of Java when this course was created.
@@ -1669,18 +1688,41 @@ public boolean isInside(double x, double y)  return true if a point represented 
 public void move(int x, int y)  moves the origin by a specified amount.
 
 #### Program 2
-Write a class called FullName that represents a person full name. It must have separate fields for title (e.g., Mr., Mrs., Ms.), first name, middle name, and last name. Override the toString() method to return a nicely formatted name. Create as many methods as you think necessary.
-Write a class called MailingAddress that represents a mailing address. It must have separate fields for a FullName object, street address, city, province and postal code. Other than FullName all other fields are Strings. Override the toString() method to return a nicely formatted address. Create as many methods as you think necessary.
-Write a class called ShippingLabel that consists of ship-from and ship-to MailingAddress objects. Write a single method that prints the label to the console. Use these statements in the method:
-ShippingLabel label = new ShippingLabel(... your parameter list ...);
-System.out.println(label);
+Write a class called FullName that represents a person full name.
+    It must have separate fields for title (e.g., Mr., Mrs., Ms.), first name, middle name, and last name.
+    Override the toString() method to return a nicely formatted name.
+    Create as many methods as you think necessary.
+Write a class called MailingAddress that represents a mailing address.
+    It must have separate fields for a FullName object, street address, city, province and postal code.
+    Other than FullName all other fields are Strings.
+    Override the toString() method to return a nicely formatted address.
+    Create as many methods as you think necessary.
+Write a class called ShippingLabel that consists of ship-from and ship-to MailingAddress objects.
+    Write a single method that prints the label to the console.
+    Use these statements in the method:
+        ShippingLabel label = new ShippingLabel(... your parameter list ...);
+        System.out.println(label);
 Write a simple test program in the main method of ShippingLabel to test the above classes.
 
 #### Program 3
 Complete exercise 5 on page 286 of TIJ.
 
+Exercise 5:
+1. Starting from Exercise 1, add a wheels( ) method in Cycle, which returns the number of wheels.
+2. Modify ride( ) to call wheels( ) and verify that polymorphism works.
+
+Exercise 1:
+1. Create a Cycle class, with subclasses Unicycle, Bicycle and Tricycle.
+2. Demonstrate that an instance of each type can be upcast to Cycle via a ride( ) method.
+
 #### Program 4
 Complete exercise 10 on page 320 of TIJ.
+
+Exercise 10: (3) Modify Music5.java by adding a Playable interface.
+    Move the play( ) declaration from Instrument to Playable.
+    Add Playable to the derived classes by including it in the implements list.
+    Change tune( ) so that it takes a Playable instead of an Instrument.
+
 
 ## Unit 5: Collections, Arrays, Exceptions and Strings
 

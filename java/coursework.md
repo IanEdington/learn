@@ -1,4 +1,5 @@
 # Course Handbook
+Student ID: 3236986
 ## OOP Theory
 An object has state, behavior and identity.
 - Everything is an object
@@ -364,6 +365,8 @@ bool, char and 6 number types:
 - `double`: 64-bit floating point number
 - `void`: nothing (used in methods)
 
+For larger floats or integers checkout BigInteger and BigDecimal. Same as int or float but arbitrarily accurate.
+
 Initial values:
 When a primitive is declared in a method, Java does not guarantee primitives values. A compile time error will occur if a primitive is used without being initialized.
 When a primitive is declared as a member of a class. The variable is initialized with an initial variable.
@@ -384,57 +387,6 @@ The result is that you can use the primitive and wrapper class interchangeably.
 |long|Long|0L|
 |float|Float|0.0f|
 |double|Double|0.0d|
-
-### Array
-Arrays are a special type of object with slightly different syntax.
-Array's are guaranteed to be initialized.
-    Array's of objects are initialized to the null object.
-    When they are assigned an array only the object reference is stored.
-    Array's of primitives are initialized by zeroing the memory for those arrays.
-
-It is impossible to access an array outside its range, unlike C & C++.
-
-Has final property `length` 
-
-```java
-// Declare an array variable (pointer):
-int[ ] variableName;
-
-// create array and assign to variable
-variableName = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
-
-// create new array with size n
-variableName = new elementType[n];
-
-// declare array variable and assign it a new array
-double[ ] measurements = new double[1000];
-
-// retreive length of array
-System.out.println(measurements.length);
-```
-
-Array initialization
-
-```
-int[] a1;
-int a2[];
-a1 = { 1, 2, 3, 4, 5 };
-a2 = a1; //reference
-int[] a3 = { 1, 2, 3, 4, 5 };
-int[] a4 = new int[3]; //initialize empty array with 3 items
-a3 = new int[8];
-int[] b = new int[]{
-        new Integer(1),
-        3, // Autoboxing
-    };
-int[] c = { // only useful at declaration
-        new Integer(1),
-        3, // Autoboxing
-    };
-```
-
-### Indexing
-Java is a zero indexed language.
 
 ### Scope
 Scope is determined by the placement of curly braces.
@@ -932,24 +884,6 @@ TODO: how is equality determined in Java?
 object.equals(); // for object equivalence.
 Default is to compare references (==).
 
-### Clonable Interface
-Seems to be a concessus that clonable is broken. 
-http://www.artima.com/intv/bloch13.html
-
-Cloning is a secondary object creation path that does not use the object constructors and instead relies on class creators to implement a clone method.
-This method starts by calling the `supper.clone()` method on the object in order to get a hierarchically cloned object. This intoduces room for errors since there are now two object creation paths to maintain.
-
-```java
-public class clonableClass implements Cloneable {
-    public clonableClass clone() throws CloneNotSupportedException {
-        // Call all previous clonning steps in order to clone any private elements from super classes.
-        clonableClass other = (clonableClass) super.clone();
-        // preform cloning process for the current class.
-        return other;
-    }
-}
-```
-
 ### Package management
 In order to manage the global name space every library is contained in it's own package. This completely eliminates the namespace issues of C and C++.
 
@@ -1349,6 +1283,26 @@ Use `<E>` when refering to class. Use `E` when refering to element within class.
 
 #### Generic Methods
 
+If static it knows what Type based on whats passed in.
+the <T> in the static method defines a new Type. This is seperate from any Type defined in the Class.
+
+```
+class ClassParameter<T> {
+    public T[] f(T[] arg) { return arg; }
+}
+class MethodParameter {
+    public static <T> T[] f(T[] arg) { return arg; }
+}
+public class ParameterizedArrayType {
+    public static void main(String[] args) {
+        Integer[] ints = { 1, 2, 3, 4, 5 };
+        Integer[] ints2;
+        ints2 = new ClassParameter<Integer>().f(ints);
+        ints2 = MethodParameter.f(ints);
+    }
+}
+```
+
 #### Bounding Generic types
 
 ### Exceptions
@@ -1395,7 +1349,7 @@ variable: valid java variable name holding the execption object
 An exception is a special class extended from the Exception class.
 Create a new exception type by extending the Exception class or any of it's subclasses.
 
-## Java Standard Library Objects
+## Java Standard Library Types
 
 ### Strings
 Java has a built in string class denoted by double quotes
@@ -1409,11 +1363,145 @@ indexing by character
 the String class is immutable
 For a mutable string use the StringBuilder class.
 
-### BigInteger and BigDecimal
-Same as int or float but arbitrarily accurate.
+### Arrays
+Arrays are first class object with greatly reduced functionality.
+
+Why? Efficiency when using primitives. Containers are better in every other way.
+
+- hold primitives directly
+- hold objects as references.
+- fixed size
+- has final property `length`: returns int of array size.
+- Arrays in Java are zero indexed.
+    - `length - 1` is the last element in the array
+- guaranteed to be initialized:
+    - objects to null
+    - primitives to their zero type
+- impossible to access an array outside its range.
+- arrays can hold references to another array
+    - Nested array
+    - Ragged arrays are nested arrays that have different lengths
+- additional array functionality is implemented using `java.util.Array` static class.
+    - Except System.arraycopy which is a faster copy method.
+
+
+Don't make array's of generics, they usually break.
+You can use array's within generics `T[]`
+
+```java
+ElementType[ ] variableName; //assign an array
+
+// create new array
+variableName = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+variableName = new ElementType[5]; // empty array of length
+variableName = new ElementType[]{2, 3, 4};
+
+// assign reference to same array
+ElementType[] a2 = variableName;
+
+// [] -> assignment and retrival
+variableName[2] = 8;
+print(variableName[2]); // output: 8
+
+// only other info for the array:
+System.out.println(measurements.length);
+```
+
+### Containers
+Type-safe containers (new in 1.6 because of generics): A container that can be made to hold a specific type of object. Instead of a container holding an Object object it's able to hold object of varying types and returns that type. This is compared to non-type safe containers that contain base level object types so there is no compile time checking of objects as they go into the container.
+
+#### Collections
+- sequence of elements
+- with special rules
+    - list: must hold elements in order inserted
+        ArrayList:
+            - Random access & set
+            - bad: insertion, removal, growing
+        LinkedList:
+            - insertion, removal, growing, sequential access.
+            - bad: random access
+    - set: cannot have duplicate elements
+        - only allows one item
+        - TreeSet (red-black tree): keeps items in sorted order
+        - HashSet: unsorted (order is unspecified)
+        - LinkedHashSet: keeps insertion order
+    - Queue: returns elements according to it's queuing discipline
+        - FIFO
+        - LIFO
+        - PriorityQueue: uses a Comparator to determine return order. Sort on insert or Sort on retrieval.
+            - Sort on insert is usually more efficient.
+            - Sort on retrieval is useful when item order can change while in the Queue.
+        - DeQue
+            - implements both FIFO & LIFO queue's
+
+All collections implement iterators
+
+#### Maps
+Maps, aka associative arrays or dictionaries, are
+    - group of key-value object pairs
+    - most useful type of container
+
+TODO: is there any restriction on holding lists or maps as the key side of a map?
+Complex example of Map containing a list:
+```java
+public static Map<Person, List<? extends Pet>> petPeople = new HashMap<Person, List<? extends Pet>>();
+```
+
+
+
+### Iterators
+Why? Collections are a lot more work to get foreach functionality.
+
+An iterator is a standardized way of moving through a collection.
+An iterator has no current element it is always between two elements. The element before and the element after.
+
+ E0 E1 E2 E3
+^  ^  ^  ^  ^
+
+When next() is called for the first time E0 is returned and the cursor is advanced to just before E1. If previous() is called E0 is called and the cursor is moved back to just before E0. If next, next, next, remove is called E2 is removed and the cursor maintains it's current position between E1 and E3. At this possition next would return E3 and previous would return E1.
+
+#### Iterable (foreach)
+Interface that returns an iterator. Used by foreach loop.
+
+#### Iterator interface
+Only moves one direction and optionally can remove elements.
+- hasNext, next
+- optional: remove
+
+#### ListIterator Interface
+Everything in Iterator, moves two directions, know it's location in the list, and can optionally add elements.
+- hasPrevious, previous
+- nextIndex, previousIndex
+- optional: set, add
+
+### Comparable Comparator
+`java.lang.Comparable`
+
+Generalized comparison for use in sorting algorithms.
+
+### Generators
+Generates data based on a _strategy_
 
 ### Random
 Psudo random number generator
+
+### Clonable Interface
+Seems to be a concessus that clonable is broken. 
+http://www.artima.com/intv/bloch13.html
+
+Cloning is a secondary object creation path that does not use the object constructors and instead relies on class creators to implement a clone method.
+This method starts by calling the `supper.clone()` method on the object in order to get a hierarchically cloned object. This intoduces room for errors since there are now two object creation paths to maintain.
+
+```java
+public class clonableClass implements Cloneable {
+    public clonableClass clone() throws CloneNotSupportedException {
+        // Call all previous clonning steps in order to clone any private elements from super classes.
+        clonableClass other = (clonableClass) super.clone();
+        // preform cloning process for the current class.
+        return other;
+    }
+}
+```
 
 ## Design Patters
 
@@ -1564,107 +1652,9 @@ Guidelines Submitting all TME's
 - Where a TME suggests developing a program in stages, document and submit the final deliverable only, not the intermediate stages. 
 - Please include examples, code fragments, etc to illustrate your points in your answers to the unit questions. 
 
-### Example Programs
+## Quiz 1: (3 / 3 percent)
 
-Shows assignment of objects vs primitives: [Assignment.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/Assignment.java)  
-Shows passing objects: [PassObject.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/operators/PassObject.java)  
-
-## Quiz 1: 100% / 3 percent
-
-## Program
-[SimpleConstructor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor.java)
-[SimpleConstructor2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/SimpleConstructor2.java)
-[Overloading.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Overloading.java)
-[OverloadingOrder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OverloadingOrder.java)
-[PrimitiveOverloading.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/PrimitiveOverloading.java)
-[Demotion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Demotion.java)
-[DefaultConstructor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/DefaultConstructor.java)
-[NoSynthesis.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/NoSynthesis.java)
-[Leaf.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Leaf.java)
-[Flower.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Flower.java)
-[TerminationCondition.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/TerminationCondition.java)
-[InitialValues.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/InitialValues.java)
-[InitialValues2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/InitialValues2.java)
-[OrderOfInitialization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OrderOfInitialization.java)
-[StaticInitialization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/StaticInitialization.java)
-[ExplicitStatic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ExplicitStatic.java)
-[Mugs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Mugs.java)
-[ArrayOfPrimitives.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArraysOfPrimitives.java)
-[ArrayNew.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArrayNew.java)
-[ArrayClassObj.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArrayClassObj.java)
-[ArrayInit.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/ArrayInit.java)
-[DynamicArray.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/DynamicArray.java)
-[VarArgs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/VarArgs.java)
-[NewVarArgs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/NewVarArgs.java)
-[OverloadingVarargs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/OverloadingVarargs.java)
-[EnumOrder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/EnumOrder.java)
-[Burrito.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/initialization/Burrito.java)
-
-[SprinklerSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SprinklerSystem.java)
-[Bath.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Bath.java)
-
-[Detergent.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Detergent.java)
-[Cartoon.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Cartoon.java)
-[Chess.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Chess.java)
-
-[SpaceShip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShip.java)
-[SpaceShipDelegation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/SpaceShipDelegation.java)
-
-[PlaceSetting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/PlaceSetting.java)
-[CADSystem.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/CADSystem.java)
-[Hide.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Hide.java)
-[Car.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Car.java)
-[Orc.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Orc.java)
-[Wind.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Wind.java)
-
-[FinalData.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalData.java)
-[BlankFinal.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/BlankFinal.java)
-[FinalArguments.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalArguments.java)
-[FinalOverridingIllusion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/FinalOverridingIllusion.java)
-[Jurassic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Jurassic.java)
-
-[Beetle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/reusing/Beetle.java)
-
-## Exercises
-Exercise 1 on page 139, exercise 7 on page 146 and exercise 8 on page 153 of TIJ
-[Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex1.java)
-[Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex7.java)
-[Answer 8a](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8a.java)
-[Answer 8b](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_2/Ch5ex8b.java)
-
-Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
-19 on page 204 of TIJ
--   [Answers 3 and 4](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex3ex4.java)
--   [Answers 10 and 11](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex10ex11.java)
--   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)
-
-Exercises 3 and 4 on page 167, exercises 10 and 11 on page 177, exercise
-19 on page 204 of TIJ
--   [Answers 3 and 4](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex3ex4.java)
--   [Answers 10 and 11](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex10ex11.java)
--   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_3/Section_3/Ch6ex19.java)
-
-Exercises 5 and 6 on pages 227 to 228, exercise 9 on page 233 of TIJ
-1.  What are the two main reasons for access control? (See TIJ page 234.)
-[Answers 5 and 6](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_1/Ch7ex5ex6.java)
-
-Exercise 5 on page 245, exercise 7 on page 246, exercises 16 and 17 on page 262 of TIJ
--   [Answer 5](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex5.java)
--   [Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex7.java)
--   [Answer 16](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex16.java)
--   [Answer 17](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_2/Ch8ex17.java)
-
-Exercise 9 on page 289 of TIJ and exercise 12 on pages 298 to 299 of TIJ.
--   [Answer 9](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_3/Ch9ex9.java)
--   [Answer 12](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_3/Ch9ex12.java)
-
-Exercise 1 on page 315, exercise 18 on page 342, and exercise 24 on page
-382 of TIJ
--   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch10ex1.java)
--   [Answer 18](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch10ex18.java)
--   [Answer 24](http://scis.athabascau.ca/html/course/COMP308/Unit_4/Section_4/Ch11ex24.java)
-
-## Tutor Marked Exercise 1 (due Dec 23rd, 2017)
+## Tutor Marked Exercise 1 ( / 5 percent)
 Please complete TME 1 and submit it by electronic mail.
 
 Tutor Marked Exercise 1 is scored out of 100 and contributes to 5% of your final grade.
@@ -1725,220 +1715,6 @@ Exercise 10: (3) Modify Music5.java by adding a Playable interface.
 
 
 ## Unit 5: Collections, Arrays, Exceptions and Strings
-
-### Unit Purpose
-Describe and use Java containers, arrays, exceptions,
-and Strings.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
-
-### Section 1: Collections in Java
-**Section Goal**: Explain and use collections in Java.
-
-#### Learning Objective 1
--   Explain what Java containers are.
-
-##### Readings
-**Required:** Pages 389 to 401 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is a type-safe container? (See TIJ page 390 to 393.)
-2.  What are the two main concepts underlying the Java 2 collections library? (See TIJ page 394.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[ApplesAndOrangesWithoutGenerics.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ApplesAndOrangesWithoutGenerics.java)
-[ApplesAndOrangesWithGenerics.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ApplesAndOrangesWithGenerics.java)
-[GenericsAndUpcasting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/GenericsAndUpcasting.java)
-[SimpleCollection.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/SimpleCollection.java)
-[AddingGroups.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/AddingGroups.java)
-[AsListInference.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/AsListInference.java)
-[PrintingContainers.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/PrintingContainers.java)
-
-#### Learning Objective 2
--   Explain the use of **List** and **Stack** in Java.
-
-##### Readings
-**Required:** Pages 401 to 414 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the two types of **List** and what is the difference between them? (See TIJ page 401.)
-2.  What is the purpose of an **Iterator**? (See TIJ page 406.)
-3.  What are the advantages of a **ListIterator** over an **Iterator**? (See TIJ page 409.)
-4.  What are the advantages and disadvantages of **ArrayList** and **LinkedList**? (See TIJ pages 410 to 411.)
-5.  What is a **stack**? (See TIJ page 412.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[ListFeatures.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ListFeatures.java)
-[SimpleIteration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/SimpleIteration.java)
-[CrossContainerIteration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/CrossContainerIteration.java)
-[ListIteration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ListIteration.java)
-[LinkedListFeatures.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/LinkedListFeatures.java)
-[StackTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/StackTest.java)
-
-#### Learning Objective 3
--   Describe and use **Set**, **Map**, and **Queue** in Java.
-
-##### Readings
-**Required:** Pages 415 to 427 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the distinctive feature of a **Set**? (See TIJ page 415.)
-2.  What are the differences **TreeSet** and **HashSet**? (See TIJ page 416.)
-3.  What is the distinctive feature of a **Map**? (See TIJ pages 419 to 420.)
-4.  What is a **Queue** and what is a **PriorityQueue**? (See TIJ pages 423 to 425.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SetOfInteger.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/SetOfInteger.java)
-[SortedSetOfInteger.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/SortedSetOfInteger.java)
-[SetOperations.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/SetOperations.java)
-[UniqueWords.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/UniqueWords.java)
-[UniqueWordsAlphabetic.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/UniqueWordsAlphabetic.java)
-[Statistics.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/Statistics.java)
-[PetMap.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/PetMap.java)
-[MapOfList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/MapOfList.java)
-[QueueDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/QueueDemo.java)
-[PriorityQueueDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/PriorityQueueDemo.java)
-
-#### Learning Objective 4
--   Discuss the issues of using **Collection** and **Iterator**.
-
-##### Readings
-**Required:** Pages 427 to 437 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the argument for having an interface over a **Collection**? (See TIJ page 427.)
-2.  How does the foreach syntax work with **Iterable**? (See TIJ pages 431 to 433.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[InterfaceVsIterator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/InterfaceVsIterator.java)
-[CollectionSequence.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/CollectionSequence.java)
-[NonCollectionSequence.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/NonCollectionSequence.java)
-[ForEachCollections.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ForEachCollections.java)
-[IterableClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/IterableClass.java)
-[ArrayIsNotIterable.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ArrayIsNotIterable.java)
-[AdapterMethodIdiom.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/AdapterMethodIdiom.java)
-[MultiIterableClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/MultiIterableClass.java)
-[ModifyingArraysAsList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/holding/ModifyingArraysAsList.java)
-
-#### Learning Objective 5
--   Integrate and summarize the material on exceptions in Java.
-
-##### Readings
-**Required:** Pages 437 to 441 of TIJ
-
-##### Exercises
-Exercise 1 on page 394, exercise 8 on page 409, and exercise 17 on page
-422 of TIJ.
-
-**Questions**
-1.  Summarize the ways Java provides to hold objects. (See TIJ page 438.)
-
-##### Answers To Exercises
--   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_1/Ch12ex1.java)
--   [Answer 8](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_1/Ch12ex8.java)
--   [Answer 17](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_1/Ch12ex17.java)
-
-### Section 2: Arrays
-**Section Goal:**  Describe and use arrays in Java.
-
-#### Learning Objective 1
--   Use arrays and explain their status as first class objects in Java.
-
-##### Readings
-**Required:** Pages 747 to 762 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the features that distinguish an array from other types of containers in Java? (See TIJ page 747.)
-2.  What are two ways of initializing arrays? (See TIJ page 749.)
-3.  What is the use of the **Arrays.deepToString()** method? (See TIJ page 755.)
-4.  How is a parameterized array created? (See TIJ pages 759 to 760.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[ContainerComparison.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/ContainerComparison.java)
-[ArrayOptions.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/ArrayOptions.java)
-[IceCream.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/IceCream.java)
-[MultidimensionalPrimitiveArray.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/MultidimensionalPrimitiveArray.java)
-[RaggedArray.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/RaggedArray.java)
-[MultidimensionalObjectArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/MultidimensionalObjectArrays.java)
-[AutoboxingArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/AutoboxingArrays.java)
-[AssemblingMultidimensionalArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/AssemblingMultidimensionalArrays.java)
-
-#### Learning Objective 2
--   Describe and use various **Arrays** methods to create data.
-
-##### Readings
-**Required:** Pages 762 to 775 of TIJ
-
-##### Exercises
-**Questions**
-1.  What conversion tools are required when using a **Generator** to create an array? (See TIJ page 770.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[FillingArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/FillingArrays.java)
-[GeneratorsTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/GeneratorsTest.java)
-[RandomGeneratorsTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/RandomGeneratorsTest.java)
-[TestGenerated.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/TestGenerated.java)
-[PrimitiveConversionDemonstration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/PrimitiveConversionDemonstration.java)
-[TestArrayGeneration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/TestArrayGeneration.java)
-
-#### Learning Objective 3
--   Describe and use the **Arrays** class.
-
-##### Readings
-**Required:** Pages 775 to 786 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the conditions when **Arrays.equals()** returns true? (See TIJ pages 777.)
-2.  How do you implement **Comparable** in sorting an array? (See TIJ pages 778 to 782.)
-3.  What is the condition of using Arrays.binarySearch()? (See TIJ page 784.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[CopyingArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/CopyingArrays.java)
-[ComparingArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/ComparingArrays.java)
-[CompType.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/CompType.java)
-[Reverse.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/Reverse.java)
-[ComparatorTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/ComparatorTest.java)
-[StringSorting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/StringSorting.java)
-[ArraySearching.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/ArraySearching.java)
-[AlphabeticSearch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/arrays/AlphabeticSearch.java)
-
-#### Learning Objective 4
--   Integrate and summarize the material on arrays in Java.
-
-##### Readings
-**Required:** Pages 786 to 788 of TIJ
-
-##### Exercises
-Exercise 5 on page 759, exercise 19 on page 778, and exercise 24 on page
-786 of TIJ
-
-##### Answers To Exercises
--   [Answer 5](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_2/Ch17ex5.java)
--   [Answer 19a](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_2/Ch17ex19a.java)
--   [Answer 19b](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_2/Ch17ex19b.java)
--   [Answer 24](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_2/Ch17ex24.java)
-
 ### Section 3: Exceptions in Java
 **Section Goal**: Explain how Java handles exceptions, and write
 programs to demonstrate this facility.

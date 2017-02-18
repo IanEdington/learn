@@ -1004,6 +1004,8 @@ For this reason there is a @override annotation that throws a compile time error
 Covariant return types: In a sub-class it's possible for a method to return a type that is a sub-type of the overridden method.
 A method can return a downstream type of it's overridden method's return type.
 
+Overridden methods can only throw the exceptions that were specified in the base method.
+
 ### Polymorphism
 Variables in java are **polymorphic**: A variable declared as a super-class can hold a sub-class but are limited to the interface of the super-class.
 ```java
@@ -1306,8 +1308,55 @@ public class ParameterizedArrayType {
 #### Bounding Generic types
 
 ### Exceptions
-#### Checked vs Un-Checked exceptions
-TODO: understand and take notes on Checked vs Un-Checked exceptions
+An exceptional condition is a condition you don't have enough information to solve in the current scope. All you can do is jump to a wider scope and let them try to solve the condition.
+
+Error handling has fallen out in favour of tests.
+
+#### Resumption vs Termination Error Handling Theory
+Resumption: Should the invoker continue after throwing an exception, assuming the error has been handled?
+Termination: The invoker stops what it's doing and returns control to the Error Handler.
+
+Java supports termination. If you want to do resumption call a method that fixes the problem (growing an array).
+
+#### Throwing Exceptions
+`throw`: from within a method, throws an exception
+acts like return but instead of following the execution stack it returns up the exception 'stack'.
+
+A new exception object is created on the heap.
+The current exception is halted.
+The exception-handling mechanism then traces back up the stack to the exception handler and passes it the exception.
+If the exception handler fails to deal with the exception the program will halt.
+
+#### Catching Exceptions
+```java
+try {
+    guardedBody
+} catch (exceptionType1 variable1) {
+    remedyBody1
+} catch (exceptionType2 | exceptionType3 variable2) {
+    remedyBody2
+} catch ... {
+    remedy...
+} finally {
+    executes no mater what.
+}
+```
+
+exceptionType: valid exception type extending the Exception class
+|: separates multiple exceptions
+variable: valid java variable name holding the execption object
+
+Try block:
+`try` followed by scope with code that might throw exceptions
+
+Catch block:
+`catch` if an exception is thrown in the try block the first catch block with that exception will be executed.
+
+finally:
+`finally` useful when you need to return something to its original state. Release external resources, close a file or network connection, remove something from the screen, or flip a switch in the outside world.
+- can cause exceptions to be lost
+    - throw exception in finally block
+    - return in the finally block
 
 #### Add Exceptions to a method
 ```java
@@ -1325,29 +1374,60 @@ modifiers returnType methodName(parameters) throws exceptionType1, exceptionType
 - Can designate a super-class of the exception thrown instead.
 - does not negate the need for @throws javadoc
 
-#### Throwing Exceptions
-`throw`: from within a method, throw an exception
-
-Usually when throwing an exception a new exception object is created with optional constructor parameters.
-
-#### Catching
-```java
-try {
-    guardedBody
-} catch (exceptionType1 variable1) {
-    remedyBody1
-} catch (exceptionType2 | exceptionType3 variable2) {
-    remedyBody2
-} catch ...
-```
-
-exceptionType: valid exception type extending the Exception class
-|: separates multiple exceptions
-variable: valid java variable name holding the execption object
-
 #### Creating new Exception types
-An exception is a special class extended from the Exception class.
+An exception is a special class extenpeaked from the Exception class.
 Create a new exception type by extending the Exception class or any of it's subclasses.
+
+This can be as simple as:
+
+    class SimpleException extends Exception {}
+
+    class MessageException extends Exception {
+        public MessageException() {}
+        public MessageException(String msg) {
+            super(msg);
+        }
+    }
+
+#### Checked vs Un-Checked exceptions
+TODO: understand and take notes on Checked vs Un-Checked exceptions
+`RuntimeException` is the base class of UnChecked exceptions
+Everything else is a Checked exception.
+
+#### Chaining exceptions
+An exception might be caused by another exception and so you pass the first exception into the second exception.
+You do this using initCause() method.
+
+#### Edge cases
+Exceptions in constructors: might not clean up resources
+When you override a method you can only throw exceptions from the base class.
+    This gets messy fast. Try to create exceptions that can't fail or don't allocate resources.
+    TODO: There are some rules about inheriting exceptions but they are unclear to me
+You can pass a checked exception to a runtime exception so you don't have to worry about it. You can still catch the exception later.
+
+    try {
+        // do something
+    } catch(IdontKnowException e) {
+        throw new RuntimeException(e);
+    }
+
+#### Exception guidelines
+1. Handle problems at the appropriate level. (Avoid catching exceptions unless you know what to do with them.)
+2. Fix the problem and call the method that caused the exception again.
+3. Patch things up and continue without retrying the method.
+4. Calculate some alternative result instead of what the method was supposed to produce.
+5. Do whatever you can in the current context and rethrow the same exception to a higher context.
+6. Do whatever you can in the current context and throw a different exception to a higher context.
+7. Terminate the program.
+8. Simplify. (If your exception scheme makes things more complicated, then it is painful
+and annoying to use.)
+9. Make your library and program safer. (This is a short-term investment for debugging, and a long-term investment for application robustness.)
+
+
+
+#### Exception Matching
+A sub-class exception can be caught by a super-class catch block.
+If a sub-class catch block is bellow a super-class catch block the compiler will give an error since it know the sub-class catch block will never be reached.
 
 ## Java Standard Library Types
 
@@ -1715,141 +1795,6 @@ Exercise 10: (3) Modify Music5.java by adding a Playable interface.
 
 
 ## Unit 5: Collections, Arrays, Exceptions and Strings
-### Section 3: Exceptions in Java
-**Section Goal**: Explain how Java handles exceptions, and write
-programs to demonstrate this facility.
-
-#### Learning Objective 1
--   Describe Java's basic exception-handling capability.
-
-##### Readings
-**Required**: Pages 443 to 449 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the benefits of using exceptions? (See TIJ page 444.)
-2.  What happens when you **throw** an exception? (See TIJ page 447.)
-3.  What is the advantage of a **try** block? (See TIJ pages 447 to 448.)
-4.  What is the function of a **catch** block? (See TIJ pages 448 to 449.)
-5.  What are the two basic models used in exception-handling theory? (See TIJ page 449.)
-
-#### Learning Objective 2
--   Create your own Java exceptions.
-
-##### Readings
-**Required:** Pages 449 to 468 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the simplest way to create your own exceptions? (See TIJ page 449 to 450.)
-2.  How do you log the output of an exception? (See TIJ pages 452 to 454.)
-3.  What is the idea of *exception chaining*? (See TIJ page 464.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[InheritingExceptions.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/InheritingExceptions.java)
-[FullConstructors.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/FullConstructors.java)
-[LoggingExceptions.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/LoggingExceptions.java)
-[LoggingExceptions2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/LoggingExceptions2.java)
-[ExtraFeatures.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/ExtraFeatures.java)
-[ExceptionMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/ExceptionMethods.java)
-[WhoCalled.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/WhoCalled.java)
-[Rethrowing.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/Rethrowing.java)
-[RethrowNew.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/RethrowNew.java)
-[DynamicFields.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/DynamicFields.java)
-
-#### Learning Objective 3
--   Describe the standard Java exceptions.
-
-##### Readings
-**Required:** Pages 468 to 471 of TIJ
-
-##### Exercises
-**Questions**
-1.  Where can you find descriptions of standard Java exceptions? (See TIJ page 468.)
-2.  What happens to **Runtime** errors that are never caught? (See TIJ page 468 to 471.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[NeverCaught.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/NeverCaught.java)
-
-#### Learning Objective 4
--   Perform cleanup with **finally**.
-
-##### Readings
-**Required:** Pages 471 to 479 of TIJ
-
-##### Exercises
-**Questions**
-1.  What happens with the **finally** statement when no exception is thrown? (See TIJ pages 471 to 472.)
-2.  For what is the **finally** statement used? (See TIJ page 473.)
-3.  How does a lost exception occur? (See TIJ pages 477 to 479.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[FinallyWorks.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/FinallyWorks.java)
-[Switch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/Switch.java)
-[WithFinally.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/WithFinally.java)
-[AlwaysFinally.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/AlwaysFinally.java)
-[MultipleReturns.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/MultipleReturns.java)
-[LostMessage.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/LostMessage.java)
-[ExceptionSilencer.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/ExceptionSilencer.java)
-
-#### Learning Objective 5
--   Describe restrictions on exceptions in Java.
-
-##### Readings
-**Required:** Pages 479 to 483 of TIJ
-
-##### Exercises
-**Questions**
-1.  Why is it that a method says it throws an exception but it does not? (See TIJ page 479 to 481.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[StormyInning.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/StormyInning.java)
-
-#### Learning Objective 6
--   Use exceptions with constructors.
-
-##### Readings
-**Required**: Pages 483 to 500 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the problem with using **finally** to handle exceptions in constructors? (See TIJ page 483 to 484.)
-2.  How does exception-handling work with derived and base exception classes? (See TIJ pages 489 to 490.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[InputFile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/InputFile.java)
-[Cleanup.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/Cleanup.java)
-[CleanupIdiom.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/CleanupIdiom.java)
-[Human.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/Human.java)
-[MainException.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/MainException.java)
-[TurnOffChecking.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/exceptions/TurnOffChecking.java)
-
-#### Learning Objective 7
--   Write programs that integrate and summarize the material on exceptions in Java.
-
-##### Readings
-**Required**: Pages 500 to 501 of TIJ
-
-##### Exercises
-Exercise 1 on page 452, exercise 10 on page 468 of TIJ.
-
-**Questions**
-1.  Summarize the guidelines of using exceptions. (See TIJ pages 500 to 501.)
-
-##### Answers To Exercises
--   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_3/Ch13ex1.java)
--   [Answer 10](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_3/Ch13ex10.java)
-
 ### Section 4: Strings in Java
 **Section Goal**: Discuss the features of **Strings ** in Java.
 

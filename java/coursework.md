@@ -421,14 +421,14 @@ Constants in the expression
 - Exponential: `1.39e-43` defaults to double, add `f` for float
 
 - Character: surrounded by single quotes
-    - '\n' (newline)
+    - '\t' (tab)
     - '\b' (backspace)
     - '\f' (form feed)
-    - '\'' (single quote)
-    - '\t' (tab)
+    - '\n' (newline)
     - '\r' (return)
-    - '\\' (backslash)
+    - '\'' (single quote)
     - '\"' (double quote)
+    - '\\' (backslash)
 - Strings: surrounded by double quotes
 
 ### Operators
@@ -1432,7 +1432,13 @@ If a sub-class catch block is bellow a super-class catch block the compiler will
 ## Java Standard Library Types
 
 ### Strings
-Java has a built in string class denoted by double quotes
+Java has a built in string class denoted by double quotes.
+
+String class
+- immutable
+- All string methods return new string objects
+
+String immutability comes at a performance cost. Usually this is acceptable but sometimes it's better to go with a string builder.
 
 ```
 String title = "Data Structures & Algorithms in Java";
@@ -1442,6 +1448,32 @@ char[ ] msg = original.toCharArray();
 indexing by character
 the String class is immutable
 For a mutable string use the StringBuilder class.
+
+#### formater
+`java.io.Console`, `java.io.PrintStream` `String` format/printf
+C like string formating.
+
+#### Scanner
+Takes almost any object and can read them line by line or search for the next of any itme type.
+Default splits input tokens along whitespace but you can specify your own delimiter.
+You can also scan using regex patterns.
+
+#### String Tokenizer (replaced by Scanner)
+Takes a string and splits it into a list of strings.
+Tokens the strings.
+These strings are seen as independent so operations (regex) on one doesn't have others as part of their context.
+
+### Regex
+Be careful of escape sequences
+very close to perl
+
+`java.util.regex` Pattern and Matcher
+
+Pattern: compiles the regex pattern (thread safe)
+Matcher: matching engine that uses pattern to search a string. (not thread safe)
+group(): returns a group specified by ()
+
+Can be used with I/O: 
 
 ### Arrays
 Arrays are first class object with greatly reduced functionality.
@@ -1794,117 +1826,39 @@ Exercise 10: (3) Modify Music5.java by adding a Playable interface.
     Change tune( ) so that it takes a Playable instead of an Instrument.
 
 
-## Unit 5: Collections, Arrays, Exceptions and Strings
-### Section 4: Strings in Java
-**Section Goal**: Discuss the features of **Strings ** in Java.
+## Tutor Marked Exercise 2 ( / 10 percent)
 
-#### Learning Objective 1
--   Describe basic characteristics of **String** objects.
+Your submission should include two zip files (part 1 and part 2), a separate test plan for both parts, and a separate document on the objective questions. Each of the zip files should include Products.java and other source files. They must unzip to different directories. Do not submit class files.
 
-##### Readings
-**Required**: Pages 503 to 513 of TIJ
+Programs
+This TME aims to familiarize students with Java generics features.
+### Part 1: (60%)
 
-##### Exercises
-**Questions**
-1.  What is the advantage of making **Strings** immutable? (See TIJ pages 503 to 504.)
-2.  In what situation will using an explicit **StringBuilder** improve efficiency? (See TIJ pages 508 to 509).
+1. Carefully study the class structure in Products.java.
+1. Design a generic container called GenericOrder that acts as a collection of an arbitrary number of objects in Products.java. Design a mechanism that gives each instance of the container a unique identifier. Implement as many methods as necessary. You must use Java generics features.
+1. Design and implement a subclass of GenericOrder called ComputerOrder that takes an arbitrary number of different classes of ComputerPart objects, Peripheral objects, and Service objects. Implement as many methods as necessary.
+1. Design and implement a subclass of GenericOrder called PartyTrayOrder that takes an arbitrary number of different classes of Cheese objects, Fruit objects, and Service objects. Implement as many methods as necessary.
+1. Design and implement a class called OrderProcessor. You must implement at least the following methods:
+    - accept; // this method accepts a GenericOrder or any of its subclass objects and stores it in any internal collection of OrderProcessor.
+    - process; // this method sorts all accepted orders in the internal collection of GenericOrder into collections of ComputerPart, Peripheral, Cheese, Fruit, and Service. You must associate each object with the unique identifier. You may refer to the TwoTuple.java example in the text book.
+    - dispatchXXX; // this method simulates the dispatch of the sorted collections. For example, the method dispatchComputerParts() should produce this output:
+        - Motherboard  name=Asus, price=$37.5, order number=123456
+        - Motherboard  name=Asus, price=$37.5, order number=987654
+        - RAM  name=Kingston, size=512, price=$25.0, order number=123456
+    - You may overload each of the above methods as you think necessary.
 
-##### Programs
-Compile, run, and analyze programs:
+1. Create a client class to test OrderProcessor. You will need to create a datagenerator for testing purpose. It is not mandatory but you may use a variation of Data Generator in TIJ pages 637 to 638.
+1. Pack the above codes into one single zip file and send it to your tutor.
 
-[Immutable.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Immutable.java)
-[Concatenation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Concatenation.java)
-[WhitherStringBuilder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/WhitherStringBuilder.java)
-[UsingStringBuilder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/UsingStringBuilder.java)
-[ArrayListDisplay.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/ArrayListDisplay.java)
-[InfiniteRecursion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/InfiniteRecursion.java)
+### Part 2: (35%)
+8. Design and implement a subclass of GenericOrder called ComputerPartyOrder that takes an arbitrary number of different classes of ComputerPart objects, Peripheral objects, Cheese objects, Fruit objects and Service objects.
+9. Create another client class that creates ComputerPartyOrder. Modify OrderProcessor if necessary. 
+10. Pack the above codes into a second zip file and send it to your tutor.
 
-#### Learning Objective 2
--   Explain and use the formatting features in Java.
+### Part 3: (5%)
+Unit 4 -> Section
 
-##### Readings
-**Required**: Pages 514 to 523 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the purpose of a **Formatter object**? (See TIJ page 515.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SimpleFormat.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/SimpleFormat.java)
-[Turtle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Turtle.java)
-[Receipt.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Receipt.java)
-[Conversion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Conversion.java)
-[DatabaseException.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/DatabaseException.java)
-
-#### Learning Objective 3
--   Explain and use regular expressions **Pattern** and **Matcher**.
-
-##### Readings
-**Required**: Pages 523 to 546 of TIJ.
-
-##### Exercises
-**Questions**
-1.  What is a regular expression? (See TIJ page 524.)
-2.  How do you use **Pattern** and **Matcher** classes with regular expressions? (See TIJ page 531.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[IntegerMatch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/IntegerMatch.java)
-[Splitting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Splitting.java)
-[Replacing.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Replacing.java)
-[Rudolph.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Rudolph.java)
-[TestRegularExpression.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/TestRegularExpression.java)
-[Finding.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Finding.java)
-[Groups.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Groups.java)
-[StartEnd.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/StartEnd.java)
-[ReFlags.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/ReFlags.java)
-[SplitDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/SplitDemo.java)
-[TheReplacements.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/TheReplacements.java)
-[Resetting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/Resetting.java)
-[JGrep.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/JGrep.java)
-
-#### Learning Objective 4
--   Explain and use **Scanner** and **StringTokenizer**.
-
-##### Readings
-**Required**: Pages 546 to 552 of TIJ
-
-##### Exercises
-**Questions**
-1.  What method of **Scanner** would you call to retrieve the next **StringTtoken**? (See TIJ page 549.)
-2.  What is one advantage of **Scanner** over **StringTokenizer**? (See TIJ pages 551 to 552.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SimpleRead.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/SimpleRead.java)
-[BetterRead.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/BetterRead.java)
-[ScannerDelimiter.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/ScannerDelimiter.java)
-[ThreatAnalyzer.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/strings/ThreatAnalyzer.java)
-
-#### Learning Objective 5
--   Write programs tjat integrate and summarize the material on **Strings** in Java.
-
-##### Readings
-**Required**: Page 552 of TIJ
-
-##### Exercises
-Exercise 6 on page 523, exercise 8 on page 527, and exercise 20 on page
-549 of TIJ.
-
-##### Answers To Exercises
--   [Answer 6](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_4/Ch14ex6.java)
--   [Answer 8](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_4/Ch14ex8.java)
--   [Answer 20](http://scis.athabascau.ca/html/course/COMP308/Unit_5/Section_4/Ch14ex20.java)
-
-## Tutor Marked Exercise 2 (due Dec 30th, 2017)
-Please complete TME 2 and submit it by electronic mail.
-
-Tutor Marked Exercise 2 is scored out of 100 and contributes to 10 per
-cent of your final grade.
+Unit 5 -> Section
 
 ## Unit 6: Types, Generics and Containers
 

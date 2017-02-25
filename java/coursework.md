@@ -644,7 +644,7 @@ for (elementType containerElement : container)
 `continue` moves flow of control to the end of the loopBody
 TODO: does `continue` execute the condition at the end of a do-while loop?
 `break` moves flow of control out of a switch, for, while, or do-while
-If you need to break out of multiple loops you can use a label. 
+If you need to break out of multiple loops you can use a label.
 
 ```
 label1:
@@ -660,18 +660,28 @@ outer-iteration {
 
 ## Object Lifetime
 
-### Initialization
+### Class Loader
+Searches for the \*.class file. Other Class Loaders exist that might search in areas other than the default database. Chain of class loaders.
+The default class loader searches for a \*.class file in the \$CLASSPATH
+Loads "trusted" classes.
 
-Unlike other languages java files are not loaded until they are needed. They are needed when the first method is called (constructor or static).
+### Initialization
+Unlike other languages java files are not loaded until they are needed. They are needed when the first static member is called that can't be a compile time constant.
+
+Compile time constants are final static primitives that don't depend on initialization for their value.
 
 Static Initialization, First time Class is used:
 
-1. Java locates \*.class file in the $CLASSPATH
-1. All methods are stored
-1. Class memory is allocated on the heap and whipped to zero
+Initialization of the Class object:
+The first time a static class member is referenced the class loader searches for it's \*.class file.
+The \*.class bytecode is checked for correctness.
+1. Loading, performed by the classloader. Finds the bytecodes and creates a Class object from those bytecodes. All methods are stored.
+1. recursive: If extending a class the base class gets initialized here. Linking.The link phase verifies the byte codes, allocates storage for static fields, and if necessary, resolves all references to other classes made by this class.
+3. Initialization. If there’s a superclass, initialize that. Execute static initializers and static initialization blocks.
+
+Initialization of the instance object:
 1. Object field memory is allocated on the heap and wiped to zero's
-1. recursive: If extending a class the base object/class gets initialized here.
-1. Static fields declarations and initializations are executed in sequential order
+1. recursive: If extending a class the base object gets initialized.
 1. fields declarations and initializations are executed in sequential order
 1. constructor is called see \<init\> methods
 
@@ -1107,6 +1117,120 @@ public class BoxedItem2 implements Insurable {
 ```
 
 ## Special Object Structures
+
+### Runtime Type Information (RTTI)
+Ability to know about type information at runtime.
+
+Polymorphism is good and all but sometimes it's practical to know what type you're dealing with. This is where you can 
+
+### Class object
+When classes are loaded they are created as objects on the heap.
+Once a class object is in memory it is used to create all objects of that type.
+All class objects belong to the Class class.
+Classes are the same as any other object and can be passed around the same way.
+
+
+`Class.forName("String")` : return reference to a class object of the class String.
+newInstance() : creates a new instance of a class without knowing what type it is.
+ClassType.class(Class Literal) : literal of the class object.
+ClassType.getSuperclass() : returns the super class of an object
+
+#### with Generics
+The Class class of objects is a bit different than regular objects.
+An ordinary Class reference can be assigned any other Class object.
+However, a bounded Class reference can only hold the class object of that class.
+
+    Class nonBoundedClass = int.class;
+    Class<Integer> boundedClasss = int.class;
+    nonBoundedClass = double.class; // This might not be the disired result.
+    //genericIntClass = double.class; // Type checking at compile time will flag this.
+
+This problem is so common that there is a convention in place to show that you really want an unbounded Class reference, `Class<?>`.
+
+#### Inheritance with Class Objects
+Inheritance gets tricky because although a class can be a sub-class of another class, it's class object is not a sub-class object of the original object... wrap your head around that :P.
+
+This is solved using the extends key word.
+
+    Class<? extends Number> bounded = int.class;
+    bounded = double.class;
+    //bounded = char.class; // Type error
+
+    Class<? super Integer> superOfInt = int.class;
+    superOfInt = Number.class;
+    superOfInt = int.class.getSuperclass();
+
+#### Casting generically
+Really only useful in generics where you don't know the types of objects you're working with.
+
+classObject.cast() : takes a subclass or superclass object and casts it to this type.
+classObject.asSubclass() : cast object to a more specific type.
+
+#### Checking your cast
+object instanceof Class : checks if an instance is of a certain Type (Type is fixed at compile time)
+classObject.isInstance(object) : dynamically check if it is an instance (Type can be dynamic at runtime)
+
+instanceof and isInstance() are true if the object being checked is a sub-class of the Type. `x instanceof Object` is always true.
+This is not true for comparison of the Classes. `classObject.equals(objectObject)` returns false.
+
+#### Reflection
+RTTI is great and all but it falls apart when you start using classes that aren't available at runtime. This is where reflection comes in.
+Reflection is a system to define classes at runtime. It uses Class to hold generic information, Field, Method, and Constructor to hold the class members since they can't be compiled at runtime. This is amazing since it means you can use objects you don't even know about when you're programing the code. TODO: I'm assuming this incurs a performance penalty.
+
+This is how you can create an object of a type at runtime.
+
+TODO: I don't know if this actually works but this is my understanding of how it would work.
+
+    KnownClass known = null;
+    Object unknown = null;
+    Class<?> c = Class.forName(userInputString);
+    if (c.class extends KnownClass) {
+        known = (KnownClass)c.newInstance();
+    } else {
+        unknown = c.newInstance();
+    }
+
+Example proxy: especially useful for splitting up a large object.
+
+    import java.lang.reflect.InvocationHandler;
+    import java.lang.reflect.Method;
+    import java.lang.reflect.Proxy;
+
+    class DynamicProxyHandler implements InvocationHandler {
+        private Object proxied;
+        public DynamicProxyHandler(Object proxied) {
+            this.proxied = proxied;
+        }
+        public Object
+        invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            System.out.println("**** proxy: " + proxy.getClass() +
+                    ", method: " + method + ", args: " + args);
+            if(args != null)
+                for(Object arg : args)
+                    System.out.println("  " + arg);
+            return method.invoke(proxied, args);
+        }
+    }
+
+    class SimpleDynamicProxy {
+        public static void consumer(Interface iface) {
+            iface.doSomething();
+            iface.somethingElse("bonobo");
+        }
+        public static void main(String[] args) {
+            RealObject real = new RealObject();
+            consumer(real);
+            // Insert a proxy and call again:
+            Interface proxy = (Interface)Proxy.newProxyInstance(
+                    Interface.class.getClassLoader(),
+                    new Class[]{ Interface.class },
+                    new DynamicProxyHandler(real)
+                );
+            consumer(proxy);
+        }
+    }
+
+Reflection also makes it possible to call any method, field or constructor no matter what permissions it was given. Basically, If you are not the one running your code nothing is safe in java.
 
 ### Enum types
 Enums are static classes with some default behaviour.
@@ -1827,7 +1951,6 @@ Exercise 10: (3) Modify Music5.java by adding a Playable interface.
 
 
 ## Tutor Marked Exercise 2 ( / 10 percent)
-
 Your submission should include two zip files (part 1 and part 2), a separate test plan for both parts, and a separate document on the objective questions. Each of the zip files should include Products.java and other source files. They must unzip to different directories. Do not submit class files.
 
 Programs
@@ -1861,133 +1984,6 @@ Unit 4 -> Section
 Unit 5 -> Section
 
 ## Unit 6: Types, Generics and Containers
-
-### Unit Purpose
-Discuss Types and Types related features in
-Java.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
-
-### Digital Reading Room
-Unit 6 links:
--   [jguru: awt](http://library.athabascau.ca/drr/redirect.php?id=8111) [jguru: awt](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27630)
--   [AWT Short Course: Introduction](http://library.athabascau.ca/drr/redirect.php?id=8113) [AWT Short Course: Introduction](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27631)
--   [javabeans (tm) 2](http://library.athabascau.ca/drr/redirect.php?id=8114) [javabeans (tm) 2](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27632)
--   [Download AWT 1.0 Tutorial](http://library.athabascau.ca/drr/redirect.php?id=8115) [Download AWT 1.0 Tutorial](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27633)
--   [Swing: Part I, About This Short Course](http://library.athabascau.ca/drr/redirect.php?id=8116) [Swing: Part I, About This Short Course](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27634)
--   [The Swing Connection](http://library.athabascau.ca/drr/redirect.php?id=8118) [The Swing Connection](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27635)
-
-### Section 1: Types Information
-**Section Goal**: Describe and use RTTI features in Java.
-
-#### Learning Objective 1
--   Outline the need for RTTI (Runtime Type Information).
-
-##### Readings
-**Required:** Pages 553 to 556 of TIJ
-
-##### Exercises
-**Questions**
-1.  What type of programming problem can be solved by using RTTI? Cite an example from the text. (See TIJ pages 555 to 556.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Shapes.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/Shapes.java)
-
-#### Learning Objective 2
--   Use **Class** objects.
-
-##### Readings
-**Required:** Pages 556 to 587 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the purpose of a **Class** object? (See TIJ page 556.)
-2.  What is a *class loader* and how does it load classes? (See TIJ pages 556 to 557.)
-3.  What is the use of **Class.forName**? (See TIJ page 558.)
-4.  What is the use of a class literal? (See TIJ pages 562 to 563.)
-5.  In Java SE5, why is **Class&lt;?&gt;** preferred over plain **Class**? (See TIJ page 566.)
-6.  What is the function of **instanceof**? (See TIJ page 569.)
-7.  What is the difference between **instancof** and **Class** objects? (See TIJ pages 586 to 587.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SweetShop.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/SweetShop.java)
-[ToyTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/toys/ToyTest.java)
-[ClassInitialization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/ClassInitialization.java)
-[GenericClassReferences.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/GenericClassReferences.java)
-[WildcardClassReferences.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/WildcardClassReferences.java)
-[BoundedClassReferences.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/BoundedClassReferences.java)
-[FilledList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/FilledList.java)
-[GenericToyTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/toys/GenericToyTest.java)
-[ClassCasts.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/ClassCasts.java)
-[ForNameCreator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/pets/ForNameCreator.java)
-[PetCount.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/PetCount.java)
-[LiteralPetCreator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/pets/LiteralPetCreator.java)
-[PetCount2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/PetCount2.java)
-[PetCount3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/PetCount3.java)
-[PetCount4.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/PetCount4.java)
-[RegisteredFactories.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/RegisteredFactories.java)
-
-#### Learning Objective 3
--   Explain the concept of reflection and describe how the class **Class** supports it.
-
-##### Readings
-**Required:** Pages 588 to 593 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are two function of reflection? (See TIJ pages 588 to 589.)
-2.  What do the methods **getMethods** and **getConstructors** return? (See TIJ page 592.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[ShowMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/ShowMethods.java)
-
-#### Learning Objective 4
--   Use *dynamic proxies, Null Objects* and interfaces.
-
-##### Readings
-**Required**: Pages 593 to 613 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the purpose of Java implementation of *dynamic proxy*? (See TIJ pages 594 to 595.)
-2.  Do you consider a *Null Object* useful? (Open question. See TIJ pages 598 to 599.)
-3.  What is the function of the **private** flag? (See TIJ page 610.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[SimpleProxyDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/SimpleProxyDemo.java)
-[SimpleDynamicProxy.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/SimpleDynamicProxy.java)
-[SelectingMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/SelectingMethods.java)
-[Staff.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/Staff.java)
-[SnowRemovalRobot.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/SnowRemovalRobot.java)
-[NullRobot.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/NullRobot.java)
-[InterfaceViolation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/InterfaceViolation.java)
-[HiddenImplementation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/HiddenImplementation.java)
-[InnerImplementation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/InnerImplementation.java)
-[AnonymousImplementation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/AnonymousImplementation.java)
-[ModifyingPrivateFields.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/typeinfo/ModifyingPrivateFields.java)
-
-#### Learning Objective 5
--   Write programs that integrate and summarize the material on Java RTTI features.
-
-##### Readings
-**Required**: Pages 613 to 615 of TIJ
-
-##### Exercises
-Exercises 8 and 10 on page 562, and exercise 19 on page 593 of TIJ.
-
-##### Answers To Exercises
--   [Answer 8](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_1/Ch15ex8.java)
--   [Answer 10](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_1/Ch15ex10.java)
--   [Answer 19](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_1/Ch15ex19.java)
 
 ### Section 2: Generics
 **Section Goal**: Explain and use Java generics.### Learning Objective 1

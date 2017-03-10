@@ -1384,6 +1384,10 @@ You need to do a few special things to makes sure you have an outer class initia
 
 ### Generics
 Introduced in Java 5.
+Type generic code with types specified later. This is code that can be used with many different object without specifying the Type. When the code is implement specify the object. This give you type checking going in and out of the code but lets you write code that can be used on many different object types.
+Less powerful than other generics language implementations.
+Most useful for containers.
+
 Used to create type independent methods.
 ```java
 public class Pair<A,B> {
@@ -1405,12 +1409,36 @@ public class Pair<A,B> {
 By default every type within this declaration is the completely generic Object type. However there are many ways to narrow these types which makes this framework more useful.
 Use `<E>` when refering to class. Use `E` when refering to element within class.
 
+#### Tuples
+Also returning multiple items as Tuples.
+
+Tuples are unique objects grouped together to be returned. With Generics, tuples allow you to return type information with the tuple.
+
+    public class TwoTuple<A,B> {
+        public final A first;
+        public final B second;
+        public TwoTuble(A a, B b) {
+            first = a;
+            second = b;
+        }
+        public String toString() {
+            return "(" + first + ", " + second + ")";
+        }
+    }
+
 #### Arrays and Generics
+Don't make array's of generics, do make generics containing arrays.
 
 #### Generic Methods
-
 If static it knows what Type based on whats passed in.
 the <T> in the static method defines a new Type. This is seperate from any Type defined in the Class.
+
+Super useful for infinitely overloading methods.
+By accepting a generic object as a parameter you essentially give the method the ability to accept any object type. Thus unlimitedly overloading the method.
+
+Also works with variable argument lists (T... t).
+
+    public <T,J> void doSomething(T t, J... j) { execute; }
 
 ```
 class ClassParameter<T> {
@@ -1429,7 +1457,43 @@ public class ParameterizedArrayType {
 }
 ```
 
+#### Complex models
+Very useful for creating simple but complex data models.
+
+#### Erasure
+All type information is erased withing a generic. This is because of limitations in the Java language spec and the need to remain backwards compatible with older libraries.
+
+- You can't use `instanceof` within generics!
+- You can't get any type information within a generic.
+
+Class type is based on the generic not on the generic's implementation. A generic is defined in a class file so the underlying class object is the same no matter what the generic is holding.
+
+This is a fundamental difference between Java and other implementations of generics. The generics have NO idea what they are dealing with once they are created. This means that code must written assuming everything is an object.
+
+There are ways around this with template and factory methods.
+
 #### Bounding Generic types
+This is where you start to be able to create complex code within your generics. By making sure it is of a type. The following returns an exact type instead of a generic Number. If used properly this makes more complex code more simple, but can make simple code more complex.
+
+    <T extends Class & Interface & Interface2> T map (T digit) { return digit; }
+
+`Generic<T2 extends T1> boundedRef;` A reference can contain a generic that holds a specific Type T2 or greater. Since we don't know what type it is holding we can't use assignment statements or any method that uses T as an argument. You can call methods that return T so long as the reference they are assigned to is T2 or a super-class of T2.
+`Class Generic<T2 extends T1> {}` a generic where T2 can be any subclass of T1. The methods associated with T1 are available within the generic.
+
+#### Wildcards
+<?> This tells the compiler it can be any type, but that it's a specific type. This makes it hard for the compiler to make any specific determinations about the class being represented. It usually means that you can't assign an object to it because you don't know what type it is and you can't call any methods because you don't know what type it is.
+
+#### Bounding and Wildcards
+Allow for an upcasting relationship.
+These are more restrictive than strait bounds because once you say it's a wild card, we don't know what that means.
+
+    List<? extends Apple>
+
+Basically you can't use any methods that will add, or change the array using a parameter, but you can call methods that will perform actions on the generic.
+
+Super type is the opposite. You know that this object is at least an apple. It might even be less than an apple but we don't know that. This will let us pass apple types in but not less than an apple.
+
+    List<? super Apple>
 
 ### Exceptions
 An exceptional condition is a condition you don't have enough information to solve in the current scope. All you can do is jump to a wider scope and let them try to solve the condition.
@@ -1715,9 +1779,6 @@ Everything in Iterator, moves two directions, know it's location in the list, an
 
 Generalized comparison for use in sorting algorithms.
 
-### Generators
-Generates data based on a _strategy_
-
 ### Random
 Psudo random number generator
 
@@ -1785,9 +1846,21 @@ E nextElement = obj.next();
 ### Factory Method
 Can be implemented using Interfaces
 
+### Generators
+Generates data based on a _strategy_, Factory method?
+
 ### Comparator
 
 ### Locator
+
+### Null Object
+There is a pattern where instead of constantly checking for null you instantiate an Object that is nullish.
+
+### Mock Objects and Studs
+Objects that create
+
+Stubs
+Large almost real objects that act like the real object but aren't actually them.
 
 ## JavaDocs
 Tags:
@@ -1890,316 +1963,9 @@ Guidelines Submitting all TME's
 
 ## Quiz 1: (3 / 3 percent)
 
-## Tutor Marked Exercise 1 ( / 5 percent)
-Please complete TME 1 and submit it by electronic mail.
-
-Tutor Marked Exercise 1 is scored out of 100 and contributes to 5% of your final grade.
-
-### Marking Scheme (5 percent of final grade)
-See Guidelines for guidance on submitting TMEs and marking scheme.
-Each program in this TME will be weighted equally in your final mark. The total for the programs will be 95% of the TME.
-You are also required to select one of the questions for one objective from each of Units 1, 2, and 3. Submit your answers to your tutor as part of this TME. The answers to the review questions have a weight of 5 per cent of your TME mark. A total of 3 questions are required.
-Your submission should include all source files, a separate test plan for all 4 programs and a separate document on the objective questions. Do not submit class files.
-
-### Programs
-
-#### Program 1
-Write a class called Circle which has two constructors. The first constructor (default constructor) does not take any parameter and supplies default values for the coordinates and the radius. The second constructor takes three doubles as parameters corresponding to the X and Y coordinates and the radius. The class must include these methods:
-
-public double circumference()  returns the circumference of the circle.
-public double area()  returns the area of the circle.
-public void setRadius(double r)  is called in the constructor and checks the radius against a maximum. If the radius is greater than the maximum, setRadius resets it to the maximum (using the ternary conditional operator). You may set your own maximum value.
-public void printAttributes()  prints the coordinates, the radius, the circumference, and the area.
-public boolean isInside(double x, double y)  return true if a point represented in the parameters falls inside the circle, false otherwise.
-public void move(int x, int y)  moves the origin by a specified amount.
-
-#### Program 2
-Write a class called FullName that represents a person full name.
-    It must have separate fields for title (e.g., Mr., Mrs., Ms.), first name, middle name, and last name.
-    Override the toString() method to return a nicely formatted name.
-    Create as many methods as you think necessary.
-Write a class called MailingAddress that represents a mailing address.
-    It must have separate fields for a FullName object, street address, city, province and postal code.
-    Other than FullName all other fields are Strings.
-    Override the toString() method to return a nicely formatted address.
-    Create as many methods as you think necessary.
-Write a class called ShippingLabel that consists of ship-from and ship-to MailingAddress objects.
-    Write a single method that prints the label to the console.
-    Use these statements in the method:
-        ShippingLabel label = new ShippingLabel(... your parameter list ...);
-        System.out.println(label);
-Write a simple test program in the main method of ShippingLabel to test the above classes.
-
-#### Program 3
-Complete exercise 5 on page 286 of TIJ.
-
-Exercise 5:
-1. Starting from Exercise 1, add a wheels( ) method in Cycle, which returns the number of wheels.
-2. Modify ride( ) to call wheels( ) and verify that polymorphism works.
-
-Exercise 1:
-1. Create a Cycle class, with subclasses Unicycle, Bicycle and Tricycle.
-2. Demonstrate that an instance of each type can be upcast to Cycle via a ride( ) method.
-
-#### Program 4
-Complete exercise 10 on page 320 of TIJ.
-
-Exercise 10: (3) Modify Music5.java by adding a Playable interface.
-    Move the play( ) declaration from Instrument to Playable.
-    Add Playable to the derived classes by including it in the implements list.
-    Change tune( ) so that it takes a Playable instead of an Instrument.
-
-
+## Tutor Marked Exercise 1 (5 / 5 percent)
 ## Tutor Marked Exercise 2 ( / 10 percent)
-Your submission should include two zip files (part 1 and part 2), a separate test plan for both parts, and a separate document on the objective questions. Each of the zip files should include Products.java and other source files. They must unzip to different directories. Do not submit class files.
-
-Programs
-This TME aims to familiarize students with Java generics features.
-### Part 1: (60%)
-
-1. Carefully study the class structure in Products.java.
-1. Design a generic container called GenericOrder that acts as a collection of an arbitrary number of objects in Products.java. Design a mechanism that gives each instance of the container a unique identifier. Implement as many methods as necessary. You must use Java generics features.
-1. Design and implement a subclass of GenericOrder called ComputerOrder that takes an arbitrary number of different classes of ComputerPart objects, Peripheral objects, and Service objects. Implement as many methods as necessary.
-1. Design and implement a subclass of GenericOrder called PartyTrayOrder that takes an arbitrary number of different classes of Cheese objects, Fruit objects, and Service objects. Implement as many methods as necessary.
-1. Design and implement a class called OrderProcessor. You must implement at least the following methods:
-    - accept; // this method accepts a GenericOrder or any of its subclass objects and stores it in any internal collection of OrderProcessor.
-    - process; // this method sorts all accepted orders in the internal collection of GenericOrder into collections of ComputerPart, Peripheral, Cheese, Fruit, and Service. You must associate each object with the unique identifier. You may refer to the TwoTuple.java example in the text book.
-    - dispatchXXX; // this method simulates the dispatch of the sorted collections. For example, the method dispatchComputerParts() should produce this output:
-        - Motherboard  name=Asus, price=$37.5, order number=123456
-        - Motherboard  name=Asus, price=$37.5, order number=987654
-        - RAM  name=Kingston, size=512, price=$25.0, order number=123456
-    - You may overload each of the above methods as you think necessary.
-
-1. Create a client class to test OrderProcessor. You will need to create a datagenerator for testing purpose. It is not mandatory but you may use a variation of Data Generator in TIJ pages 637 to 638.
-1. Pack the above codes into one single zip file and send it to your tutor.
-
-### Part 2: (35%)
-8. Design and implement a subclass of GenericOrder called ComputerPartyOrder that takes an arbitrary number of different classes of ComputerPart objects, Peripheral objects, Cheese objects, Fruit objects and Service objects.
-9. Create another client class that creates ComputerPartyOrder. Modify OrderProcessor if necessary. 
-10. Pack the above codes into a second zip file and send it to your tutor.
-
-### Part 3: (5%)
-Unit 4 -> Section
-
-Unit 5 -> Section
-
 ## Unit 6: Types, Generics and Containers
-
-### Section 2: Generics
-**Section Goal**: Explain and use Java generics.### Learning Objective 1
-
--   Introduce the generics and parameterized types.
-
-##### Readings
-**Required**: Pages 617 to 631 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the general concept of generics or parameterized types? (See TIJ pages 617 to 618.)
-2.  What is a tuple? How do a generics implement tuples? (See TIJ pages 621 to 622.)
-
-##### Programs
-Compile, run and analyse programs
-
-[Holder1.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Holder1.java)
-[Holder3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Holder3.java)
-[TwoTuple.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/util/TwoTuple.java)
-[ThreeTuple.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/util/ThreeTuple.java)
-[LinkedStack.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/LinkedStack.java)
-[RandomList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/RandomList.java)
-[CoffeeGenerator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/coffee/CoffeeGenerator.java)
-[Fibonacci.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Fibonacci.java)
-[IterableFibonacci.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/IterableFibonacci.java)
-
-#### Learning Objective 2
--   Describe and use generic methods, anonymous inner classes, and complex data structure.
-
-##### Readings
-**Required:** Pages 631 to 649 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is *type argument inference*? Why does a generic method look like an indefinite overloaded method? (See TIJ page 632.)
-2.  Give one example of a generic method accepting variable argument list. (See TIJ page 635 to 636.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[GenericMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericMethods.java)
-[LimitsOfInference.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/LimitsOfInference.java)
-[ExplicitTypeSpecification.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ExplicitTypeSpecification.java)
-[GenericVarargs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericVarargs.java)
-[Generators.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Generators.java)
-[BasicGeneratorDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/BasicGeneratorDemo.java)
-[TupleTest2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/TupleTest2.java)
-[WatercolorSets.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/WatercolorSets.java)
-[BankTeller.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/BankTeller.java)
-[TupleList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/TupleList.java)
-[Store.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Store.java)
-
-#### Learning Objective 3
--   Discuss the issue of erasure.
-
-##### Readings
-**Required:** Pages 650 to 672 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is meant by *erasure*? Does Java consider **List&lt;String&gt;** and **List&lt;Integer&gt;** the same type?
-    (See TIJ page 651.)
-2.  What is a *bound* and how does Java implement a bound in generics? Explain the meanings of &lt;T1 extends T2&gt;? (See TIJ page 653.)
-3.  What are the problems with erasure when using generics? (See TIJ pages 656 to 657.)
-4.  How do you compensate for erasure by using a *type tag*? (See TIJ page 662 to 663.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[LostInformation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/LostInformation.java)
-[Manipulation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Manipulation.java)
-[ErasureAndInheritance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ErasureAndInheritance.java)
-[ArrayMaker.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ArrayMaker.java)
-[ListMaker.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ListMaker.java)
-[FilledListMaker.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/FilledListMaker.java)
-[SimpleHolder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SimpleHolder.java)
-[GenericHolder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericHolder.java)
-[ClassTypeCapture.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ClassTypeCapture.java)
-[InstantiateGenericType.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/InstantiateGenericType.java)
-[FactoryConstraint.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/FactoryConstraint.java)
-[CreatorGeneric.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CreatorGeneric.java)
-[ArrayOfGeneric.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ArrayOfGeneric.java)
-[GenericArray.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericArray.java)
-[GenericArray2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericArray2.java)
-[GenericArrayWithTypeToken.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericArrayWithTypeToken.java)
-
-#### Learning Objective 4
--   Discuss *bounds* and *wildcards*.
-
-##### Readings
-**Required:** Pages 673 to 694 of TIJ
-
-##### Exercises
-**Questions**
-1.  How does Java implement multiple bounds? (See TIJ page 673.)
-2.  Consider the example given on pages 677 to 680 in TIJ. What is meant by ***List&lt;? extends Fruit&gt;*** and why can **flist** not add a
-    new Apple object? (See TIJ pages 677 to 680.)
-3.  Referring to the above question, how can you add a new Apple object using *supertype wildcards*? (See TIJ pages 682 to 683.)
-4.  What is one situation that requires the use of an *unbounded wildcard*? (See TIJ pages 692 to 693.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[BasicBounds.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/BasicBounds.java)
-[InheritBounds.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/InheritBounds.java)
-[EpicBattle.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/EpicBattle.java)
-[CovariantArrays.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CovariantArrays.java)
-[NonCovariantGenerics.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/NonCovariantGenerics.java)
-[GenericsAndCovariance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericsAndCovariance.java)
-[CompilerIntelligence.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CompilerIntelligence.java)
-[Holder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Holder.java)
-[SuperTypeWildcards.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SuperTypeWildcards.java)
-[GenericWriting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericWriting.java)
-[GenericReading.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericReading.java)
-[UnboundedWildcards1.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/UnboundedWildcards1.java)
-[UnboundedWildcards2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/UnboundedWildcards2.java)
-[Wildcards.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Wildcards.java)
-[CaptureConversion.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CaptureConversion.java)
-
-#### Learning Objective 5
--   Discuss issues of generics.
-
-##### Readings
-**Required**: Pages 694 to 701 of TIJ
-
-##### Exercises
-**Questions**
-1.  Explain why a class cannot implement two variants of the same generic interface? (See TIJ page 696.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[ListOfInt.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ListOfInt.java)
-[PrimitiveGenericTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/PrimitiveGenericTest.java)
-[MultipleInterfaceVariants.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/MultipleInterfaceVariants.java)
-[GenericCast.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericCast.java)
-[NeedCasting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/NeedCasting.java)
-[ClassCasting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ClassCasting.java)
-[UseList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/UseList.java)
-[RestrictedComparablePets.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/RestrictedComparablePets.java)
-
-#### Learning Objective 6
--   Describe self-bounded types, dynamic type checking features, Exceptions issues, and the use of Mixins in Java.
-
-##### Readings
-**Required**: Pages 701 to 721 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is a value of self-bounding types? (See TIJ page 706.)
-2.  Describe a way to check type dynamically. (See TIJ page 710 to 711.)
-3.  Explain why a **catch** clause cannot catch an exception of a generic type. (See TIJ page 711.)
-4.  What is a *mixin*? Why is it difficult for Java to implement *mixins*? According to the author of TIJ, what approach in Java is
-    closest to a true **mixin**? (See TIJ pages 713 to 715 and 719 to 721.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[CRGWithBasicHolder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CRGWithBasicHolder.java)
-[Unconstrainted.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Unconstrained.java)
-[SelfBounding.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SelfBounding.java)
-[NotSelfBounded.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/NotSelfBounded.java)
-[SelfBoundingMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SelfBoundingMethods.java)
-[GenericsAndReturnTypes.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/GenericsAndReturnTypes.java)
-[OrdinaryArguments.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/OrdinaryArguments.java)
-[SelfBoundingAndCovariantArguments.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SelfBoundingAndCovariantArguments.java)
-[PlainGenericInheritance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/PlainGenericInheritance.java)
-[CheckedList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/CheckedList.java)
-[ThrowGenericException.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/ThrowGenericException.java)
-[Mixins.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Mixins.java)
-[Decoration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/decorator/Decoration.java)
-[DynamicProxyMixin.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/DynamicProxyMixin.java)
-
-#### Learning Objective 7
--   Discuss the issues of latent typing and function objects and how they can be used in Java.
-
-##### Readings
-**Required**: Pages 721 to 743 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is latent typing? What is its advantage? (See TIJ pages 721 to 722.)
-2.  How to compensate the lack of latent typing by using adapters? (See TIJ pages 733 to 736.)
-3.  What is a *function object* and what are the advantages of using one? (See TIJ page 737.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Performs.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Performs.java)
-[LatentReflection.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/LatentReflection.java)
-[Apply.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Apply.java)
-[SimpleQueue.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/SimpleQueue.java)
-[Fill.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Fill.java)
-[Fill2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Fill2.java)
-[Functional.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/generics/Functional.java)
-
-#### Learning Objective 8
--   Summarize the materials in this section.
-
-##### Readings
-**Required**: Pages 743 to 746.
-
-##### Exercises
-Exercise2 on page 621, exercise 9 on page 633, exercise 20 on page 654,
-exercise 25 on page 677, exercise 28 on pages 685 to 686 of TIJ.
-
-**Questions**
-1.  Is casting really so bad? (open question)
-
-##### Answers To Exercises
--   [Answer 2](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_2/Ch16ex2.java)
--   [Answer 9](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_2/Ch16ex9.java)
--   [Answer 20](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_2/Ch16ex20.java)
--   [Answer 25](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_2/Ch16ex25.java)
--   [Answer 28](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_2/Ch16ex28.java)
 
 ### Section 3: Containers and Types
 **Section Goal**: Discuss the full functionality of various containers

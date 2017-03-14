@@ -658,6 +658,17 @@ outer-iteration {
 }
 ```
 
+### References
+Basically a hirerachie of what can be garbage collected. This allows limited interaction with the garbage collector.
+1.  What are the three types of **References** and what are their differences?
+    Strong - default reference type. Cannot be garbage collected.
+    Soft - can be garbage collected IF there is no more room on the heap.
+        Soft references are for implementing memory-sensitive caches
+    Weak - Still accessible but doesn't prevent the object from being reclaimed.
+        weak references are for implementing canonicalizing mappings that do not prevent their keys (or values) from being reclaimed
+    Phamtom - underlying object is unreachable. It is only useful for knowing if an object has been finalized. Doesn't stop it from being garbage collected.
+        phantom references are for scheduling pre-mortem cleanup actions in a more flexible way than is possible with the Java finalization mechanism.
+
 ## Object Lifetime
 
 ### Class Loader
@@ -1176,6 +1187,11 @@ This is not true for comparison of the Classes. `classObject.equals(objectObject
 #### Reflection
 RTTI is great and all but it falls apart when you start using classes that aren't available at runtime. This is where reflection comes in.
 Reflection is a system to define classes at runtime. It uses Class to hold generic information, Field, Method, and Constructor to hold the class members since they can't be compiled at runtime. This is amazing since it means you can use objects you don't even know about when you're programing the code. TODO: I'm assuming this incurs a performance penalty.
+Useful for:
+- latent typing write a method that works with any object but calls object specific methods.
+
+Downside:
+- Moves all type checking to runtime.
 
 This is how you can create an object of a type at runtime.
 
@@ -1383,8 +1399,15 @@ You need to do a few special things to makes sure you have an outer class initia
     using $ between outer and inner class name.
 
 ### Generics
-Introduced in Java 5.
-Type generic code with types specified later. This is code that can be used with many different object without specifying the Type. When the code is implement specify the object. This give you type checking going in and out of the code but lets you write code that can be used on many different object types.
+Why Generics?
+- Type safe containers (usually not a huge benefit).
+- Generic code that can be reused for any object.
+
+Introduced in Java 5. Which means there are issues with backwards compatibility.
+
+Type generic code with types specified at use rather than with initial code. All types are still declared before compile time.
+
+This is code that can be used with many different object without specifying the Type. When the code is implement specify the object. This give you type checking going in and out of the code but lets you write code that can be used on many different object types.
 Less powerful than other generics language implementations.
 Most useful for containers.
 
@@ -1480,10 +1503,10 @@ This is where you start to be able to create complex code within your generics. 
 `Generic<T2 extends T1> boundedRef;` A reference can contain a generic that holds a specific Type T2 or greater. Since we don't know what type it is holding we can't use assignment statements or any method that uses T as an argument. You can call methods that return T so long as the reference they are assigned to is T2 or a super-class of T2.
 `Class Generic<T2 extends T1> {}` a generic where T2 can be any subclass of T1. The methods associated with T1 are available within the generic.
 
-#### Wildcards
+##### Wildcards
 <?> This tells the compiler it can be any type, but that it's a specific type. This makes it hard for the compiler to make any specific determinations about the class being represented. It usually means that you can't assign an object to it because you don't know what type it is and you can't call any methods because you don't know what type it is.
 
-#### Bounding and Wildcards
+##### Bounding and Wildcards
 Allow for an upcasting relationship.
 These are more restrictive than strait bounds because once you say it's a wild card, we don't know what that means.
 
@@ -1494,6 +1517,19 @@ Basically you can't use any methods that will add, or change the array using a p
 Super type is the opposite. You know that this object is at least an apple. It might even be less than an apple but we don't know that. This will let us pass apple types in but not less than an apple.
 
     List<? super Apple>
+
+##### Self Bounding
+It's possible to bound a generic with itself. I'm not sure why this is useful.
+
+#### Exceptions
+Catch clauses cannot catch an exception of a generic type, because the exact type of the exception must be known at compile time.
+This means that the error checking is very limited within generics.
+You can however, write a generic that takes an exception. This allows you to write code that varies based on the exception thrown.
+
+#### Legacy Code
+Pre java 5 syntax didn't have support for generics. Because of that extra care needs to be used when mixing code with generics with pre java 5 code. One way to do that is to use checkedCollections.
+checkedCollection( ), checkedList( ), checkedMap( ), checkedSet( ), checkedSortedMap( ), checkedSortedSet( )
+If you didn't use these methods you wouldn't get an error until you take out the object and it throws a bad assignment error. With these methods you find out when you try to assign them to the collection.
 
 ### Exceptions
 An exceptional condition is a condition you don't have enough information to solve in the current scope. All you can do is jump to a wider scope and let them try to solve the condition.
@@ -1714,39 +1750,125 @@ Type-safe containers (new in 1.6 because of generics): A container that can be m
 - sequence of elements
 - with special rules
     - list: must hold elements in order inserted
-        ArrayList:
-            - Random access & set
-            - bad: insertion, removal, growing
-        LinkedList:
-            - insertion, removal, growing, sequential access.
-            - bad: random access
     - set: cannot have duplicate elements
-        - only allows one item
-        - TreeSet (red-black tree): keeps items in sorted order
-        - HashSet: unsorted (order is unspecified)
-        - LinkedHashSet: keeps insertion order
     - Queue: returns elements according to it's queuing discipline
-        - FIFO
-        - LIFO
-        - PriorityQueue: uses a Comparator to determine return order. Sort on insert or Sort on retrieval.
-            - Sort on insert is usually more efficient.
-            - Sort on retrieval is useful when item order can change while in the Queue.
-        - DeQue
-            - implements both FIFO & LIFO queue's
 
 All collections implement iterators
 
+`java.util.Collections` - collections of static methods that help with Collections.
+
+##### List
+ArrayList:
+    - Random access & set
+    - bad: insertion, removal, growing
+LinkedList:
+    - insertion, removal, growing, sequential access.
+    - bad: random access
+
+##### Set
+All Elements in a set are unique.
+This uniqueness is established using the equals() method.
+Therefore all elements should implement an appropriate equals() method.
+###### TreeSet
+Keeps items in sorted order based on the comparator used.
+Implemented using a red-black tree.
+Elements must implement Comparable interface.
+###### HashSet
+unsorted (order is unspecified).
+Very fast lookup time.
+hashCode() is used to set the hash buckets.
+It is advisable to override this method.
+###### LinkedHashSet
+Same as HashSet but maintains doubly-linked list through it's nodes, in order to keep insertion order.
+Lookups are fast, insertion is slightly slower because of linked-list.
+
+##### Queue
+- FIFO
+- LIFO
+- PriorityQueue
+- DeQue
+    - implements both FIFO & LIFO queue's
+###### Priority Queue
+Uses Comparator function to determine return order.
+Sort on insert or Sort on retrieval based on performance.
+- Sort on insert is usually more efficient.
+- Sort on retrieval is useful when item order can change while in the Queue.
+
 #### Maps
-Maps, aka associative arrays or dictionaries, are
-    - group of key-value object pairs
-    - most useful type of container
+Maps, aka associative arrays or dictionaries, are group of key-value object pairs. Most useful type of container.
+Similar implementations to sets. The keys can be thought of as a set.
 
-TODO: is there any restriction on holding lists or maps as the key side of a map?
-Complex example of Map containing a list:
-```java
-public static Map<Person, List<? extends Pet>> petPeople = new HashMap<Person, List<? extends Pet>>();
-```
+##### HashMap
+##### LinkedHashMap
+Provides order guarantee for keys. See LinkedHashSet for implementation.
+Also allows for a least recently used (LRU) order.
+##### TreeMap
+Keeps keys in sorted order based on the comparator used (natural is default).
+Only Map allowing for returning a subMap.
+##### WeakHashMap
+If no references to a particular key are held outside the map, that key may be garbage collected.
+##### ConcurrentHashMap
+no synchronization locking, thread safe Map.
+##### IdentityHashMap
+uses == instead of equals() for identity. Not used often.
 
+#### HashTables and Hashing
+How a hashtable works:
+Array of fixed length is created.
+(key.hashCode() % bucket.length) gives which bucket to store/retrieve object.
+LinkedList of Tuple<key, value> is put in the bucket if one doesn't exist.
+key is compared with other key's in LinkedList using equals().
+If it already exists the object is returned/replaced.
+If not a new Tuple<key, value> is added to the LinkedList.
+
+Speed is based on:
+- Capacity: The number of buckets in the table. Initial capacity can be set in HashMap and HashSet.
+- Size: The number of entries currently in the table.
+- Load factor: Size/capacity defaults to 0.75. This can be set in HashMap and HashSet.
+
+If you make more buckets it will decrease the collisions, increasing access and put speed, but decreasing traversal speed. This is usually set in the Constructor.
+
+##### hashCode()
+Two things contribute to a good hashCode, uniqueness and generation speed.
+These should be balanced but favouring generation speed.
+A non unique hash will result in more keys in the same bucket, where a slow generation speed will decrease performance for every operation.
+
+1. Store some constant nonzero value, say, 17, in an int variable called result.
+2. For each significant field f in your object (each field taken into account by the equals method, that is), do the following:
+    a. Compute an int hash code c for the field:
+        i. If the field is a boolean, compute (f ? 1 : 0).
+            c = f ? 1 : 0;
+        ii. If the field is a byte, char, short, or int, compute (int) f.
+            c = (int) f;
+        iii. Ifthefieldisalong, compute (int)(f^(f>>>32)).
+            c = (int)(f^(f>>>32));
+        iv. If the field is a float, compute Float.floatToIntBits(f).
+            c = Float.floatToIntBits(f);
+        v. If the field is a double, compute Double.doubleToLongBits(f), and then hash the resulting long as in step 2.a.iii.
+            long l = Double.doubleToLongBits(f);
+        vi. If the field is an object reference and this class’s equals method compares the field by recursively invoking equals, recursively invoke hashCode on the field.
+            c = f.hashCode();
+            If a more complex comparison is required, compute a “canonical representation” for this field and invoke hashCode on the canonical representation.
+            If the value of the field is null, return 0 (or some other constant, but 0 is traditional).
+        vii. If the field is an array, treat it as if each element were a separate field.
+            That is, compute a hash code for each significant element by applying these rules recursively, and combine these values per step 2.b.
+            If every element in an array field is significant, you can use one of the Arrays.hashCode methods added in release 1.5.
+    b. Combine the hash code c computed in step 2.a into result as follows: result = 31 * result + c;
+3. Return result.
+4. When you are finished writing the hashCode method, ask yourself whether equal instances have equal hash codes. Write unit tests to verify your intuition! If equal instances have unequal hash codes, figure out why and fix the problem.
+
+The most common error for hashing results when creating a new object type.
+When two objects of the same time should be equal but aren't.
+Even though they logically should be equal, they both return false because the default hashCode and equals methods are based on the objects address in memory.
+
+    gh1 = new Groundhog("Willy", "Wiarton");
+    gh2 = new Groundhog("Willy", "Wiarton");
+    out.println("these should be equal: " + (gh1.equals(gh2)));
+    out.println("these should have the same hashCode: " + (gh1.hashCode().equals(gh2.hashCode())));
+
+#### Optional Methods
+Both Collections and maps use optional methods. These methods are possible because of Java's runtime errors. The methods make the container interfaces more flexible, but in certain cases push type checking to runtime.
+This is a departure from conventional static typing.
 
 
 ### Iterators
@@ -1774,10 +1896,18 @@ Everything in Iterator, moves two directions, know it's location in the list, an
 - nextIndex, previousIndex
 - optional: set, add
 
-### Comparable Comparator
+### Comparable & Comparator
 `java.lang.Comparable`
+`java.lang.Comparator`
 
 Generalized comparison for use in sorting algorithms.
+Comparable is an interface that objects implement to compare themselves with other objects.
+
+    object1.compareTo(object2);
+
+Comparator is a function Class that compares two objects.
+
+    ComparatorClass.compare(object1, object2);
 
 ### Random
 Psudo random number generator
@@ -1853,6 +1983,9 @@ Generates data based on a _strategy_, Factory method?
 
 ### Locator
 
+### Flyweight
+Abstracts away object attributes that don't need to be part of the object. Useful when many objects are needed and they are very similar (Charachters in a word editor, potions in a alchamy shop).
+
 ### Null Object
 There is a pattern where instead of constantly checking for null you instantiate an Object that is nullish.
 
@@ -1861,6 +1994,26 @@ Objects that create
 
 Stubs
 Large almost real objects that act like the real object but aren't actually them.
+
+### Mixins
+Mixins are difficult to accomplish in Java because it doesn't allow for multiple inheritance.
+Interface - gives certain characteristics of mixins (multiple types have the same interface)
+    - breaks down because each class has to implement their own code for this.
+Decorator - allows code to be reused and multiple classes to share functionality
+    - breaks down because it only allows the last 'decoration' to be used.
+Dynamic Proxy & interfaces - Hold the underlying classes.
+    - Doesn't provide a common interface for everything however, it does allow casing to different types.
+    - Each object is still kept separate like with the composition pattern.
+    see TIJ - Mixins with dynamic proxies
+
+### Latent Typing
+Reflection - able to write a method that will call methods on any objects.
+    - this is the best way to get a trully dynamic language like python.
+    - however, delays all typechecking till runtime
+Reflection + interface - adds some type checking
+adapter pattern - Using an adapter interface and a generic adapter, it is possible to create a common interface for objects that don't have a common interface but do have common methods.
+    - Still requires a lot of structural code but gives you type checking.
+    see TIJ - Simulating latent typing with adapters
 
 ## JavaDocs
 Tags:
@@ -1962,175 +2115,9 @@ Guidelines Submitting all TME's
 - Please include examples, code fragments, etc to illustrate your points in your answers to the unit questions. 
 
 ## Quiz 1: (3 / 3 percent)
-
 ## Tutor Marked Exercise 1 (5 / 5 percent)
-## Tutor Marked Exercise 2 ( / 10 percent)
+## Tutor Marked Exercise 2 (9.2 / 10 percent)
 ## Unit 6: Types, Generics and Containers
-
-### Section 3: Containers and Types
-**Section Goal**: Discuss the full functionality of various containers
-in Java.### Learning Objective 1
-
--   Describe the full container taxonomy and ways to fill containers.
-
-##### Readings
-**Required**: Pages 791 to 809 of TIJ
-
-##### Exercises
-**Questions**
-1.  List the new containers implementation added in Java 5. (See TIJ page 792 to 793).
-2.  Briefly describe a Flyweight design pattern. How does the use of Abstract class demonstrate the use of Flyweight design pattern? (See TIJ page 800).
-
-##### Programs
-Compile, run, and analyze programs:
-
-[FillingLists.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/FillingLists.java)
-[CollectionDataTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/CollectionDataTest.java)
-[CollectionDataGeneration.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/CollectionDataGeneration.java)
-[MapDataTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/MapDataTest.java)
-[Countries.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/util/Countries.java)
-
-#### Learning Objective 2
--   Discuss and use Java **Collection** features.
-
-##### Readings
-**Required:** Pages 809 to 817 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are *optional operations* and why are they unusual? (See TIJ page 813.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[CollectionMethods.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/CollectionMethods.java)
-[Unsupported.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Unsupported.java)
-
-#### Learning Objective 3
--   Discuss and use **Lists, Sets, Queues,** and **Maps**.
-
-##### Readings
-**Required**: Pages 817 to 839 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the characteristics of different implementations of **Set**? (See TIJ page 821.)
-2.  What are the two implementations of **Queue** in Java SE5? (See TIJ page 827.)
-3.  What is the basic idea of a **Map** or *associative array*? (See TIJ page 831.)
-4.  What is the fundamental issue for **Maps** and what is the advantage of a **HashMap**? (See TIJ pages 833 to 835.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Lists.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Lists.java)
-[TypesForSets.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/TypesForSets.java)
-[SortedSetDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/SortedSetDemo.java)
-[QueueBehavior.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/QueueBehavior.java)
-[ToDoList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/ToDoList.java)
-[DequeTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/DequeTest.java)
-[AssociativeArray.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/AssociativeArray.java)
-[Maps.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Maps.java)
-[SortedMapDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/SortedMapDemo.java)
-[LinkedHashMapDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/LinkedHashMapDemo.java)
-
-#### Learning Objective 4
--   Explain the issues of hashing and hash codes.
-
-##### Readings
-**Required**: Pages 839 to 858 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is one common pitfall when creating customized classes as keys for **HashMaps** and how can you avoid it? (See TIJ pages 840 to 842.)
-2.  What are the conditions that must be satisfied when overriding the **equals()** method? (See TIJ page 842.)
-3.  What is one scheme to speed up searching within a **Map**? What is a *collision* and how can you resolve it? (See TIJ pages 847 to 848.)
-4.  What are the two factors governing a good **hashCode()**? (See TIJ pages 852 to 853.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Groundhog.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Groundhog.java)
-[Groundhog2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Groundhog2.java)
-[SlowMap.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/SlowMap.java)
-[MapEntry.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/MapEntry.java)
-[SimpleHashMap.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/SimpleHashMap.java)
-[CountedString.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/CountedString.java)
-
-#### Learning Objective 5
--   Discuss the issues in choosing a particular type of container.
-
-##### Readings
-**Required**: Pages 858 to 879 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the distinction between different types of containers? Give an example. (See TIJ pages 858 to 859.)
-2.  What are the advantages and disadvantages of **ArrayList** and **LinkedList**? (See TIJ page 870.)
-3.  What are the advantages and disadvantages of **TreeSet** and **HashSet**? (See TIJ page 874.)
-4.  What are the advantages and disadvantages of **TreeMap**, **HashMap**, and **HashTable**? (See TIJ page 877.)
-5.  What are the performance factors of a **HashMap**? (See TIJ page 878.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[TestParam.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/TestParam.java)
-[Tester.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Tester.java)
-[ListPerformance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/ListPerformance.java)
-[RandomBounds.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/RandomBounds.java)
-[SetPerformance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/SetPerformance.java)
-[MapPerformance.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/MapPerformance.java)
-
-#### Learning Objective 6
--   Introduce utilities for containers.
-
-##### Readings
-**Required**: Pages 879 to 889 of TIJ
-
-##### Exercises
-**Questions**
-1.  How do you make a **CollectionMap** unmodifiable? (See TIJ pages 885 to 887.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Utilities.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Utilities.java)
-[ListSortSearch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/ListSortSearch.java)
-[ReadOnly.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/ReadOnly.java)
-[Synchronization.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Synchronization.java)
-[FailFast.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/FailFast.java)
-
-#### Learning Objective 7
--   Introduce different types of References and Java 1.0/1.1 containers.
-
-##### Readings
-**Required**: Pages 889 to 900 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the three types of **References** and what are their differences? (See TIJ page 890.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[References.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/References.java)
-[CanonicalMapping.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/CanonicalMapping.java)
-[Enumerations.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Enumerations.java)
-[Stacks.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Stacks.java)
-[Bits.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/containers/Bits.java)
-
-#### Learning Objective 8
--   Summarize the materials in this section and finish the exercises.
-
-##### Readings
-**Required**: Page 900 of TIJ
-
-##### Exercises
-Exercises 1 and 2 on page 809, exercise 20 on page 851 of TIJ.
-
-##### Answers To Exercises
--   [Answer 1](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_3/Ch18ex1.java)
--   [Answer 2](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_3/Ch18ex2.java)
--   [Answer 20](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_3/Ch18ex20.java)
 
 ### Section 4: Enumerated Types
 **Section Goal**: Discuss and use Java **enum**  features.
@@ -2453,11 +2440,7 @@ files.
 Unit 7 Section 2 Links:
 -   [On cloning and object immutability](http://library.athabascau.ca/drr/redirect.php?id=8129)
 
-## Tutor Marked Exercise 3 (due Jan 6th, 2017)
-Please complete TME 3 and submit it by electronic mail.
-
-Tutor Marked Exercise 3 is scored out of 100 and contributes to 12 per
-cent of your final grade.
+## Tutor Marked Exercise 3 ( / 12 percent)
 
 ## Unit 8: GUI Development
 
@@ -3179,14 +3162,9 @@ Compile, run, and analyze programs:
 ##### Readings
 **Required**: [Using Javadoc](http://library.athabascau.ca/drr/redirect.php?id=25165)
 
-## Tutor Marked Exercise 4 (due Jan 13th, 2017)
-Please complete TME 4 and submit it by electronic mail.
+## Tutor Marked Exercise 4 ( / 20 percent)
 
-Tutor Marked Exercise 4 is scored out of 100 and contributes to 20% of
-your final grade.
-
-## Final Exam (due Jan 23rd, 2017)
-
+## Final Exam ( / 50 percent)
 The exam will be a closed-book online examination three hours in length.
 - Nine percent of the mark will be for analyzing a program and describing its output.
 - Thirty percent of the mark will be for 10 short-answer questions (100 words or less) from the questions in the Study Guide.

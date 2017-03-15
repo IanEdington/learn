@@ -1255,7 +1255,7 @@ Constructors, initializes and everything about a static class is also available 
 Automatically provided with the ENUM
     ordinal(): returns 0-index order of enum
     toString(): returns name of enum
-    static values(): an array of values
+    static values(): an array of values (iterable)
 
 Useful for representing groups of constants like the days of the week.
 
@@ -1275,10 +1275,12 @@ Day today;
 today = Day.TUE;
 ```
 
+#### ENUMs as classes
 enum types are full static classes so they have access to all the methods and static variables you would expect a class to have.
 
 ```java
 public enum Planet {
+    // Instances of the ENUM
     MERCURY (3.303e+23, 2.4397e6),
     VENUS   (4.869e+24, 6.0518e6),
     EARTH   (5.976e+24, 6.37814e6),
@@ -1319,6 +1321,105 @@ public enum Planet {
     }
 }
 ```
+
+#### Enums Constant-specific methods
+Each enum instance can have it's own specific instance methods, weird.
+
+    public enum Day {
+        MON {
+            String whatToDo() {
+                return "Work.";
+            }
+        },
+        TUE {
+            String whatToDo() {
+                return "Party!";
+            }
+        },
+        WED, THU, FRI, SAT, SUN;
+
+        String whatToDo() {
+            return this.toString();
+        };
+    };
+
+#### ENUMs with switches
+enum Signal { GREEN, YELLOW, RED, }
+
+public class TrafficLight {
+    Signal color = Signal.RED;
+    switch(color) {
+        case RED:
+            color = Signal.GREEN;
+            break;
+        case GREEN:
+            color = Signal.YELLOW;
+            break;
+        case YELLOW:
+            color = Signal.RED;
+            break;
+    }
+}
+
+#### ENUM Generator
+
+    public class Enums {
+        private static Random rand = new Random(47);
+        public static <T extends Enum<T>> T random(Class<T> ec) {
+            T[] values = random(ec.getEnumConstants());
+            return values[rand.nextInt(values.length)];
+        }
+    }
+
+    enum Activity { SITTING, LYING, STANDING, HOPPING,
+        RUNNING, DODGING, JUMPING, FALLING, FLYING }
+
+    public class RandomTest {
+        public static void main(String[] args) {
+            for(int i = 0; i < 20; i++)
+                System.out.print(Enums.random(Activity.class) + " ");
+        }
+    }
+
+#### SubTypes of ENUMs using interfaces and enums of enums
+Inheritance isn't possible with enums. The only way to implement types of enums is to use interfaces.
+The outer enum holds 
+
+    public enum Meal {
+        MAINCOURSE(Food.MainCourse.class),
+        DESSERT(Food.Dessert.class);
+        private Food[] values;
+        private Meal(Class<? extends Food> kind) {
+            values = kind.getEnumConstants();
+        }
+        public interface Food {
+            enum MainCourse implements Food { LASAGNE, BURRITO, PAD_THAI; }
+            enum Dessert implements Food { FRUIT, CREME_CARAMEL; }
+        }
+        public Food randomSelection() {
+            return Enums.random(values);
+        }
+        public static void main(String[] args) {
+            Food food = Dessert.FRUIT;
+            food = MainCourse.LASAGNE;
+            food = Dessert.CREME_CARAMEL;
+
+            for(int i = 0; i < 5; i++) {
+                for(Meal meal : Meal.values()) {
+                    Food food = meal.randomSelection();
+                    System.out.println(food);
+                }
+                System.out.println("---");
+            }
+        }
+    }
+
+#### EnumSet (Collection)
+Very useful for flags (on off) (replaces BitSet).
+Very fast!
+
+#### EnumMap (Collection)
+
 
 ### Inner and Nested Classes
 
@@ -2117,94 +2218,6 @@ Guidelines Submitting all TME's
 ## Quiz 1: (3 / 3 percent)
 ## Tutor Marked Exercise 1 (5 / 5 percent)
 ## Tutor Marked Exercise 2 (9.2 / 10 percent)
-## Unit 6: Types, Generics and Containers
-
-### Section 4: Enumerated Types
-**Section Goal**: Discuss and use Java **enum**  features.
-
-#### Learning Objective 1
--   Discuss and use Java **enum** features.
-
-##### Readings
-**Required**: Pages 1011 to 1028 of TIJ
-
-##### Exercises
-**Questions**
-1.  How is an **enum** used inside a **switch** statement? Give an example. (See TIJ pages 1016 to 1017.)
-2.  What is the use of the **values()** method in an **enum**? (See TIJ pages 1017 to 1019.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[EnumClass.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/EnumClass.java)
-[Spiciness.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/Spiciness.java)
-[OzWitch.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/OzWitch.java)
-[SpaceShip.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/SpaceShip.java)
-[TrafficLight.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/TrafficLight.java)
-[Reflection.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/Reflection.java)
-[UpcastEnum.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/UpcastEnum.java)
-[NonEnum.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/NonEnum.java)
-[EnumImplementation.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/cartoons/EnumImplementation.java)
-[RandomTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RandomTest.java)
-[TypeOfFood.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/menu/TypeOfFood.java)
-[Meal.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/menu/Meal.java)
-[SecurityCategory.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/SecurityCategory.java)
-[Meal2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/menu/Meal2.java)
-
-#### Learning Objective 2
--   Discuss and use **EnumSet** and **EnumMap**.
-
-##### Readings
-**Required**: Pages 1028 to 1047 of TIJ
-
-##### Exercises
-**Questions**
--   What is an **EnumSet**? (See TIJ pages 1028 to 1030.)
--   What is an **EnumMap**? (See TIJ pages 1030 to 1032.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[EnumSets.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/EnumSets.java)
-[EnumMaps.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/EnumMaps.java)
-[ConstantSpecificMethod.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/ConstantSpecificMethod.java)
-[CarWash.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/CarWash.java)
-[OverrideConstantSpecific.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/OverrideConstantSpecific.java)
-[PostOffice.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/PostOffice.java)
-[Input.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/Input.java)
-[VendingMachine.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/VendingMachine.java)
-
-#### Learning Objective 3
--   Discuss the use of **Enum** in multiple dispatching.
-
-##### Readings
-**Required**: Pages 1047 to 1057 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the problem with single dispatching? Give an example. (See TIJ pages 1047 to 1048.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[RoShamBo2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RoShamBo2.java)
-[RoShamBo3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RoShamBo3.java)
-[RoShamBo4.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RoShamBo4.java)
-[RoShamBo5.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RoShamBo5.java)
-[RoShamBo6.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/enumerated/RoShamBo6.java)
-
-#### Learning Objective 4
--   Summarize the materials in this section and complete the exercises.
-
-##### Readings
-**Required**: Pages 1057 to 1058 of TIJ
-
-##### Exercises
-Exercise 4 on page 1027 of TIJ
-
-##### Answers To Exercises
--   [Answer 4](http://scis.athabascau.ca/html/course/COMP308/Unit_6/Section_4/Ch20ex4.java)
-
 ## Unit 7: Java IO and Networking
 
 ### Unit Purpose

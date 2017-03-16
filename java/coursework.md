@@ -660,14 +660,74 @@ outer-iteration {
 
 ### References
 Basically a hirerachie of what can be garbage collected. This allows limited interaction with the garbage collector.
-1.  What are the three types of **References** and what are their differences?
-    Strong - default reference type. Cannot be garbage collected.
-    Soft - can be garbage collected IF there is no more room on the heap.
-        Soft references are for implementing memory-sensitive caches
-    Weak - Still accessible but doesn't prevent the object from being reclaimed.
-        weak references are for implementing canonicalizing mappings that do not prevent their keys (or values) from being reclaimed
-    Phamtom - underlying object is unreachable. It is only useful for knowing if an object has been finalized. Doesn't stop it from being garbage collected.
-        phantom references are for scheduling pre-mortem cleanup actions in a more flexible way than is possible with the Java finalization mechanism.
+What are the three types of **References** and what are their differences?
+- Strong
+    - default reference type. Cannot be garbage collected.
+- Soft
+    - can be garbage collected IF there is no more room on the heap.
+    - Soft references are for implementing memory-sensitive caches
+- Weak
+    - Still accessible but doesn't prevent the object from being reclaimed.
+    - weak references are for implementing canonicalizing mappings that do not prevent their keys (or values) from being reclaimed
+- Phamtom
+    - underlying object is unreachable. It is only useful for knowing if an object has been finalized. Doesn't stop it from being garbage collected.
+    - phantom references are for scheduling pre-mortem cleanup actions in a more flexible way than is possible with the Java finalization mechanism.
+
+### Annotations
+Essentially metadata programing for your program.
+Possible to programmatically add external functionality based on the metadata in your processor.
+Can be added infront of Class, Method or Field
+Can have data integrated as follows:
+
+    @Annotation
+    @Annotation(value)
+    @Annotation(field="value", field2="value2")
+
+#### Base annotations
+These are in java.lang
+    @Override, to indicate that a method definition is intended to override a method in the base class. This generates a compiler error if you accidentally misspell the method name or give an improper signature.2
+    @Deprecated, to produce a compiler warning if this element is used.
+    @SuppressWarnings, to turn off inappropriate compiler warnings. This annotation is allowed but not supported in earlier releases of Java SE5 (it was ignored).
+
+#### Creating new Annotations
+Creating new annotations is done using @interface.
+
+The following annotations annotate an new annotation:
+    @Target
+    @Retention
+    @Inherited
+    @Documented
+
+    import java.lang.annotation.ElementType;
+    import java.lang.annotation.RetentionPolicy;
+    import java.lang.annotation.Retention;
+    import java.lang.annotation.Target;
+
+    // Annotating the new annotation with:
+    @Target(ElementType.METHOD) // restricts UseCase annotation to being used on methods.
+    @Retention(RetentionPolicy.RUNTIME) // determins how long the annotation is kept.
+    public @interface UseCase { // declares the annotation 
+        public int id(); // sets the 
+        public String description() default "no description";
+    }
+
+#### Annotation Data
+You can use fields to pass in annotation data to an annotation.
+These are the types of fields you can pass in:
+- All primitives (int, float, boolean etc.)
+- String
+- Class
+- Enums
+- Annotations
+- Arrays of any of the above
+
+#### Annotation processors
+Programming of annotations is possible by using the AnnotatedElement interface.
+
+What is the syntax of annotations? (See TIJ pages 1060 to 1061.)
+- @annotation(field=value, field2=value2)
+What are the allowed types for annotation elements? (See TIJ page 1065.)
+Explain the circumstance in which annotations are useful. (See TIJ pages 1066 to 1069.)
 
 ## Object Lifetime
 
@@ -2031,6 +2091,80 @@ public class clonableClass implements Cloneable {
 }
 ```
 
+## IO
+The IO functionality in Java seems to be built using wrapper classes.
+This makes it possible for each layer to be swapped out without changing program functionality.
+A file IO system has the same readbuffer as a network IO system meaning that a program that reads from a buffer can be used for both.
+
+### Typical use
+Use the BufferedReader or BufferedWriter Classes wherever possible.
+Then another Reader Writer where possible.
+
+#### Buffered input file
+When you want to read from a file line by line.
+
+Pre-java 7
+```
+public class BufferedInputFile {
+    public static void main(String[] args) {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new FileReader("BufferedInputFile.java"));
+            // do something with file
+        } finally {
+            if (null != in) {
+                in.close();
+            }
+        }
+    }
+}
+```
+Post-Java 7
+```
+public class BufferedInputFile {
+    public static void main(String[] args) {
+        try (BufferedReader in = new Files.newBufferedReader(Paths.get("BufferedInputFile.java"))) {
+            // do something with file
+        }
+    }
+}
+```
+
+### IO Streams
+Input or Output objects.
+
+ByteStream
+- basis for all other streams
+- raw byte stream
+CharacterStreams
+- return characters instead of raw bytes
+BufferStreams
+- Buffer the IO operations to be more efficient when reading and writing from Disk/Network
+DataStreams
+- primitive types and Strings
+ObjectStreams
+- Any serializable object
+
+### Scanning and formating
+Scanner
+- Takes an input Stream or String and reads the tokens one at a time.
+
+### Closing IO's
+Any IO object you create needs to be closed once it's no longer needed.
+
+    Scanner s = null;
+
+    try {
+        s = new Scanner(new BufferedReader(new FileReader("xanadu.txt")));
+        // Do something with Scanner
+    } finally {
+        if (s != null) {
+            s.close();
+        }
+    }
+
+
+
 ## Design Patters
 
 ### Delegation
@@ -2219,193 +2353,6 @@ Guidelines Submitting all TME's
 ## Tutor Marked Exercise 1 (5 / 5 percent)
 ## Tutor Marked Exercise 2 (9.2 / 10 percent)
 ## Unit 7: Java IO and Networking
-
-### Unit Purpose
-Discuss and use Java IO and Java Networking features.
-
-### Conferencing
-Post any questions or comments to the CMC system (conferencing is optional, but is recommended)
-
-### Digital Reading Room
--   [On cloning and object immutability](http://library.athabascau.ca/drr/redirect.php?id=8129) [On cloning and object immutability](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27638)
--   [Networking Basics](http://library.athabascau.ca/drr/redirect.php?id=25146) [Networking Basics](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27639)
--   [Working with URLs&gt;](http://library.athabascau.ca/drr/redirect.php?id=25147) [Working with URLs](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27640)
--   [Working with Sockets](http://library.athabascau.ca/drr/redirect.php?id=25148) [Working with Sockets](http://drr2.lib.athabascau.ca/index.php?c=node&m=detail&n=27641)
-
-### Section 1: Java IO
-**Section Goal**: Describe and use the I/O facilities of Java.
-
-#### Learning Objective 1
--   Use the **File** class.
-
-##### Readings
-**Required**: Pages 901 to 914 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are two ways of using the **File** object to get a directory listing? (See TIJ page 902.)
-2.  What are four other uses of the **File** class? (See TIJ page 912.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[DirList.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/DirList.java)
-[DirList2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/DirList2.java)
-[DirList3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/DirList3.java)
-[Directory.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/util/Directory.java)
-[DirectoryDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/DirectoryDemo.java)
-[ProcessFiles.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/util/ProcessFiles.java)
-[MakeDirectories.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/MakeDirectories.java)
-
-#### Learning Objective 2
--   Describe I/O streams in Java.
-
-##### Readings
-**Required**: Pages 914 to 922 of TIJ
-
-##### Exercises
-**Questions**
-1.  What are the six types of **InputStream**? (See TIJ pages 915 to 917.)
-2.  What are the four types of **OutputStream**? (See TIJ pages 917 to 918.)
-3.  What is a Decorator? (See TIJ pages 918 to 919.)
-4.  What are the four types of **FilterInputStream**? (See TIJ page 919 to 920.)
-5.  What are the three types of **FilterOutputStream**? (See TIJ page 921 to 922.)
-
-#### Learning Objective 3
--   Use I/O streams.
-
-##### Readings
-**Required**: Pages 922 to 973 of TIJ
-
-##### Exercises
-**Note**: You should be able to recognize these types and use them
-appropriately, but you are not expected to generate them verbatim for
-examination purposes.
-
-**Questions**
-1.  What are the additional features provided by Java 1.1 **Reader** and **Writer** classes? (See TIJ pages 922 to 923.)
-2.  How is **RandomAccessFile** used? (See TIJ pages 926 to 927.)
-3.  What is the use of buffered input? (See TIJ pages 927 to 928.)
-4.  What is one way of reading input from memory? (See TIJ pages 928 to 929.)
-5.  What is the difference between a **PrintWriter** and a **DataOutputStream**? (See TIJ page 932.)
-6.  How do you redirect I/O in Java? (See TIJ pages 942 to 943.)
-7.  What is the goal of the Java *new* I/O library? (See TIJ page 946.)
-8.  What are the four indexes of a **Buffer**? (See TIJ page 962.)
-9.  How to lock and release a file? (See TIJ pages 970 to 971.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[BufferedInputFile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/BufferedInputFile.java)
-[MemoryInput.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/MemoryInput.java)
-[FormattedMemoryInput.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/FormattedMemoryInput.java)
-[TestEOF.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/TestEOF.java)
-[BasicFileOutput.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/BasicFileOutput.java)
-[FileOutputShortcut.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/FileOutputShortcut.java)
-[StoringAndRecoveringData.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/StoringAndRecoveringData.java)
-[UsingRandomAccessFile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/UsingRandomAccessFile.java)
-[TextFile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/util/TextFile.java)
-[BinaryFile.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/util/BinaryFile.java)
-[Echo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Echo.java)
-[ChangeSystemOut.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/ChangeSystemOut.java)
-[Redirecting.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Redirecting.java)
-[OSExecuteDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/OSExecuteDemo.java)
-[GetChannel.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/GetChannel.java)
-[ChannelCopy.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/ChannelCopy.java)
-[TransferTo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/TransferTo.java)
-[BufferToText.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/BufferToText.java)
-[AvailableCharSets.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/AvailableCharSets.java)
-[GetData.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/GetData.java)
-[IntBufferDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/IntBufferDemo.java)
-[ViewBuffers.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/ViewBuffers.java)
-[Endians.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Endians.java)
-[UsingBuffers.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/UsingBuffers.java)
-[LargeMappedFiles.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/LargeMappedFiles.java)
-[MappedIO.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/MappedIO.java)
-[FileLocking.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/FileLocking.java)
-[LockingMappedFiles.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/LockingMappedFiles.java)
-
-#### Learning Objective 4
--   Use the Java compression facilities.
-
-##### Readings
-**Required**: Pages 973 to 980
-
-##### Exercises
-**Questions**
-1.  What is the primary function of GZIP? (See TIJ pages 974 to 975.)
-2.  When would you use Zip? (See TIJ page 975.)
-3.  What is the JAR format? (See TIJ page 978.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[GZIPcompress.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/GZIPcompress.java)
-[ZipCompress.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/ZipCompress.java)
-
-#### Learning Objective 5
--   Describe and use object serialization facilities in Java.
-
-##### Readings
-**Required**: Pages 980 to 1003 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is *lightweight persistence*? (See TIJ pages 980 to 981.)
-2.  What are two functions of *serialization*? (See TIJ page 981.)
-3.  What is a rule for serializing to save the state of a system? (See TIJ pages 986 to 990.)
-4.  What is the function of the **transient** keyword? (See TIJ pages 990 to 991.)
-5.  How do **writeObject** and **readObject** function? (See TIJ pages 992 to 995.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Worm.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Worm.java)
-[FreezeAlien.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/FreezeAlien.java)
-[ThawAlien.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/xfiles/ThawAlien.java)
-[Blips.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Blips.java)
-[Blip3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Blip3.java)
-[Logon.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/Logon.java)
-[SerialCtl.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/SerialCtl.java)
-[MyWorld.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/MyWorld.java)
-[StoreCADState.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/StoreCADState.java)
-[RecoverCADState.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/RecoverCADState.java)
-
-#### Learning Objective 6
--   Use XML and Preferences.
-
-##### Readings
-**Required**: Pages 1003 to 1008 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the limitation of object serialization and what is the advantage of converting data to XML format? (See TIJ page 1003.)
-2.  What is the advantage and what is limitation of the **Preferences API**? (See TIJ page 1006.)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Person.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/xml/Person.java)
-[People.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/xml/People.java)
-[PreferencesDemo.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/io/PreferencesDemo.java)
-
-#### Learning Objective 7
--   Summarize the materials in this section and complete the exercises.
-
-##### Readings
-**Required**: pages 1008 to 1009 of TIJ
-
-##### Exercises
-**Exercises** 7 to 9 on page 928, exercise 12 on page 932, exercise 27
-on page 984 of TIJ
-
-##### Answers To Exercises
--   [Answer 7](http://scis.athabascau.ca/html/course/COMP308/Unit_7/Section_1/Ch19ex7.java)
--   [Answer 8](http://scis.athabascau.ca/html/course/COMP308/Unit_7/Section_1/Ch19ex8.java)
--   [Answer 9](http://scis.athabascau.ca/html/course/COMP308/Unit_7/Section_1/Ch19ex9.java)
--   [Answer 12](http://scis.athabascau.ca/html/course/COMP308/Unit_7/Section_1/Ch19ex12.java)
--   [Answer 27](http://scis.athabascau.ca/html/course/COMP308/Unit_7/Section_1/Ch19ex27.java)
-
 ### Section 2: Passing and Returning Objects
 **Section Goal**: This section introduces Java networking features.
 
@@ -3079,101 +3026,6 @@ Compile, run, and analyze programs:
 1.  [<span class="glyphicon glyphicon-home" aria-hidden="true"></span>](http://drr2.lib.athabascau.ca/index.php)
 2.  [COMP](http://drr2.lib.athabascau.ca/index.php?c=index&m=listcourses&sid=44)
 3.  COMP 308: Java for Programmers
-
-## Unit 10: Annotations and Java Documentation
-
-### Unit Purpose
-This unit introduces annotation and metadata, Java documentation, and deployment issues of Java applications.
-
-### Section 1: Annotations
-**Section goal**: This section explains a formalized way to add information to your Java codes so that you can use easily use the data later.
-
-#### Learning Objective 1
--   Discussthe basic idea and syntax of annotation.
-
-##### Readings
-**Required**: Pages 1059 to 1063 of TIJ
-
-##### Exercises
-**Questions**
-1.  What is the syntax of annotations? (See TIJ pages 1060 to 1061.)
-2.  What are the three standard annotations and the four meta-annotations defined in Java? (See TIJ pages 1059 to 1060, 1063)
-
-##### Programs
-Compile, run, and analyze programs:
-
-[Testable.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/Testable.java)
-[UseCase.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/UseCase.java)
-[PasswordUtils.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/PasswordUtils.java)
-
-#### Learning Objective 2
--   Explain how to write annotation processors.
-
-##### Readings
-**Required**: Pages 1064 to 1074 of TIJ
-
-##### Exercises
-**Questions**
-
-1.  What are the allowed types for annotation elements? (See TIJ page 1065.)
-2.  Explain the circumstance in which annotations are useful. (See TIJ pages 1066 to 1069.)
-
-##### Programs
-Compile, run, and analyze programs:
-[UseCaseTracker.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/UseCaseTracker.java)
-[Constraints.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/database/Constraints.java)
-[Member.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/database/Member.java)
-[TableCreator.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/database/TableCreator.java)
-
-#### Learning Objective 3
--   Explain how to use the **apt** annotation processing tool.
-
-##### Readings
-**Required**: Pages 1074 to 1083 of TIJ
-
-##### Programs
-Compile, run, and analyze programs:
-[Multiplier.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/Multiplier.java)
-[InterfaceExtractorProcessor.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/InterfaceExtractorProcessor.java)
-[InterfaceExtractorProcessorFactory.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/InterfaceExtractorProcessorFactory.java)
-[TableCreationProcessorFactory.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/database/TableCreationProcessorFactory.java)
-
-#### Learning Objective 4
--   Explain annotation-based unit testing
-
-##### Readings
-**Required**: Pages 1083 to 1106 of TIJ
-
-##### Programs
-Compile, run, and analyze programs:
-
-[AtUnitExample1.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExample1.java)
-[AtUnitExternalTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExternalTest.java)
-[AtUnitComposition.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitComposition.java)
-[AtUnitExample2.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExample2.java)
-[HashSetTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/HashSetTest.java)
-[AtUnitExample3.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExample3.java)
-[AtUnitExample4.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExample4.java)
-[AtUnitExample5.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/AtUnitExample5.java)
-[StackLStringTest.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/annotations/StackLStringTest.java)
-[AtUnit.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/atunit/AtUnit.java)
-[ClassNameFinder.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/atunit/ClassNameFinder.java)
-[AtUnitRemover.java](https://triton2.athabascau.ca/html/courses/comp308/access/samples/net/mindview/atunit/AtUnitRemover.java)
-
-#### Learning Objective 5
--   Summarize the materials in this section.
-
-##### Readings
-**Required**: Pages 1106 to 1107 of TIJ
-
-### Section 2: Java Documentation
-**Section goal**: This section explains the use of Javadoc utility.
-
-#### Learning Objective 1
--   Use javadoc.
-
-##### Readings
-**Required**: [Using Javadoc](http://library.athabascau.ca/drr/redirect.php?id=25165)
 
 ## Tutor Marked Exercise 4 ( / 20 percent)
 

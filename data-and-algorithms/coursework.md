@@ -1,96 +1,6 @@
 # COMP272: Data Structures and Algorithms (Revision 7)
 ## Notes
-### Useful classes
-java.util.Array - many array based methods
-java.util.Random - pseudo-random number generator
-
-### Recursion
-### Amortization
-### Divide-and-conquer
-### Prune-and-search (aka decrease-and-conquer)
-### Brute force
-### The greedy method
-### Dynamic programming
-
-## Unit 0: Orientation
-
-### Using the Textbooks
-
-You can choose to complete COMP 272 using either Java or C++, or both.
-
-TODO: add note to forms with link to DSA:
-https://drive.google.com/file/d/0B48k2jhdQ5P2aVlmMFB1UUJLczA/edit
-> In addition to the main text, we will use another free online textbook by Granville Barnett and Luca Del Tongo titled [Data Structures and Algorithms: Annotated Reference with Examples](http://dotnetslackers.com/Community/files/folders/data-structures-and-algorithms/entry30283.aspx).
-
-### Assessment and Reflection
-
-The assessment activities are marked using these guidelines.
-
-You are expected to add any inline comment in your code or prepare a separate document to reflect on how the essential methods, classes, parameters, or entire programs were designed and handled while implementing those algorithms.
-
-You need to submit a reflection component for each program/code that you create or review as part of this course. ****
-Reflection is nothing but your personal commentary on your own coding habits. For COMP 272 assessment, reflection includes ***two*** ***or more*** of the following:
-As you can see, the reflection component is quite fluid. 
-- Significant errors/warnings you faced when coding programs
-- if you were able to correct these errors/warnings quickly
-- What debugging strategy you used, e.g., searched the Web for a solution, contacted tutor, solved by self, used a debugging tool, posted in forum, talked to a friend, ect.
-- What commenting strategy you used, eg., Javadoc or inline commenting of key methods and variables, ect.
-- What testing strategy you used, eg., JUnit, tested for typical inputs, extensively tested the code, . . .
-- What code optimization techniques you followed, if any (e.g., unused local variables, parameters, and private methods; wasteful string/stringbuffer usage; unnecessary *if* statements and *for* loops that could be *while* loops; duplicate code; . . .
-- Resources that you referred to (online resources, book references, discussions, . . .)
-- Other comments that reflect on the process of your learning to program
-
-### Guidelines for Marking Programming Assignments
-
-The following table presents the overall approach to marking a program.
-The first column lists the five key criteria on which your program will be marked.
-*Functionality* is the main criterion.
-The rest of them will receive proportionally reduced marks depending on the percentage of functionality implemented in the program.
-If you have implemented only half the functionality expected in the program, don’t expect to receive full marks for documentation, test cases, and so on.
-
-![Guidelines for Marking Programming Assignments](img/program-marking.png "Guidelines for Marking Programming Assignments")
-
-## Unit 1: Introduction
-
-Data structure: a declared format to hold a specific type of data, designed to organize data to suite a specific purpose so it can be worked with in an appropriate way.
-Algorithm: set of actions that manipulates data to provide a desired outcome.
-
-### Study Questions
-
-What are data structures and algorithms?
-
-Data structures and algorithms are the heart and soul of computer science and information systems. There are thousands of algorithms being employed both in theory and in the real world – see http://en.wikipedia.org/wiki/List_of_algorithms
-
-What is a data structure?
-
-A data structure is a collection of data stored in the computer, usually organized to make it easy to add, delete, and retrieve pieces of data. For instance, *integer* is a type of data, and an array of integers stored in the computer is a data structure.
-
-Why are data structures important?
-
-Good algorithms and data structures can make your programs run much faster. If you are writing code in a specialized area, such as graphics or databases, you don't waste time writing programs that run slower than existing programs. The data structures and algorithms covered in this unit are fundamental building blocks for almost all later and more complex programs.
-
-What is an algorithm?
-
-As you will recall from earlier in your studies, an algorithm is a step-by-step process that performs actions on data structures. For example, you can design and write code for an algorithm to find the smallest integer in an array of integers; you can design and write code for an algorithm that finds all red pixels in a 2-D colour image.
-
-I see. So, in the second example, is the 2-D colour image a data structure?
-
-A 2-D colour image can be a collection of pixels; in this case, a pixel is a data item. If you suppose the 2-D colour image is stored in the computer in a two-dimensional array of pixels, then this two-dimensional array is the corresponding data structure.
-
-Is the code in a program an algorithm?
-
-A program is *an implementation of an algorithm*. In fact, every program is an implementation of some algorithm.
-
-Why are algorithms important?
-
-Browse through the material from the following web page: http://www.topcoder.com/tc?module=Static&d1=tutorials&d2=importance_of_algorithms It introduces the analysis of algorithms and presents a measure of complexity for algorithms called *big Oh*. Don’t worry if you don’t understand it much at this point. What is important is for you to read about different classes of algorithms that we employ in our day-to-day life.
-
-### Analysis
-
-### 1.1 The Need for Efficiency
-As the available data becomes larger and larger efficiency becomes important. Although many applications will work without efficient implementations, some will fail because of poor implementation choices.
-
-### 1.2 Interfaces or Abstract Data Type (ADT)
+### Abstract Data Type (ADT)
 Distinguish the difference between an *interface* and an *implementation*.  
 Interface: describes what a data structure does and how you can interact with it  
 Implementation: describes how it is done.  
@@ -105,26 +15,25 @@ Abstract data types is the interface. List, dictionary, stacks, queues, objects,
 From the point of view of the user
 Purely theoretical
 
-#### Types of ADTs
 
-##### Queue's
+#### Queue's
 Item's added and removed from a data structure in order.
 
-###### Deque (Double Ended Queue)
+##### Deque (Double Ended Queue)
 interface: `addFirst | addLast | removeFirst | removeLast`  
 Can implement both LIFO and FIFO queues.
 
-###### FIFO (First in, First out)
+##### FIFO (First in, First out)
 interface: `add queue addFirst | remove dequeue removeLast`
 
-###### Stack aka LIFO (Last in, First out)
+##### Stack aka LIFO (Last in, First out)
 interface: `push addFirst | pop removeFirst`
 
-###### Priority Queue
+##### Priority Queue
 This queue has some kind of prioritization that occurs during the add method.  
 interface: `insert_with_priority | pop_next_priority_element deleteMin`
 
-##### List or sequence
+#### List or sequence
 Lists essentially replace all the benefits of Queue's:
 
 ![list deque and queue](img/list-deque-queue.png "list deque and queue")
@@ -136,9 +45,9 @@ x_1,x_2,...,x_(n-1)
  - `add(i, y)`: add x at position i, moving *x_i,...,x_(n−1)* => *x_(i+1),...,x_(n−1+1)*
  - `remove(i)`: remove the value x_i, moving *x_(i+1),...,x_(n−1)* => *x_i),...,x_(n−1-1)*
 
-##### Sets
+#### Sets
 
-###### Unordered Set (Uset or Mathematical Set)
+##### Unordered Set (Uset or Mathematical Set)
 This is the basis of dictionaries or named arrays. Each item can be stored as a pair of items.
 
 - `size()`: return the number of elements in the set
@@ -147,17 +56,17 @@ This is the basis of dictionaries or named arrays. Each item can be stored as a 
 - `find(x)`: find x in the set if it exists. Return y, or null if no such element exists.
 
 
-###### Ordered Set (SSet)
+##### Ordered Set (SSet)
 Only add and find are different.
 - `add(x)`: add element in sorted order
 - `find(x)`: Find smallest element y, such that y ≥ x. Return y or null if no such element exists.
 
-##### Containers
+#### Containers
 Pointers to another object
 
-##### Graph
+#### Graph
 
-### 1.3 Mathematical Background
+### Mathematical Background
 
 #### Exponentials
 
@@ -206,10 +115,13 @@ c_{1} \leq \frac{1}{2} - \frac{3}{n} \leq c_{2}
 $$
 
 
-### 1.4 The Model of Computation
+
+### Analysis
+
+#### The RAM (Random Access Machine) Model of Computation
 TODO: apply a model of computation.
 
-#### RAM model (W-bit machine)
+RAM model (W-bit machine)
 
 Still don't understand how memory works in this model (w-bit word)
 
@@ -225,6 +137,45 @@ operations: arithmetic (add, subtract, multiply, divide, remainder, floor, ceili
 
 Some of these assumptions are not true about computers, however, they are close enough to be useful without being overly complicated.
 The RAM model does not account for the memory hierarchy (cache, ram, drive)
+
+
+### Recursion
+### Amortization
+### Divide-and-conquer
+### Prune-and-search (aka decrease-and-conquer)
+### Brute force
+### The greedy method
+### Dynamic programming
+## Interesting Algorithms
+### Fisher-Yates shuffle
+https://blog.codinghorror.com/the-danger-of-naivete/
+
+```java
+int[] cards = {1-n}; // cards from 1 to n
+
+for (int i = cards.Length - 1; i > 0; i--) {
+    int n = rand.Next(i + 1);
+    Swap(ref cards[i], ref cards[n]);
+}
+```
+
+Randomly swaps the last card with itself or any card smaller.
+Randomly swaps the second last card with itself or any card smaller.
+Continues until the second smallest card.
+
+
+## Guidelines for Marking Programming Assignments
+
+The following table presents the overall approach to marking a program.
+The first column lists the five key criteria on which your program will be marked.
+*Functionality* is the main criterion.
+The rest of them will receive proportionally reduced marks depending on the percentage of functionality implemented in the program.
+If you have implemented only half the functionality expected in the program, don’t expect to receive full marks for documentation, test cases, and so on.
+
+![Guidelines for Marking Programming Assignments](img/program-marking.png "Guidelines for Marking Programming Assignments")
+
+## Unit 1: Introduction
+
 
 ### 1.5 Properties used to analyse algorithms
 Algorithms are generally analysed based on Correctness, Time Complexity, and Space Complexity.
@@ -1456,23 +1407,6 @@ Go to Data Structure Visualizations at http://www.cs.usfca.edu/~galles/visualiza
 - [B+ Trees](http://www.cs.usfca.edu/~galles/visualization/BPlusTree.html)
 
 - Check the desired learning outcomes at the beginning of this unit. Go through the exercises at the end of Chapter 13; use the Unit 13 outcomes as a focus for your activities. Post to the Unit 13 discussion forum if you have questions. Check the Unit 13 discussion forum to see if you can answer a question someone else has posted or share a link to an online resource you have found useful.
-
-## Interesting Algorithms
-### Fisher-Yates shuffle
-https://blog.codinghorror.com/the-danger-of-naivete/
-
-```java
-int[] cards = {1-n}; // cards from 1 to n
-
-for (int i = cards.Length - 1; i > 0; i--) {
-    int n = rand.Next(i + 1);
-    Swap(ref cards[i], ref cards[n]);
-}
-```
-
-Randomly swaps the last card with itself or any card smaller.
-Randomly swaps the second last card with itself or any card smaller.
-Continues until the second smallest card.
 
 ## Assignment 3 (due Jan 6th, 2017)
 min 50%, worth 20%

@@ -258,155 +258,140 @@ From OSC9ed
     b. Several campus locations across a statewide university system: WAN
     c. A neighborhood: WAN
 
-5.  describe the overall structure and operations of operating systems.
-6.  explain the importance of understanding how an operating
-    system works.
-7.  define *multiprogramming*, *time-sharing*, *dual-mode operation*,
-    *privileged instructions*, *timer*, and *caching*.
-8.  describe (briefly) the activities in process management, memory
-    management, and storage management.
-9.  discuss (briefly) protection, security, computing environments,
-    distributed operating systems, special-purpose operating systems,
-    and open-source operating systems.
+### 1.2 Computer Hardware: Organization, Architecture, and Operating Systems
+OSC9ed: 1.4 to 1.13.
 
-#### Reading Assignment
+#### Learning Outcomes
 
--   Silberschatz, A., Galvin, P. B., & Gagne, G. *Operating system
-    concepts* (9th ed.): Chapter 1: Introduction: 1.1 to 1.3.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-4 above.
+5. describe the overall structure and operations of operating systems.
+6. explain the importance of understanding how an operating system works.
+7. define *multiprogramming*, *time-sharing*, *dual-mode operation*, *privileged instructions*, *timer*, and *caching*.
+8. describe (briefly) the activities in process management, memory management, and storage management.
+9. discuss (briefly) protection, security, computing environments, distributed operating systems, special-purpose operating systems, and open-source operating systems.
 
 #### Key Concepts and Topics
 
--   central processing unit (CPU)
--   memory and RAM (and DRAM)
--   firmware and ROM (or EEPROM)
--   input/output (I/O) devices
--   instruction-execution cycle
--   instruction register
--   storage device hierarchy
--   small computer-systems interface (SCSI)
--   direct memory access (DMA)
--   device driver
--   multiprocessor system (parallel systems)
--   symmetric multi-processing (SMP)
--   uniform memory access (UMA)
--   non-uniform memory access (NUMA)
--   multiple computing cores
--   blade server
--   clustered system
--   Beowulf clusters
--   storage-area networks (SANs)
-
-#### Goals of Operating Systems Software
-
-It is important to keep in mind the following goals of operating systems as you work through this unit:
-
--   provide for efficient use of computer hardware.
--   provide a reliable environment in which to run programs.
--   handle errors reasonably and with sufficient feedback.
--   provide services (tools, languages) for users.
--   hide the details of hardware and resource management from users.
--   protect users from one another, and protect the operating system
-    from users.
-
-At times, these goals may conflict with one another; for example, it is quite common for a designer to trade efficiency for improved security or reduced cost.
-
-#### Study Questions
-
-1.  Why are operating systems important for computer systems? How can
-    you run a program on a computer system that has no operating system
-    (e.g., a microcontroller system)?
-2.  How is an instruction executed on a computer system with a von
-    Neumann architecture?
-3.  How does interrupt-driven I/O work through the relevant device
-    controller and device driver?
-
-#### Learning Activities
-
--   To learn more about CPU and instruction execution, read [Central
-    processing
-    unit](http://en.wikipedia.org/wiki/Central_processing_unit)
-    (especially the Operation section) and [Instruction
-    cycle](http://en.wikipedia.org/wiki/Instruction_cycle)
-    at Wikipedia.org.
--   Search the Internet to find some animation for an instruction
-    execution cycle, and share your links with your classmates on the
-    course discussion forum.
--   Complete Exercises 1.17, 1.18, 1.22, 1.23 and 1.26 in *OSC9ed*.
-
-#### Reading Assignment
-
--   *Operating system concepts* (9th ed.): Chapter 1: Introduction: 1.4
-    to 1.13.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 5-9 above.
-
-#### Key Concepts and Topics
-
--   multiprogramming
--   job pool and job scheduling
--   time sharing or multitasking
--   interactive (hands-on) computer system
--   response time
--   process
--   virtual memory
--   swapping
--   interrupt driven
--   trap or exception
--   dual-mode
--   user mode
--   kernel mode
--   privileged instructions
--   timer
--   process management
--   program counter
--   memory management
--   instruction-fetch cycle
--   data-fetch cycle
--   file
--   mass-storage
--   caching
--   cache management
--   I/O subsystem
--   protection
--   security
--   network operating system
--   real-time operating systems
--   handheld system
--   multimedia system
--   client-server
--   peer-to-peer
--   open-source operating system
--   Linux
--   BSD UNIX
--   Solaris
+- multiprogramming
+    - running multiple programs at the same time to optimize use of resources
+- job pool
+    - on disk memory of all the jobs needing to be done
+    - a subset is kept in main memory
+- job scheduling
+    - the process of deciding which job to execute next (and for how long in time-sharing systems) when the process controller get back control of the CPU.
+- time sharing or multitasking
+    - time-sharing is multiprogramming that splits the CPU between all the programs so it appears to be running multiple programs concurently
+    - the switches happen so often that users can interact with the system as if many programs are running in parallel
+- interactive (hands-on) computer system
+    - computer that interacts with a human
+- response time
+    - amount of time it takes for a computer to respond to input
+- process
+    - a set of instructions executed by the CPU
+- virtual memory
+    - a program is on disk but parts are in memory.
+    - This treats main memory as a cache on top of the disk allowing faster response times for programs
+- swapping
+    - This is a section on disk that is used as main memory.
+    - programs are swap into and out of disk
+    - This is different than Virtual Memory because whole chunks of the program are transfered leading to lower response times.
+- interrupt driven
+    - interrupts are used for management of the CPU as a resource.
+    - they trigger process changes, IO, and system calls
+- trap or exception
+    - a special interrupt for when there is an error
+- dual-mode
+    - keeps the user code from having access to certain instructions in the CPU by setting a flag.
+    - the flag is switched off when an interrupt function is called and turned on when the kernel passes control back to a user process.
+- user mode
+    - a restricted set of CPU instructions
+- kernel mode
+    - the full set of CPU instructions
+- privileged instructions
+    - instructions that can only be accessed from kernel mode
+- timer
+    - sends an interrupt after a certain period
+- process management
+    - scheduling
+    - creating user system and kernel processes
+    - pausing and resuming processes (multi-tasking)
+    - how processes interact
+        - data synchronization between processes
+        - communication between processes
+- program counter
+    - points to the next instruction in a process
+    - multitasking requires multiple program counters to keep track of the next instruction in each of the processes that are running concurrently
+- memory management
+    - the process of allocating and de-allocating main memory
+    - knowing what processes are using what memory
+    - deciding which processes to move from virtual memory to main memory
+- instruction-fetch cycle
+    - get, decode, execute
+    - the process of executing an instruction has 3 steps
+- data-fetch cycle
+    - when the CPU reads and writes data to the main memory
+- file
+    - an abstraction of the bytes stored on a disk into logical chunks.
+    - everything on the computer is stored as a file
+    - programs, data, ect
+- mass-storage
+    - a device that holds a large amount of data (hard disk, NAS, ect)
+- caching
+    - there are multiple layers of memory each with a smaller size and faster access time
+    - caching optimizes it's usage by bringing information into the higher layers when it will be used by the CPU, and pushing it back down once it has been used.
+    - This is an extremely complex system.
+- cache management
+    - the process of deciding what piece of cache to change out and when to push it down
+- I/O subsystem
+    - the particular interface of the IO device
+    - they are all different and only the device drive knows how to request what it needs
+- protection
+    - stray electrons flipping bits
+    - infinite loops
+    - from different users
+    - from peripherals & subsystems
+    - from unauthorized use
+- security
+    - protect system from attacks
+    - worms, viruses, dos
+    - privilege escalation
+- network operating system
+    - systems that share a LAN and work together
+- real-time operating systems
+    - functions with certain real-time constraints
+- handheld system - mobile devices
+    - require programs optimized for low memory, processing power, and energy consuption
+- multimedia system
+    - vertex processing to run the same function on a lot of data at the same time
+- client-server
+    - data and program stored on one computer and interface on another computer ie. the web
+- peer-to-peer
+    - all systems in the network are equal
+- open-source operating system
+    - programs that are open to use
+- Linux
+- BSD UNIX
+- Solaris
 
 #### Study Questions
 
-1.  What do you think are the major aspects of operating systems?
-2.  Why do kernel mode and user mode need to be separated, and what
-    mechanisms are used for the separation?
-3.  What are *interrupt* and *trap* (or *exception*), and how are they
-    used to support multi-programming and multi-tasking?
-4.  Compare open-source operating systems such as Linux with
-    closed-source systems such as Windows. Which one do you prefer under
-    what conditions (or circumstances)?
+1. What do you think are the major aspects of operating systems?
+    - allow users to easily run their programs
+    - keep users and programs from affecting eachother
+    - optimize resource usage
 
-#### Learning Activities
+    - Process Scheduling
+    - Memory Management
+    - IO
+    - Security (protection)
+2. Why do kernel mode and user mode need to be separated, and what mechanisms are used for the separation?
+    - So users can't mess with data that isn't theirs to mess with
+    - the mode flag
+3. What are *interrupt* and *trap* (or *exception*), and how are they used to support multi-programming and multi-tasking?
+    - a special signal to the CPU to pause what it's going and do something else
+    - they allow the CPU to be managed by task
+4. Compare open-source operating systems such as Linux with closed-source systems such as Windows. Which one do you prefer under what conditions (or circumstances)?
+    - Linux always unless there are historical reasons to use something else
 
--   Complete Practice Exercises 1.1 to 1.12 in *OSC9ed*.
--   Try Practice Exercises 1.13 to 1.16, 1.19, 1.24, 1.25, 1.27, 1.28,
-    1.31, and 1.32 in *OSC9ed*.
--   Download the [PowerPoint
-    slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
-    or pdf for Chapter 1 of *OSC9ed*.
--   Supplemental Reading: Chapter 1: Computer System Overview in of the
-    supplemental textbook, *Operating systems: Internals and design
-    principles* (9th ed.) (*OS9ed*). This chapter provides some
-    explanation for computer hardware for you to review.
--   Solutions to the Practice Exercises are available at the [textbook
-    website](http://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118063333&bcsId=7887).
 
 ### 1.2 Operating System Structures
 

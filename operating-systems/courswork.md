@@ -1,60 +1,59 @@
 # Computer Science 314: Operating Systems (Revision 5)
 
-## Unit 0: Introduction
+## Course Learning Outcomes
+- computer-system structures
+- operating-system structures
+- process management:
+    - defining a process
+    - CPU scheduling
+    - process synchronization
+    - deadlocks
+    - interprocess communication
+- storage management:
+    - memory management
+    - virtual memory
+    - file-system management
+    - disk management
+    - I/O (input/output) systems;
+- protection and security issues:
+    - access matrix and its implementations
+    - authentication
+    - viruses and other intruders
+    - encryption
+- distributed and special-purpose operating systems:
+    - distributed operating systems
+    - real-time systems
+    - embedded systems
+    - multimedia systems
 
-### Course Overview
+- describe the overall structure and components of operating systems
+- explain the key concepts and mechanisms of:
+    - process management
+    - memory management
+    - storage management
+    - security and protection
+- apply the appropriate principles and methods to practical tasks:
+    - analysis, diagnosis, and development of functions and components that are associated with modern operating systems.
+-   describe the goals and tasks of an operating system and the techniques used to handle these tasks.
+-   explain key terms and principles of process management
+    - kernel
+    - process
+    - thread
+    - scheduling
+    - synchronization
+    - deadlock handling
+    - recovery
+-   explain how an operating system manages processes and threads (system queues, scheduling algorithms).
+-   outline the different strategies (such as virtual memory) used by operating systems to manage memory.
+-   explain the benefits, limitations, resource overhead (such as fragmentation and data structures), and hardware requirements of each memory-management technique.
+-   list and describe several strategies used by systems software to manage disks and other devices.
+-   explain the nature of protection for and security problems of operating systems.
+-   identify and explain the protection features built into operating systems and their supporting hardware to enhance security.
+-   describe the concepts, structures, and functions of real-time, embedded, mobile, multimedia, or distributed operating systems.
+-   discuss, briefly, how various aspects of the theory of operating systems are implemented in practice in systems such as DOS, Windows, UNIX, Solaris 2, and Mach.
+-   apply the concepts and principles of operating systems in investigating, exploring, and implementing system components or the interfaces of modern operating systems such as Linux, Windows, and Solaris.
 
-*COMP 314: Operating Systems* introduces the fundamental concepts, principles, and structures of operating systems. On a computer, the operating system is the software that orchestrates the hardware components. Operating systems provide users and programmers with efficient and convenient service, as well as a high degree of machine independence in writing and executing programs, and in managing system resources. It is assumed that students taking this course are familiar with the basic structure and the main hardware components of a computer.
-
-*COMP 314* covers the following topics:
-
--   computer-system structures and operating-system structures;
--   process management: defining a process, CPU scheduling, process
-    synchronization, deadlocks, and interprocess communication;
--   storage management: memory management, virtual memory, file-system
-    management, disk management, and I/O (input/output) systems;
--   protection and security issues: access matrix and its
-    implementations, authentication, viruses and other intruders,
-    encryption; and
--   distributed and special-purpose operating systems: distributed
-    operating systems, real-time systems, embedded systems, and
-    multimedia systems.
-
-### Course Learning Outcomes
-
-After completing *COMP 314*, the student should be able to describe the overall structure and components of operating systems, and explain the key concepts and mechanisms of process management, memory management, storage management, as well as security and protection of operating systems. The student should also be able to apply the appropriate principles and methods to practical tasks such as analysis, diagnosis, and development of functions and components that are associated with modern operating systems.
-
-The following are some specific learning outcomes:
-
--   describe, in general terms, the goals and tasks of an operating
-    system and the techniques used to handle these tasks.
--   explain key terms and principles of process management, such as
-    *kernel*, *process*, *thread*, *scheduling*, *synchronization*,
-    *deadlock handling*, and *recovery*.
--   explain how an operating system manages processes and threads
-    (system queues, scheduling algorithms).
--   outline the different strategies (such as virtual memory) used by
-    operating systems to manage memory.
--   explain the benefits, limitations, resource overhead (such as
-    fragmentation and data structures), and hardware requirements of
-    each memory-management technique.
--   list and describe several strategies used by systems software to
-    manage disks and other devices.
--   explain the nature of protection for and security problems of
-    operating systems.
--   identify and explain the protection features built into operating
-    systems and their supporting hardware to enhance security.
--   describe the concepts, structures, and functions of real-time,
-    embedded, mobile, multimedia, or distributed operating systems.
--   discuss, briefly, how various aspects of the theory of operating
-    systems are implemented in practice in systems such as DOS, Windows,
-    UNIX, Solaris 2, and Mach.
--   apply the concepts and principles of operating systems in
-    investigating, exploring, and implementing system components or the
-    interfaces of modern operating systems such as Linux, Windows,
-    and Solaris.
-
-### Goals of Operating Systems
+## Goals of Operating Systems
 
 As you work through this course it is important to keep in mind the following goals of operating systems:
 
@@ -68,77 +67,17 @@ As you work through this course it is important to keep in mind the following go
 
 At times, these goals may conflict with one another; for example, it is quite common for a designer to trade efficiency for improved security or reduced cost.
 
-### Course Outline
+## Course Materials
+OSC9ed - Operating system concepts (9th ed.)
 
-The Study Guide for COMP 314 consists of the following five units:
+OS6ed - Operating systems: Internals and design principles (6th ed.)
 
-#### Unit 1: Overview of Computer Organization and Operating Systems
+- Bovet, D. P., & Cesati, M. (2006). *Understanding the Linux kernel* (3rd ed.). Sebastopol, CA: O’Reilly Media.
+- Mauerer, W. (2008). *Professional Linux kernel architecture*. Indianapolis, IA: Wiley Publishing.
 
-This brief introduction to computer-system structures and operating-system structures covers computer organization, computer architecture, and overall operating-system structure.
+The following journals from ACM and IEEE may be most relevant for this course.
 
-#### Unit 2: Process Management
-
-Unit 2 will define *process* and address processes, threads, CPU scheduling, process synchronization, deadlocks, and interprocess communication.
-
-#### Unit 3: Storage Management
-
-This unit covers memory management, virtual memory, file system management, disk management, mass storage structures, and I/O systems.
-
-#### Unit 4: Protection and Security
-
-Protection and security issues covered in Unit 4 include access matrix and its implementations, authentication, viruses (and other intruders), and encryption.
-
-#### Unit 5: Distributed, Real-time, and Multimedia Systems
-
-Unit 5 reviews distributed systems and special-purpose operating systems, such as real-time systems, embedded systems, mobile systems, and multimedia systems. This unit serves as an extension to the core topics of the course.
-
-### Course Materials
-
-Both a textbook and other reading materials are assigned for this course. The required textbook provides systematic and comprehensive information, while other reading materials address state-of-the-art topics that the textbook does not cover.
-
-#### eTextbook
-
-Before you access your eTextbook, you may need to disable your pop-up blocker. If you need help doing that, follow [these instructions](http://www.athabascau.ca/courses/student_manual/eText/popupBlocker.html). Then click on the eTextbook and accept the license agreement to get online access.
-
-Silberschatz, A., Galvin, P. B., & Gagne, G. (2009). *Operating system concepts* (9th ed.). Hoboken, NJ: John Wiley & Sons, Inc. Note: in the Learning Activities sections of *Study Guide*, the textbook is referred to as “*OSC9ed*.”
-
-To learn about some of the features of your eText, including how to download it so you can use it without being connected to the internet, how to print pages, search, cite passages, manage notes and highlights, and to learn about [privacy issues](http://etext.athabascau.ca/student/privacy.php) and where to go for help, see the [eText section in the Student Manual](http://www.athabascau.ca/courses/student_manual/#eTextbooks).
-
-#### AU Materials
-
-The study schedule, and *Study Guide* (containing the course units), assignments, and student evaluation information provided on the course homepage are important for your success in this course. The *Student Manual* also contains non-course specific material (e.g., ordering exams, using the Library, etc.) that may assist you as an AU student.
-
-### Supplementary Course Materials
-
-#### Supplementary textbook
-
-Stallings, W. (2009). *Operating systems: Internals and design principles* (6th ed.). Upper Saddle River, NJ: Prentice Hall.
-
-The supplementary textbook is not required, so it is not included in the course package. However, you may find it useful, especially when you want to find a different presentation of a certain concept or principle. The *Study Guide* refers to the supplementary textbook as *OS6ed*.
-
-Additional course materials such as journal and conference papers and online learning objects will be provided through Web links and AU Library access.
-
-#### Linux Kernel Source Code
-
-The following books are helpful for examining Linux kernel source code for further understanding of operating systems.
-
-Bovet, D. P., & Cesati, M. (2006). *Understanding the Linux kernel* (3rd ed.). Sebastopol, CA: O’Reilly Media.
-
-Mauerer, W. (2008). *Professional Linux kernel architecture*. Indianapolis, IA: Wiley Publishing.
-
-#### Textbook Online Resources
-
-[Student Companion Site](http://bcs.wiley.com/he-bcs/Books?action=index&itemId=0470128720&bcsId=4431):
-http://codex.cs.yale.edu/avi/os-book/OS8/os8c/
-
-It is important to visit these websites to download materials such as solutions to practical exercises in the textbook, additional online chapters, source code, and lecture slides, which may help you to complete your assignments.
-
-#### Athabasca University Library
-
-Visit the [Athabasca University (AU) Library online](http://library.athabascau.ca/) to find many books, magazines, journals, and conference proceedings about computer organization and operating The following journals from ACM and IEEE may be most relevant for this course.
-
--   Conference Proceedings of the ACM Symposium on Operating Systems
-    Principles
+-   Conference Proceedings of the ACM Symposium on Operating Systems Principles
 -   Journals and Magazines
     -   Operating Systems Review
     -   ACM Transactions on Computer Systems
@@ -148,73 +87,177 @@ Visit the [Athabasca University (AU) Library online](http://library.athabascau.c
     -   IEEE Computers
     -   Linux Journal
 
-### Activities
+## Activities
 
 1.  Access [the AU Library online](http://library.athabascau.ca/) and locate the databases (Databases) and the journal index (E-Journals).
 2.  Locate the following databases:
     -   ACM Digital Library
     -   IEEE/IEE Electronic Library
     -   Science Direct
-3.  Browse the journals, magazines, and proceedings listed under Supplementary Course Materials: Athabasca University Library.
-4.  Bookmark any links that you wish to save for future use in the course.
-5.  Use *Google Scholar* to find introductory articles discussing operating systems.
 6.  Browse relevant online resources for this course:
     -   Textbook website
     -   Textbook Student Companion Site
     -   Textbook Solutions to Practice Exercises
     -   [Supplementary textbook website](http://williamstallings.com/OS/OS6e.html)
     -   [MIT OpenCourseWare’s 6.828 Operating System Engineering course](http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-828-operating-system-engineering-fall-2006/index.htm)
-7.  Compare notes with your classmates on what you have found (using the course discussion forum).
 
 ## Unit 1: Overview of Computer Organization and Operating Systems
-
-### Unit Overview
-
-Unit 1 has two major tasks. First, it introduces computer-system organization and architecture: that is, how an operating system manages the hardware of a computer in which it resides. The design and functions of operating systems are strongly connected to the hardware infrastructure, which brings us to the main focus of the course: operating systems.
-The second part of the unit discusses the goals, structures, and major features or operating systems. It also addresses the history of their development, as well as current and developing technologies.
-
-This unit is divided into two sections:
-
-**1.1 Computer Hardware: Organization, Architecture, and Operating Systems**
-
-**1.2 Operating System Structures**
-
-Depending on your background, you may find the material in this unit a review, or entirely new. If you are not familiar with basic machine components (CPU, data and control bus, logic unit, registers, memory) you may wish to consult the Suggested References at the end of the unit, and study these subjects before you go any further in the course.
-
-The introduction on concepts and principles such as process, threads, memory, and storage management may not answer all your questions in detail. However, subsequent units will elaborate on some important concepts, techniques, and algorithms introduced in this unit, such as scheduling, synchronization, and swapping.
-
 ### Learning Objectives
-
-After you complete Unit 1, you should be able to describe the overall structures and major components in computer organization and computer architecture and list some of the advances in hardware and software that have enabled contemporary operating systems technology. In addition, studying the course materials should enable you to identify and describe the goals and tasks of operating systems, as well as the techniques used to handle the tasks of operating systems.
+- describe the overall structures and major components in computer organization and computer architecture
+- list some of the advances in hardware and software that have enabled contemporary operating systems technology
+- identify and describe the goals and tasks of operating systems
+- identify and describe the techniques used to handle the tasks of operating systems
 
 ### 1.1 Computer Hardware: Organization, Architecture, and Operating Systems
-
-#### Overview
-
-This section briefly introduces computer hardware; that is, computer organization and architecture. It is particularly important for students who are new to the discipline because knowledge of the underlying hardware of computers is a necessary foundation for the study of operating systems. If you are already familiar with computer hardware and operating-system structure, you may be able to simply review or skip parts of this section.
-
-In the overview of computer hardware, focus on the overall structures and components of general computer hardware to figure out their functions and tasks in the computer system.
-
-You can consider an operating system from a user view or from a system view. Overall, an operating system controls the computer system and allows users to run programs. It consists of many programs and routines. The operating system communicates with users (or with a running application) and performs the services they request. These services may involve sending a file for printing, reading or writing to a disk, and many other functions. While communicating with users, an operating system is also managing all machine components (CPU, control bus, data bus, logical unit, registers, memory, and other devices such as printers and disks). We will look at this complex task is closely throughout the course.
-
-Understanding the following key concepts related to computer organization and architecture will help you understand operating system concepts and functions:
-
--   CPU and its main components: arithmetic-logic unit, control unit, data registers, addresses and control information, clock, control bus, and data bus
--   interrupt and system call
--   instruction-execution cycle
--   instruction register
--   multiprocessor
--   cache
-
-If you are not already familiar with the purpose and function of the main CPU components, refer to the Suggested References at the end of the unit before beginning the reading assignments in Unit 1.
-
 #### Learning Outcomes
-After you have completed Section 1.1, you should be able to
 
 1.  describe the overall structure of computer-system organization.
+    - CPU and its main components:
+        - arithmetic-logic unit
+        - control unit
+        - data registers
+        - addresses and control information
+        - clock
+        - control bus
+        - and data bus
+    -   interrupt and system call
+    -   instruction-execution cycle
+    -   instruction register
+    -   multiprocessor
+    -   cache
 2.  identify major computer hardware components.
 3.  explain how instructions are executed in a computer.
 4.  explain how the I/O devices are managed.
+
+#### Reading Assignment
+
+-   Silberschatz, A., Galvin, P. B., & Gagne, G. *Operating system concepts* (9th ed.): Chapter 1: Introduction: 1.1 to 1.3.
+
+#### 1.1
+What is an operating system?
+    The one program that is always running. Also called the kernel.
+    The next layer up is system programs that aren't necesarily the kernal but are clossly related.
+    The third layer is user programs.
+    OS often has middle wear and other tools bundled with it.
+What is it's role:
+    The OS 
+
+- central processing unit (CPU)
+    - a large set of transistors that perform the instruction-execution cycle
+- memory and RAM (and DRAM)
+    - DRAM: dynamic RAM because it is volitile
+    - SRAM: static RAM because it's not volitile
+        - used for cache
+- firmware and ROM (or EEPROM)
+    - ROM: read only memory
+    - EEPROM: Electronically Erasable Programable ROM
+    - used to hold bootstrap program
+- input/output (I/O) devices
+    - extendable data transfer and storage space
+    - cpu sends I/O request
+    - data is sent or received
+    - interupt is returned
+- instruction-execution cycle
+    - the next instruction is retrieved from memory
+    - the instruction is decoded
+    - the instruction is executed
+- instruction register
+    - the register that holds the instruction to be executed
+- storage device hierarchy
+    - fast and expensive - slow and cheep
+    - Anything that doesn't reside along this line ends up dying like core memory and paper tapes
+- small computer-systems interface (SCSI)
+    - IO controller
+- simple IO:
+    - OS start/requests driver, driver sets registers in controller, returns cpu flow.
+    - controller performs action based on registers, stores data in buffer, sends interupt.
+    - CPU gets data from buffer
+- direct memory access (DMA)
+    - OS alocates memory & start/requests driver, driver sets registers in controller, returns cpu flow.
+    - controller performs action based on registers, transfers large amount of data to memory, then sends interupt.
+    - CPU accesses data in main memory
+- device driver
+    - provides OS with a uniform interface for the IO device
+- multiprocessor system (parallel systems)
+    - 
+- symmetric multi-processing (SMP)
+    - all processors are eqaul
+- uniform memory access (UMA)
+    - Every processesor can access any memory in constant time
+- non-uniform memory access (NUMA)
+    - Performance penalty for a certain processors accessing specific memory
+    - Possible to access more memory
+    - mitigating these penalties is possible with well designed algorithms that don't encourage memory crossover.
+- multiple computing cores
+    - a single chip with multiple cores is often what happens with current architecture.
+TODO: what's the diff between Blade Servers and Clustered Systems?
+    - loosely coupled vs tightly coupled?
+- blade server
+    - multiple OS's working in unison together.
+    - usually hot swappable
+- clustered system
+    - a cluster is a set of systems that interact together
+    - share memory, tightly networked over LAN with 1gig or greater connection
+    - Asymetric vs Symetric like with processors
+        - Standby server vs parallelism
+        - breaking things into separate systems
+    - Generally a SAN will connect the individual parts
+- Beowulf clusters
+    - clusters using opensource products and cheap computers
+- storage-area networks (SANs)
+    - Storage on a network that manages access for multiple systems.
+    - generally solving problems to do with concurrent reads and writes
+
+#### Study Questions
+
+1. Why are operating systems important for computer systems?
+    - Provide optimizations in software that are not possible in hardware.
+    - Orchestration of Hardware
+    - Platform for software
+    - Optimization of software for a particular architecture
+    - user management and control
+    - security
+2. How can you run a program on a computer system that has no operating system (e.g., a microcontroller system)?
+    - hard code an instruction set that runs without orchestration.
+    - write a program that is compiled to the native chip set instruction set.
+    - have the bootstrap program load it instead of the OS
+2. How is an instruction executed on a computer system with a von Neumann architecture?
+    - Instruction fetched from memory
+    - decode instruction
+    - execute action
+        - fetch data
+        - fetch oporator
+        - write data to cache or memory
+        - ect.
+3. How does interrupt-driven I/O work through the relevant device controller and device driver?
+    - in CPU
+        - program needs a piece of data
+        - OS asks driver for that data
+        - driver (knowing the device) sets the appropriate registers in the IO device and makes the request of the IO device
+        - the CPU continues in a different part of the program while waiting for the IO
+    - in the IO device
+        - using the information provided by the driver the IO interface the interface fetches the data and either stores it locally in it's buffer or saves it into a chunk of memory using DMA (direct memory access).
+        - Once the IO is finished the IO interface sends an interrupt to the CPU.
+    - Back in the CPU
+        - When the CPU gets the interrupt it stops what it saves it's current instruction
+
+From OSC9ed
+1.17 Consider a computing cluster consisting of two nodes running a database. Describe two ways in which the cluster software can manage access to the data on the disk. Discuss the benefits and disadvantages of each.
+    - each node can access it concurrently
+    - do they mean sharding?
+    - do they mean caching?
+    - do they mean synchronized using a lock?
+1.18 How are network computers different from traditional personal computers? Describe some usage scenarios in which it is advantageous to use network computers.
+    - security
+1.22 Many SMP (Symmetric Multi-Processor) systems have different levels of caches; one level is local to each processing core, and another level is shared among all processing cores. Why are caching systems designed this way?
+    - trade off between speed and cost. A small local cache for partial calculations with shared cache for synchronized data
+1.23 Consider an SMP system similar to the one shown in Figure 1.6. Illustrate with an example how data residing in memory could in fact have a different value in each of the local caches.
+    - 
+1.26 Which network configuration (LAN or WAN) would best suit the following environments?
+    a. A campus student union: LAN
+    b. Several campus locations across a statewide university system: WAN
+    c. A neighborhood: WAN
+
 5.  describe the overall structure and operations of operating systems.
 6.  explain the importance of understanding how an operating
     system works.

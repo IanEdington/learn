@@ -392,10 +392,8 @@ OSC9ed: 1.4 to 1.13.
 4. Compare open-source operating systems such as Linux with closed-source systems such as Windows. Which one do you prefer under what conditions (or circumstances)?
     - Linux always unless there are historical reasons to use something else
 
-
-### 1.2 Operating System Structures
-
-#### Overview
+### 1.3 Operating System Structures
+OSC9ed: 2.1 to 2.5
 
 Now that you are equipped with the necessary knowledge of computer hardware and systems, you will cover more details about operating system structures in this section. You will view an operating system from several vantage points: of a user, a programmer, and a designer of operating systems. You will examine the services and interface that the system provides, and also the components and their interconnections in the system.
 
@@ -403,14 +401,128 @@ This section still addresses the overall structure of operating systems, but fro
 
 This section looks at the following key concepts of operating systems:
 
--   system call
--   microkernel
--   performance tuning
--   operating system generation
--   system boot
--   system and application programs
+- system call
+- system boot
+- system and application programs
+
+- micro kernel
+- performance tuning
+- operating system generation
 
 #### Learning Outcomes
+
+1. identify the services and interfaces that an operating system provides to users, to processes, and to other systems.
+2. define system calls and types of system calls, and explain how system calls work in an operating system.
+3. list the main system programs that an operating system usually provides.
+4. describe several main structures of operating systems, and compare their structure and performance.
+5. describe the design, implementation, debugging, and generation of operating systems.
+6. explain the system boot function of operating systems.
+
+#### Key Concepts and Topics
+
+- operating system services helpful to users
+    - graphical user interface (GUI)
+    - batch interface: commands are placed in files and the files are executed
+    - command interpreter: Command line
+    - program execution
+    - I/O operations: methods to get info from IO devices
+    - file-system manipulation: the files and metadata on IO devices
+        - programs need access, users need access, protecting & ownership
+    - communications: allow processes to send messages on the same system or over the network
+        - share memory, or message passing
+    - error detection: able to see when an error has occurred and know what to do about it
+        - pass error code to process, destroy process, or shutdown system, ect.
+- operating-system functions that ensure the efficient operation of the system itself
+    - resource allocation
+        - So many resources to manage (CPU, memory, cache, IO)
+    - accounting
+        - keeping records of who uses what
+    - protection and security
+        - keep things from touching when there not supposed to (memory, processes)
+        - only as strong as the weakest link.
+- system calls
+    - a way for a user program to ask the OS to do a protected thing on it's behalf
+    - System calls are a way for the OS to expose privileged instructions to a user program.
+- system-call interface
+    - usually in OS's there is an array table containing system calls and the index of that table calls that syscall.
+- types of system calls
+    - Process control
+      control of running program (start, wait, end, end with error (+level?))
+        - end, abort
+        - load, execute
+        - create process, terminate process
+        - get process attributes, set process attributes
+        - wait for time
+        - wait event, signal event
+        - allocate and free memory
+    - File management:
+      often mixed with device manipulation (linux unix) or faked (microsoft).
+        - create file, delete file
+        - open, close
+        - read, write, reposition
+        - get file attributes, set file attributes
+    - Device management:
+        - request device, release device
+        - read, write, reposition
+        - get device attributes, set device attributes
+        - logically attach or detach devices
+    - Information maintenance:
+        pass info between kernel and user program. Useful for debugging, error reporting, system profiling, ect
+        - get time or date, set time or date
+        - get system data, set system data
+        - get process, file, or device attributes
+        - set process, file, or device attributes
+    - Communications:
+        between processes and between systems
+        - create, delete communication connection
+        - send, receive messages
+        - transfer status information
+        - attach or detach remote devices
+    - Protection:
+        Control which users have access to what resources.
+        - set permission
+        - get permission
+        - allow user
+        - deny user
+
+    - locking: provides a way for processes to control certain resources for a specified amount of time (memory, devices, files)
+
+- application programming interface (API)
+    - a higher level way to interact with the system call
+    - rather than using the system calls directly a user program uses the api and the api interacts with the system calls.
+    - this is an abstraction strategy similar to the example of drivers. When you move to a new system you simply re-compile your code using that systems version of the API and everything else stays the same... in theory :P
+- systems programs: programs that are provided by the OS and may or may not be run in kernel mode.
+    - file manager programs and text editors
+    - logging, registry, system information viewer
+    - compilers, interpreters, assemblers, and debuggers
+    - communication programs such as Web browser
+
+#### Study Questions
+
+1. What are the three different vantage points for considering operating systems?
+    > user, programmer, system designer wrong!
+    > services provided by system, User and Programmer Interface, components and how they work together
+2. What services are designed for performance, and what services are designed for usability?
+    > user systems are generally designed for usability over performance, and systems where direct human interaction isn't common are usually designed for performance.
+3. What are *system calls*, and how does a system call work in a dual-mode context?
+    > system calls for an interface from a user program to the kernel. system calls generally execute a CPU's protected instruction on behalf of a user program while making sure that program isn't abusing it's power.
+4. How do you see the relationship between Linux system calls and a standard C Library?
+    > the standard C library is an API to the system calls. Any calls to the standard C library are generally translated to that OS's system calls.
+
+#### Learning Activities
+
+- [x] Take a look at Assignment 4: Part 2: Research Project: Option 2: Programming Project and evaluate whether adding a system call to the Linux Kernel may be something you may wish to try for this assignment.
+- [x] Take a look at system calls in Linux to get a sense about their coverage. Consider consulting the supplemental Linux books listed in Unit 0.
+- [x] Complete Exercises of *OSC9ed*.
+    - 2.12: The services and functions provided by an operating system can be divided into two main categories. Briefly describe the two categories, and discuss how they differ.
+        > System and Kernel programs: System programs have less privilege and interact through system calls to the kernel. The kernel is the interface between the hardware and the programs.
+    - 2.13: Describe three general methods for passing parameters to the operating system.
+        > registers, memory, function parameters
+        > registers, on the stack, or in memory (pointers to the memory location)
+    - 2.16: What are the advantages and disadvantages of using the same system-call interface for manipulating both files and devices?
+        > advantage: simple to think about them the same way. easy to implement new driver. disadvantage: special functions of devices may not be available through system calls.
+    - 2.18: What are the two models of interprocess communication? What are the strengths and weaknesses of the two approaches?
+        > shared memory or message passing. Shared memory is faster but much more prone to error, message passing is slower but results in fewer errors.
 
 After you have completed Section 1.2, you should be able to
 

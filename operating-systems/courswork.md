@@ -539,13 +539,27 @@ OSC9ed: 2.7 and 2.8.
 #### Key Concepts and Topics
 
 - operating system structure
-- layered approach
-- kernel
-- micro kernel approach
-- mach
-- modular kernels
+    Many ways to structure OS like any Software. 
+    - kernel
+        - The software that is always running on the computer. The minimum required in order to start an OS.
+    - layered approach
+        each layer adds more functionality.
+        Positive: one way dependency means easy to design and debug.
+        Negavite: increases distance of path through kernel by forcing function calls all the way down the layers.
+            limits the ability for layers to interact in a potentially useful way.
+    - micro kernel approach
+        very small basic kernel with almost everything pushed into userspace. Most things are accomplished using message passing. 
+        positive: small footprint, simple to reason about and debug, 
+        Negative: too simple and causes inefficiency because of increased function calls.
+        - mach
+    - modular kernels
+        monolithic kernel with interchangeable parts
+        positive: dynamic loading of modules allows greater hardware flexibility
+            modular design allows for boundaries to be well defined and decreases cognitive load while working
+        negative: higher cognitive load than Micro or layered kernel
+        IMO this is the way forward. Good balance of cognitive load vs flexibility
 - virtual machine and virtualization
-- para-virtualization
+    - para-virtualization
 - zones or containers
 - simulation
 - VMware architecture
@@ -556,16 +570,23 @@ OSC9ed: 2.7 and 2.8.
 
 1. What do you think about operating systems based on microkernel structure compared with their layered and modular kernel counterparts?
 2. Why is it important to separate kernel from user space?
+    > in order to protect the system from bad code
 3. How are user mode and kernel mode issues dealt with under a virtual machine environment?
+    > no idea
 
 #### Learning Activities
 
-- [ ] Complete Exercises of *OSC9ed*:
-    - 2.20
-    - 2.21
-    - 2.22
-    - 2.24
-    - 2.25
+- [x] Complete Exercises of *OSC9ed*:
+    - 2.20: It is sometimes difficult to achieve a layered approach if two components of the operating system are dependent on each other. Identify a scenario in which it is unclear how to layer two system components that require tight coupling of their functionalities.
+        > CPU scheduling and Memory Management: Complex schedulers often need to use memory for optimization. Memory Management depends on CPU scheduling to be effective.
+    - 2.21: What is the main advantage of the microkernel approach to system design? How do user programs and system services interact in a microkernel architecture? What are the disadvantages of using the microkernel approach?
+        > small, simple, secure, most things run in user space. Can become very complex and non performant when system grows due to complex interactions.
+    - 2.22: What are the advantages of using loadable kernel modules?
+        > flexibility, size of core kernel is smaller than monolith. Ability to load needed drivers/section on demand rather than as part of kernel.
+    - 2.24: Explain why Java programs running on Android systems do not use the standard Java API and virtual machine.
+        > Android runs a Java Interpreter instead of a VM in order to decrease resource demand. the Android API is used for legal reasons but also allows it's supposed to be more performant with low resources.
+    - 2.25: The experimental Synthesis operating system has an assembler incor- porated in the kernel. To optimize system-call performance, the kernel assembles routines within kernel space to minimize the path that the system call must take through the kernel. This approach is the antithesis of the layered approach, in which the path through the kernel is extended to make building the operating system easier. Discuss the pros and cons of the Synthesis approach to kernel design and system-performance optimization.
+        > downside: more complex OS, upside: faster runtimes for all programs
 
 ### 1.5 Operating System Structures
 OSC9ed: 2.6, 2.9, 2.10, 2.11
@@ -574,56 +595,51 @@ OSC9ed: 2.6, 2.9, 2.10, 2.11
 
 - explain the system boot function of operating systems.
 - system boot
-- micro kernel
-- performance tuning
 - operating system generation
 
 #### Key Concepts and Topics
 
 - operating-system design:
-    - goals
-    - mechanisms
-    - policies
+    separating mechanism from policy makes it possible to make modular kernel where different sections can be swapped out so long as the policy's (interface) between sections is consistent. This design pattern is an example of a modular system.
+    - goals: always tricky to define for a system with many optimization points. What is the right balance of priorities in order to best service a customer.
+    - policies: what to do
+    - mechanisms: how to do it
 - operating-system implementation: language issue
+    - made in many languages both interpreted and compiled
 - operating-system debugging
-- debugger
-- core dump
-- crash dump
+    - dumps core to a special area on disk for later inspection
+    - dstats: a program for hooking into current kernel and user programs running through interrupt calls in order to get a better view of what's happening at any moment during execution.
+    - debugger
+    - core dump
+    - crash dump
 - operating-system performance tuning
-- profiling
+    - profiling
 - operating-system generation
 - system boot
-- boot block
-- GRUB
+    a sequence of loaders are executed everytime a computer powers on, with the purpose of finding and executing the OS. This sequence varies by machine but often involves ROM or EEPROM, a boot loader on disk, and finally the OS.
+    - boot block
+    - GRUB
 
 #### Study Questions
 
 1. What is the reason (besides a few core codes programmed by assembly) for using high level language in OS design?
+    > easier to program and maintain. More cross platform.
 2. Why is operating-system generation and booting needed in most operating systems? What is the two-step process for system boot?
+    > different systems have different components and an OS is only useful for a single system without this 2 step process. The OS first determines which functions it will need in order to interface with the CPU devices, memory, IO, ect. Maps those functions to the sys-calls, and then starts the OS.
 
 #### Learning Activities
 
 - Complete Practice Exercises of *OSC9ed*.
-    - 2.1:
-    - 2.11:
-    - 2.19:
-    - 2.23:
-
-### Supplementary Unit Activities
-
-- Explore surveys and technical documents about the structures and components of modern computer organization, architecture, and operating systems. Based on this exploration, try to identify an existing problem of your interest and a possible solution to it (you may continue this work in the following units, until you find a suitable topic for Assignment 4 of this course). Share your findings and opinions with your classmates and tutor on the course discussion forum.
-- If you need to know more about computer organization and architecture, please access materials on the following Suggested References through the AU Library.
-
-AU Library: Electronic Resources
-- Patterson, D. A., & Hennessy, J. L. (2009). *Computer organization and design: The hardware/software interface* (4th ed.). Burlington, MA: Morgan Kaufmann/Elsevier.
-- Mostafa, A-E-B, & Hesham, E-R. (2005). *Fundamentals of computer organization and architecture.* Hoboken, NJ: Wiley.
-- Dandamudi, S. P. (2003). *Fundamentals of computer organization and design.* New York: Springer.
-
-AU Library: Print Resources
-- Stallings, W. (1996). *Fundamentals of computer organization and design* (4th ed.). Englewood Cliffs, NJ: Prentice-Hall.
-- Baron, R. J. (1992). *Computer architecture: Case studies.* Reading, MA: Addison-Wesley.
-- Hwang, K. (1993). *Advanced computer architecture: Parallelism, scalability, programmability.* New York: McGraw-Hill.
-- Mano, M. M. (1993). *Computer system architecture* (3rd ed.). Englewood Cliffs, NJ: Prentice-Hall.
+    - 2.1: What is the purpose of system calls?
+        > interface between OS and user space.
+    - 2.11: How could a system be designed to allow a choice of operating systems from which to boot? What would the bootstrap program need to do?
+        > a bootstrap would need to have pointers to the OS locations of multiple OS's and would have to give the option of which OS to point to.
+    - 2.19: Why is the separation of mechanism and policy desirable?
+        > makes it easier to change the system in the future. Same reason OOP information hiding is important.
+    - 2.23: How are iOS and Android similar? How are they different?
+        > both optimized for low power devices with paired down functionality and increased special use IO devices.
+        > iOS is a layered system with a micro-kernel on the bottom layer.
+        > linux base with runtimes and libries built on top of it.
 
 ## Assignment 1
 

@@ -821,56 +821,105 @@ OSC9ed: 3.1 to 3.3.
 #### Learning Outcomes
 
 1. define *process*, *process states*, and *process scheduling*.
+    - process
+    - process states
+    - process scheduling
 2. outline the differences between processes and programs.
+    - process vs program
 3. describe how the states of processes change during their execution.
 4. explain how process control block (PCB) is used during central processing unit (CPU) switches from process to process.
+    - what is the PCB: 
+    - how is it used?: 
 5. describe the queuing diagram representation of process scheduling.
 6. explain how processes are created and terminated, and how to apply them in multi-process programming in Linux or Windows operating systems.
+    How are processes created and terminated?
+    How do you apply processes in multi-process programming?
 
 #### Key Concepts and Topics
 
 - process
+    - a running instance of a program
 - process states
-    - new
-    - running
-    - waiting
-    - ready
-    - terminated
+    - new: is in the process of being allocated
+    - ready: is ready to execute
+    - running: in the process of executing
+    - waiting: is in a queue waiting for IO or time
+    - terminated: finished execution ready to be deallocated
 - process control block
+    - a section of OS memory where the process state and other info is kept.
+        - Process state: The state may be new, ready, running, waiting, halted, and so on.
+        - Program counter: The counter indicates the address of the next instruction to be executed for this process.
+        - CPU registers: The registers vary in number and type, depending on the computer architecture. They include accumulators, index registers, stack pointers, and general-purpose registers, plus any condition-code information. Along with the program counter, this state information must be saved when an interrupt occurs, to allow the process to be continued correctly afterward (Figure 3.4).
+        - CPU-scheduling information: This information includes a process priority, pointers to scheduling queues, and any other scheduling parameters. (Chapter 6 describes process scheduling.)
+        - Memory-management information: This information may include such items as the value of the base and limit registers and the page tables, or the segment tables, depending on the memory system used by the operating system (Chapter 8).
+        - Accounting information: This information includes the amount of CPU and real time used, time limits, account numbers, job or process numbers, and so on.
+        - I/O status information: This information includes the list of I/O devices allocated to the process, a list of open files, and so on.
 - process scheduling
+    - the process that decides which process to run when
 - process scheduler
     - job scheduler, or long-term scheduler
+        - which processes to run
     - CPU scheduler, or short-term scheduler
+        - which of the running process to allocate CPU time to.
     - medium-term scheduler
+        - when memory gets low, what process can be put on ice for a bit (moved to disk storage)
 - swapping
+    - the processes of pausing a process when resources are limited
+    - copying the PCB to disk
+    - restoring the PCB when resources free up.
 - context switch
+    - changing from one executing process to another. For most systems this means copying the saved registers and program counter into the CPU and starting execution where it left off.
 - scheduling queues
-    - job queue
-    - ready queue
-    - device queue
+    - job queue: all processes in the system
+    - ready queue: processes currently in main memory that are ready to execute
+    - device queue: each device can only be used by one process at a time. The device queue allows additional processes to wait for an IO device.
 - degree of multiprogramming
+    - the number of concurrently executing processes allowed to run on a system
+    - on user systems this is often a function of how much main memory exists.
+    - other systems may have more advanced queueing methods such as 
 - process creation
+    - fork creates a new process
+    - forking then forking then exiting the first fork leave the grandchild process orphaned and init becomes it's parrent
 - fork ()
+    - creates a child process
 - process termination
+    - exit(status) exits the program with the status.
 
 #### Study Questions
 
 1. What are the main features of processes?
 2. What information is included in PCB?
+    - program counter
+    - registers
+    - list of files
 3. What data structures are involved in process scheduling?
-4. What is the rationale for each kind of scheduler: long-term, short-term, and medium-term schedulers?
+    - queue's and DLLists
+4. What is the rationale for each kind of scheduler:
+    - long-term: from the job queue, decides when to admit a new processes
+    - short-term: from the ready queue, decides which processes to execute
+    - medium-term: when resources are low/high, decides which process to swap from the ready queue
 5. How do you use fork() to create a process?
+- assign the return value of fork to a PID variable. Fork copies the running program and continues execution for both programs after returning from fork. If the return value is 0 you are in the new 'child' process. If it's greater than 0 you are in the original process. If it's less than 0, fork failed to create a new process and you are in the original process.
 
 #### Learning Activities
 
-- Run the following online animations:
-    - [the dynamic state of a process](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/dynamicprocess.htm)
-    - [CPU switching between processes due to system calls or interrupts](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/switch.htm)
-    - [example of a process life cycle](http://williamstallings.com/OS/Animation/Queensland/PROCESS.SWF)
 - Try Exercises of *OSC9ed*.
-    - 3.6
-    - 3.10
-    - 3.13
+    - 3.1 Using the program shown in Figure 3.30, explain what the output will be at LINE A.
+        > 5 because the operation that adds only happens in the fork, therefore not affecting the original.
+    - 3.2 Including the initial parent process, how many processes are created by the program shown in Figure 3.31?
+        > 8
+    - 3.3 Original versions of Apple’s mobile iOS operating system provided no means of concurrent processing. Discuss three major complications that concurrent processing adds to an operating system.
+        > battery drain
+        > context switching
+        > make sure programs can't mess with other programs memory
+        > others?
+    - 3.4 The Sun UltraSPARC processor has multiple register sets. Describe what happens when a context switch occurs if the new context is already loaded into one of the register sets. What happens if the new context is in memory rather than in a register set and all the register sets are in use?
+        > instead of copying the PCB from memory into the registers, the process simply continues where it left off.
+    - 3.5 When a process creates a new process using the fork() operation, which of the following states is shared between the parent process and the child process?
+        > only shared memory segments
+        a. Stack
+        b. Heap
+        c. Shared memory segments
 
 ### 2.1.2 Processes
 OSC9ed: 3.4 to 3.6.
@@ -884,17 +933,37 @@ OSC9ed: 3.4 to 3.6.
 #### Key Concepts and Topics
 
 - process cooperation
+    - processes able to share data and cooperate on a task together
+    - independent process is one that can not be affected by another process.
 - interprocess communication (IPC)
-    - shared-memory
-    - message passing
+    - shared-memory: two or more processes use system calls to establish a shared piece of memory. Once memory is shared one can write and the others can read.
+    - message passing: use system calls to pass messages either directly or indirectly.
 - producer-consumer problem
 - bounded and unbounded buffer
 - direct and indirect communication
+    - passing messages directly between processes
+    - passing messages to a mailbox where other processes can attach to to get messages.
 - naming
+    - used in direct communication methods.
+    - Either the sender names the receiver, or both name eachother.
+    - This is a difficult way to manage messaging because the values are hard-coded and inflexible
 - mailbox or port
-- synchronization
+    - used in indirect messaging
+    - processes attach to a mailbox and either receive or send messages to it.
+    - This results in more flexible coding conditions.
+    - mailboxes can either be owned by the OS or by a process
+    - may options in terms of
+        - how many processes can attach
+        - which processes receive which messages
+- synchronous vs asynchronous sending and receiving
+    - blocking send: sending processes is blocked until message is received (by mailbox or process)
+    - non-blocking send: sending process is not blocked
+    - blocking receive: receiving process is blocked until message is received from process or mailbox
+    - non-blocking receive: call to get message returns the message if it's available or null if it isn't
 - buffering
-    - zero, bounded, and unbounded capacity
+    - zero capacity: sender blocks until receiver is ready
+    - bounded capacity: sender blocks when buffer is full
+    - unbounded capacity: sender never blocks
 - POSIX shared memory
 - message passing in Mach
 - local procedure calls in Windows
@@ -911,19 +980,63 @@ OSC9ed: 3.4 to 3.6.
 #### Study Questions
 
 1. Why is process cooperation supported in modern operating systems?  What are the benefits?
+    - Sharing information between users: concurrent access to a file.
+    - Parallel computation on single hunk of data
+    - Reduce cognitive load through modularity sometimes requires multiple parts.
 2. What is the difference between IPC and RPC?
+    inteprocess communication: is the overarching idea of all communication between processes in systems
+    remote procedure call: specific type of structured communication using ports
 3. How are shared memory, message passing, RPC, sockets, and pipes implemented practically in systems such as POSIX, Mach, and Windows?
+    - POSIX:
+        - shared memory
+        Open (process 1):
+            - shm_open: open a shared memory by name set permissions
+            - ftruncate: set the size
+            - mmap: attaches the file to the memory space of the program
+        Open (process 2):
+            - shm_unlink: destroy shared memory 
+        - message passing
+        - RPC
+        - sockets
+        - pipes
+    - Mach:
+        - shared memory
+        - message passing
+            > a FIFO queue in the OS collects messages
+            > systems calls are performed using the kernel queue and notifications are received from the notification queue.
+        - RPC
+            > same as the message passing only with special call to allow for inter system communication
+        - sockets
+        - pipes
+    - Windows:
+        - advanced local procedure call
+            > RPC for local calls, and local calls are executed using this
+        - shared memory
+        - message passing
+        - RPC
+        - sockets
+        - pipes
 
 #### Learning Activities
 
 - Try Exercises of *OSC9ed*.
-    - 3.11
-    - 3.12
-    - 3.14
-- Test and run the sample c or [Java source code of IPC and client-server communication](http://people.westminstercollege.edu/faculty/ggagne/osc/osc8e-src.zip) provided on the textbook’s website.
-- Download and review the [PowerPoint slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777) or pdf for Chapter 3 of *OSC9ed*.
-- Read “3.23 POSIX Message Passing” in the Programming Projects section near the end of Chapter 3 of *OSC9ed*., and consider whether a similar programming project might interest you for Assignment 4.
-- Complete Practice Exercises 3.1 to 3.5 of *OSC9ed*. You may check the answers to these questions at Operating System Concepts (9th ed.): [Solutions to Practice Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
+    - 3.6: Consider the "exactly once" semantic with respect to the RPC mechanism. Does the algorithm for implementing this semantic execute correctly even if the ACK message sent back to the client is lost due to a network problem? Describe the sequence of messages, and discuss whether “exactly once” is still preserved.
+        > yes.
+        > - On the client machine the call is sent and the process waits.
+        > - On the server the cache is checked to see if this call has been processed, the call is processed, the ACK is returned, and the call and return are cached.
+        > - the ACK is lost
+        > - after a given amount of time the client sends the call again, the server looks in the cache and find the call and returns the return.
+    - 3.7 Assume that a distributed system is susceptible to server failure. What mechanisms would be required to guarantee the “exactly once” semantic for execution of RPCs?
+        > Keep a redundant copy of the RPC cache (either on disk or a NAS.
+    - 3.8 Describe the differences among short-term, medium-term, and long- term scheduling.
+        > short term: what process to give to the CPU
+        > medium-term: if your running out of memory, what process should you pause (swap to disk)
+        > long-term: most useful for large batch systems, what processes you should let execute on the system.
+    - 3.9 Describe the actions taken by a kernel to context-switch between processes.
+        > Process 1 is stopped, Process 1 Control Block is updated, Process 2 CPU registers and cache uploaded from PCB, Process 2 starts.
+        > all of this is overhead
+    - 3.11 Explain the role of the init process on UNIX and Linux systems in regard to process termination.
+    > when a process terminates and it's parent process hasn't called wait() yet, it stops executing and it's resources are released but it stays in the process table because it contains the process status. If the parent process never calls wait and exits. This process is 'orphaned' and becomes the child process of the init process. When that child exits it will stay in the process table until wait is called by the init process. In order for all these zombie processes to be removed the init process periodically calls wait().
 
 ### 2.2 Threads
 OSC9ed: 4.1 to 4.7.
@@ -1238,8 +1351,28 @@ This assignment should be submitted after you have completed Unit 2. It is worth
 Instructions: Please answer the following questions in complete sentences. Your answer for each question should be about 150 words. (100 marks total)
 
 1. Define short-term scheduler and long-term scheduler, and explain the main differences between them. (6 marks)
+    - short-term decides which of the ready processes to execute.
+    - long-term decides which job to start next.
+    From internet:
+    - Short-term (CPU scheduler)-selects from jobs in memory those jobs that are ready to execute and allocates the CPU to them.
+    - Medium-term- used especially with time-sharing systems as an intermediate scheduling level. A swapping scheme is implemented to remove partially run programs from memory and reinstate them later to continue where they left off.
+    - Long-term (job scheduler)-verifies which jobs are brought into memory for processing.
+
 1. Explain the concept of a context switch. (6 marks)
+    When switching from one process to another a processor needs to save the state of the currently running process in order to be able to pick up where it left off the next time it runs the process. The context switch expresses a process where one process is halted, all state associated with it is saved in it's Process Control Block, the new process to be run has it's state loaded from it's PCB, and the new process starts executing in the CPU. All the times spent in context switching is overhead since the CPU does no useful work while switching.
+
 1. Explain the terms at most once and exactly once, and indicate how these terms relate to remote procedure calls. (6 marks)
+    When and RPC happens "at most once" it means that it is guaranteed that the procedure does not happen more than once, however, it does not guarantee that the procedure will happen less than once.
+    "Once and exactly once" guarantees that the process will happen once, and only once. This is usually accomplished by having the client process attach an identifier to the call and the server keep track of the RPC's it's performed. This way if the client doesn't receive the ACK, it can send the call again and the server will return the ACK without performing the procedure.
+    - 3.6: Consider the "exactly once" semantic with respect to the RPC mechanism. Does the algorithm for implementing this semantic execute correctly even if the ACK message sent back to the client is lost due to a network problem? Describe the sequence of messages, and discuss whether “exactly once” is still preserved.
+        > yes.
+        > - On the client machine the call is sent and the process waits.
+        > - On the server the cache is checked to see if this call has been processed, the call is processed, the ACK is returned, and the call and return are cached.
+        > - the ACK is lost
+        > - after a given amount of time the client sends the call again, the server looks in the cache and find the call and returns the return.
+    - 3.7 Assume that a distributed system is susceptible to server failure. What mechanisms would be required to guarantee the “exactly once” semantic for execution of RPCs?
+        > Keep a redundant copy of the RPC cache (either on disk or a NAS.
+
 1. Identify and briefly explain each of the four major categories of benefits of multithreaded programming. (6 marks)
 1. Briefly describe the benefits and challenges for multithreaded programming that are presented by multicore systems. (8 marks)
 1. Define coarse-grained multithreading and fine-grained multithreading, and explain their differences. (6 marks)

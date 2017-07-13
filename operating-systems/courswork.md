@@ -1189,88 +1189,6 @@ Main issues with Threading
         7 fork(); /* *2 */
 
 
-### 2.3 CPU Scheduling
-OSC9ed: 6.1 to 6.9.
-
-CPU scheduling is the basis of modern operating systems that can execute multiple processes and threads simultaneously. This section covers the concepts, criteria, algorithms, and examples of CPU scheduling, and introduces scheduling issues related to *thread* (thread scheduling), *multiple-processors* (multiple-processor and multicore processor scheduling), and *virtualization*.
-
-#### Learning Outcomes
-
-1. define *CPU scheduling*, and explain the rationale for using it in modern operating systems.
-2. explain the concepts and criteria associated with various CPU scheduling algorithms.
-3. explain the implementation of CPU scheduling in current operating systems such as Linux, Solaris, and Windows.
-4. describe and evaluate methods for CPU scheduling algorithms for a particular system.
-
-#### Key Concepts and Topics
-
-- CPU scheduling
-    - process scheduling
-    - thread scheduling
-- CPU burst and I/O burst
-- CPU scheduler or short-term scheduler
-- pre-emptive scheduling
-- non-pre-emptive or cooperative scheduling
-- dispatcher
-- dispatcher latency
-- scheduling criteria
-    - CPU utilization
-    - throughput
-    - turnaround time
-    - waiting time
-    - response time
-- Gantt chart
-- scheduling algorithms
-    - first-come, first-served (FAFS)
-    - shortest-job-first (SJF)
-    - shortest-next-CPU-burst
-    - shortest-remaining-time-first
-    - priority scheduling
-    - aging
-    - starvation of indefinite blocking
-    - round-robin (RR) scheduling
-    - multilevel queue scheduling
-    - multilevel feedback queue scheduling
-- thread scheduling
-    - process-contention scope (PCS)
-    - system-contention scope (SCS)
-    - Pthread scheduling
-- multiple-processor scheduling
-- asymmetric multiprocessing
-- symmetric multiprocessing (SMP)
-- processor affinity
-    - soft affinity
-    - hard affinity
-    - load balancing
-- multicore processor scheduling
-- scheduling in virtual machines
-- Linux scheduling
-- Windows scheduling
-- Solaris scheduling
-- scheduling algorithm evaluation
-    - deterministic modeling
-    - queueing model
-    - Little’s formula
-    - queueing-network analysis
-    - simulation
-    - implementation
-
-#### Study Questions
-
-1. Why is CPU scheduling very important in modern operating systems?
-2. What are the differences between pre-emptive and cooperative scheduling? How are pre-emptive scheduling and cooperative scheduling used in operating system design?
-3. What are the main CPU scheduling algorithms, and how do they work?
-4. What are the issues unique to multiple processor scheduling compared to single CPU scheduling?
-5. In practice, how do operating systems perform CPU scheduling?
-
-#### Learning Activities
-
-- Try Exercises of *OSC9ed*.
-    - 6.1 - 6.9
-    - 6.16 - 6.20
-    - 5.1
-    - 5.8 
-- Test the [sample c source code of Pthread scheduling](http://people.westminstercollege.edu/faculty/ggagne/osc/osc8e-src.zip) provided on the website of *OS6ed*.
-
 ### 2.4 Process Synchronization
 OSC9ed: 5.1 to 5.11.
 
@@ -1371,6 +1289,88 @@ Key concepts and problems in this section:
     - [Mutex: A Binary Semaphore](http://williamstallings.com/OS/Animation/Queensland/SEMA.SWF)
     - [Process Synchronization with Semaphores](http://williamstallings.com/OS/Animation/Queensland/SYNC.SWF)
 - Download the [PowerPoint slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777) or pdf for Chapter 6 of *OSC9ed*.
+
+### 2.3 CPU Scheduling
+OSC9ed: 6.1 to 6.9.
+
+CPU scheduling is the basis of modern operating systems that can execute multiple processes and threads simultaneously. This section covers the concepts, criteria, algorithms, and examples of CPU scheduling, and introduces scheduling issues related to *thread* (thread scheduling), *multiple-processors* (multiple-processor and multicore processor scheduling), and *virtualization*.
+
+#### Learning Outcomes
+
+1. define *CPU scheduling*, and explain the rationale for using it in modern operating systems.
+2. explain the concepts and criteria associated with various CPU scheduling algorithms.
+3. explain the implementation of CPU scheduling in current operating systems such as Linux, Solaris, and Windows.
+4. describe and evaluate methods for CPU scheduling algorithms for a particular system.
+
+#### Key Concepts and Topics
+
+- CPU scheduling
+    - process scheduling
+    - thread scheduling
+- CPU burst and I/O burst
+- CPU scheduler or short-term scheduler
+- pre-emptive scheduling
+- non-pre-emptive or cooperative scheduling
+- dispatcher
+- dispatcher latency
+- scheduling criteria
+    - CPU utilization
+    - throughput
+    - turnaround time
+    - waiting time
+    - response time
+- Gantt chart
+- scheduling algorithms
+    - first-come, first-served (FAFS)
+    - shortest-job-first (SJF)
+    - shortest-next-CPU-burst
+    - shortest-remaining-time-first
+    - priority scheduling
+    - aging
+    - starvation of indefinite blocking
+    - round-robin (RR) scheduling
+    - multilevel queue scheduling
+    - multilevel feedback queue scheduling
+- thread scheduling
+    - process-contention scope (PCS)
+    - system-contention scope (SCS)
+    - Pthread scheduling
+- multiple-processor scheduling
+- asymmetric multiprocessing
+- symmetric multiprocessing (SMP)
+- processor affinity
+    - soft affinity
+    - hard affinity
+    - load balancing
+- multicore processor scheduling
+- scheduling in virtual machines
+- Linux scheduling
+- Windows scheduling
+- Solaris scheduling
+- scheduling algorithm evaluation
+    - deterministic modeling
+    - queueing model
+    - Little’s formula
+    - queueing-network analysis
+    - simulation
+    - implementation
+
+#### Study Questions
+
+1. Why is CPU scheduling very important in modern operating systems?
+2. What are the differences between pre-emptive and cooperative scheduling? How are pre-emptive scheduling and cooperative scheduling used in operating system design?
+3. What are the main CPU scheduling algorithms, and how do they work?
+4. What are the issues unique to multiple processor scheduling compared to single CPU scheduling?
+5. In practice, how do operating systems perform CPU scheduling?
+
+#### Learning Activities
+
+- Try Exercises of *OSC9ed*.
+    - 6.1 - 6.9
+    - 6.16 - 6.20
+    - 5.1
+    - 5.8 
+- Test the [sample c source code of Pthread scheduling](http://people.westminstercollege.edu/faculty/ggagne/osc/osc8e-src.zip) provided on the website of *OS6ed*.
 
 ### 2.5 Deadlocks
 OSC9ed: 7.4 to 7.7.

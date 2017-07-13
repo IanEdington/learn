@@ -1056,50 +1056,138 @@ This section addresses threads and discusses multithreading models and thread li
 #### Key Concepts and Topics
 
 - thread
+    - one execution path in a process - each process can have more than one thread, code, data, and files are shared between all threads in a process.
 - multithreaded programming
+    - when one program has more than one thread of control. This allows the process to make progress even if one thread is waiting.
 - multithreaded process and single-threaded process
 - multicore programming
+    - when a process is running on multiple cores. This allows multiple threads from the same process to run in parallel.
 - multithreading models
-    - many-to-one model
-    - one-to-one model
-    - many-to-many model
-    - two-level model
-- user threads
-- kernel threads
+    - many-to-one model: many user-space threads to one kernel thread. Limited to using one core.
+    - one-to-one model: many user-space threads each with it's own kernel thread. Limited by number of kernel threads.
+    - many-to-many model: many user-space threads run by an equal or smaller number of kernel space threads. Not limited by either of these issues, but has extra overhead in maintaining structure. User-space scheduling of threads is required.
+    - two-level model: many-to-many with optional one-to-one: best of both worlds.
+- user threads: managed by a thread library in user space designed to manage all aspects of the threads.
+- kernel threads: uses the threads built into the kernel thread library.
 - thread libraries
-    - Pthreads
-    - Java threads
-    - Windows threads
-- thread cancellation
-- signal handling in multithreaded programs
+    - Pthreads: POSIX Threads - a standard implemented by many unix linux systems. There are even windows implementations.
+    - Java threads: thread library for java
+    - Windows threads:
+Main issues with Threading
+    - signal handling: How do you handle synchronous and asynchronous signals?
+        - synchronous need to get back to the thread who initiated them, and be handled appropriately.
+        - for asynchronous there is usually a default signal handler that responds to them but custom handling must be possible in order to customize how an application reacts to external input.
+    - thread cancellation: what is the right strategy for canceling a thread?
+        - one asynchronous input that needs to be handled by almost every program is how to cancel a thread.
+        - a thread that isn't given the chance to exit properly might have resources left behind. Although the local thread resources are freed by the system, any locks, files, half written shared data, ect. is left in a broken state. For this reason most systems suggest using a method of interupting the process that gives it a chance to finish what it's doing and clean up after itself.
+        - in Java this is a try finally clause, or checking an interrupt flag
+        - in PThreads this is `pthread_cancel()` it sets a flag that the thread can then check using `pthread_testcancel()` at a stable point and perform cleanup.
 - thread pool
-- lightweight process (LWP)
-- thread-specific data
 - scheduler activations
+    - lightweight process (LWP) a shell around a kernel thread in order for user threads to be implemented on top of
+    - usually used in many-to-many and two-level models
+    - uses a light weight process as a helper between the user thread and the kernel thread.
+    - an LWP is needed for each blocking system call(wait or I/O) + the number of processors.
+- thread-specific data: local storage for a thread. This is often used when data can be reused on a thread by thread basis but could be corrupted as a global variable. Local working storage usable across functions in a thread.
 - fork(), exec(), and clone()
+    - fork() does it for the entire process including threads or just the specific thread. Does it 
+    - exec() always replaces the entire program including all threads.
+    - clone() creates new thread (task) that contains pointers to whatever is wanted from the original task. This gives fine grain control over what is shared and what isn't shared between processes/threads.
 - threads implementation in operating systems
-    - Linux threads
-    - Windows threads
+    - Linux threads: Processes and kernel threads are the same thing in Linux. They are both just tasks. A task is a structure which contains a link to a separate structure for File-system information, memory space, Signal handlers, and open files. When creating a new task any of these elements can be shared.
+        - fork creates a new task with all of these things copied
+        - clone(CLONE FS, CLONE VM, CLONE SIGHAND, CLONE FILES) creates a new task with pointers for all of these to the original task.
+    - Windows threads through the Windows API
+        - 1 to 1 mapping
+        - ETHREAD - executive thread block
+            - pointer to the process to which the thread belongs
+            - address of the routine in which the thread starts control
+            - pointer to the KTHREAD
+        - KTHREAD - kernel thread block
+            - scheduling and synchronization information
+            - CPU registers
+            - kernel stack
+            - pointer to the TEB
+        - TEB - thread environment block (user space)
+            - thread ID (thread identifier)
+            - user stack
+            - thread local storage (private storage)
 
 #### Study Questions
 
 1. What is the motivation for using multiple threads in a process?
+- efficiency through parallelism: If a process with multiple threads can be run in parallel and the system has multiple cores, the threads can execute on separate cores speeding up the execution time of the process.
+- responsiveness because of concurrency: if one part of the program is blocked either by IO or by CPU, the main thread can still respond to input.
 2. What are the benefits of using multithreaded programming?
 3. What are the differences between user-level threads and kernel-level threads?
+    - user space vs kernel space
+    - managed by thread libraries vs managed by the kernel
+    - tend to have lower over head vs are a first class process for CPU contention
 4. How do POSIX, Java, and Windows implement their thread libraries?
+    POSIX is a standard with different implementation
+        - pthreads_
 5. How can thread libraries be used for multithreaded programming?
+    - using thread calls with call backs to split into multiple parts.
+    - divide based on task and data
 
 #### Learning Activities
 
 - Try Exercises of *OSC9ed*.
-    - 4.1
-    - 4.6
-    - 4.9
-    - 4.10
-    - 4.15
-- Test and run the [sample c or Java source code of multithreaded programs](http://people.westminstercollege.edu/faculty/ggagne/osc/osc8e-src.zip) provided on the textbook’s website.
-- Download the [PowerPoint slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777) or pdf for Chapter 4 of *OSC9ed*.
-- Read “Project 1: Naming Service Project” and “Project 2: Matrix Multiplication Project” in the Projects section of Chapter 4 of *OSC9ed* to see whether such a programming project might interest you for Assignment 4.
+    - 4.1: Provide two programming examples in which multithreading provides better performance than a single-threaded solution.
+        - a browser loading assets from a network, each asset has their own thread and when the finish loading they are applied to the DOM. Blocking IO will not affect other parts of the system form rendering.
+        - a large(gigs) amount of data is summed, by breaking the problem into multiple threads each thread can do it's part of the sum and the be summed with the other threads. Multiple cores will execute this faster than a single core.
+    - 4.2: What are two differences between user-level threads and kernel-level threads? Under what circumstances is one type better than the other?
+        - kernel-level threads are better when waiting for interrupts, or when parallel processing. No blocking on page faults.
+        - user-level threads implement threads on a system that doesn't support threads. Light overhead from context switching. Allow custom thread schedules.
+    - 4.3: Describe the actions taken by a kernel to context-switch between kernel- level threads.
+        - registers saved to kernel thread block 1, registers loaded from kernel thread block 2, start ktb2
+    - 4.4: What resources are used when a thread is created? How do they differ from those used when a process is created?
+        - register set, stack & thread priority. These are lower overhead.
+    - 4.5: Assume that an operating system maps user-level threads to the kernel using the many-to-many model and that the mapping is done through LWPs. Furthermore, the system allows developers to create real-time threads for use in real-time systems. Is it necessary to bind a real-time thread to an LWP? Explain.
+        - yes because they still use the LWP. The LWP will contain the scheduling information about this real-time thread.
+    - 4.6: Provide two programming examples in which multithreading does not provide better performance than a single-threaded solution.
+        - When a divide and conquer calculation is split up into multiple sections but run on a single processor. The overhead of thread switching is big and there is no benefit in terms of the calculation speedup.
+        - 
+    - 4.7 Under what circumstances does a multithreaded solution using multiple kernel threads provide better performance than a single-threaded solution on a single-processor system?
+        - only when there is waiting involved either for CPU or IO.
+        - especially during cache misses
+    - 4.8 Which of the following components of program state are shared across threads in a multithreaded process?
+        a. Register values: no
+        b. Heap memory: yes
+        c. Global variables: yes
+        d. Stack memory: no
+    - 4.9 Can a multithreaded solution using multiple user-level threads achieve better performance on a multiprocessor system than on a single-processor system? Explain.
+        - no. There is no parallelism in this case because only one kernel-level thread is being used, and using multiple threads increase overhead.
+    - 4.10 In Chapter 3, we discussed Google’s Chrome browser and its practice of opening each new website in a separate process. Would the same benefits have been achieved if instead Chrome had been designed to open each new website in a separate thread? Explain.
+        - no. processes have their own memory, files, ect that are managed by the OS. Since each webpage is a unique entitly detatched from any other webpage, there is no benifite to using the threaded processing model, and you incure the overhead of managing the user-threads.
+    - 4.11 Is it possible to have concurrency but not parallelism? Explain.
+        - yes. concurrency means multiple processes are progressing together, whereas parallelism is when multiple processes are progressing at each clock cycle. The former can be accomplished on a single threaded CPU using context switching. The latter can only be accomplished on multi-processor systems.
+    - 4.12 Using Amdahl’s Law, calculate the speedup gain of an application that has a 60 percent parallel component for (a) two processing cores and (b) four processing cores.
+        - max theoretical: 1/0.4 = 2.5x
+        - 2 cpu's: 1 / (0.4 + 0.6/2) = 1.43
+        - 4 cpu's: 1 / (0.4 + 0.6/4) = 1.82
+    - 4.13 Determine if the following problems exhibit task or data parallelism:
+        - The multithreaded statistical program described in Exercise 4.21: task
+        - The multithreaded Sudoku validator described in Project 1 in this chapter: task
+        - The multithreaded sorting program described in Project 2 in this chapter: data
+        - The multithreaded webserver described in Section 4.1: task
+    - 4.14 A system with two dual-core processors has four processors available for scheduling. A CPU-intensive application is running on this system. All input is performed at program start-up, when a single file must be opened. Similarly, all output is performed just before the program terminates, when the program results must be written to a single file. Between startup and termination, the program is entirely CPU- bound. Your task is to improve the performance of this application by multithreading it. The application runs on a system that uses the one-to-one threading model (each user thread maps to a kernel thread).
+        - How many threads will you create to perform the input and output? Explain.
+            - one thread for read one for write
+        - How many threads will you create for the CPU-intensive portion of the application? Explain.
+            - 4 threads one for each CPU. Unless there are 4 cpu's with 2 threads per CPU .: 8 threads.
+    - 4.15 Consider the following code segment:
+        a. How many unique processes are created? 8
+        b. How many unique threads are created? 10
+
+        1 pid_t pid; /* 1 */
+        2 pid = fork(); /* *2 */
+        3 if (pid == 0) { /* child process */
+        4 fork(); /* +1 */
+        5 thread_create( . . .);
+        6 }
+        7 fork(); /* *2 */
+
 
 ### 2.3 CPU Scheduling
 OSC9ed: 6.1 to 6.9.
@@ -1374,8 +1462,23 @@ Instructions: Please answer the following questions in complete sentences. Your 
         > Keep a redundant copy of the RPC cache (either on disk or a NAS.
 
 1. Identify and briefly explain each of the four major categories of benefits of multithreaded programming. (6 marks)
+    - Responsiveness: When a process is waiting for IO or a long calculation, it is not possible to interact with that process. By breaking a single process into multiple section, one to wait for IO, one to do a big calculation, and a third one to manage them and listen to input the entire system can be more responsive.
+    - Resource sharing: a process can only share information with other processes through shared memory and message passing. Since threads are all part of the same process, the code, data and files are shared between all the threads in the process automatically.
+    - Economy (efficiency): Because of the shared code, data and files, both making a new thread and context switching between threads is much more efficient than the equivalent with processes.
+    - Scalability: by having a single process with multiple threads, that process can run across as many core as a computer has, vs a process with a single thread can only run on a single core.
+
 1. Briefly describe the benefits and challenges for multithreaded programming that are presented by multicore systems. (8 marks)
+    Benefits: 
+    - speedup processing time
+    Challenges:
+    - cache coherency
+    - 
+
 1. Define coarse-grained multithreading and fine-grained multithreading, and explain their differences. (6 marks)
+    from wikipedia: 
+    - Coarse-grained multithreading. The simplest type of multithreading occurs when one thread runs until it is blocked by an event that normally would create a long-latency stall. Such a stall might be a cache miss that has to access off-chip memory, which might take hundreds of CPU cycles for the data to return.
+    - Interleaved multithreading: Interleaved issue of multiple instructions from different threads, also referred to as temporal multithreading. It can be further divided into fine-grained multithreading or coarse-grained multithreading depending on the frequency of interleaved issues. Fine-grained multithreading—such as in a barrel processor—issues instructions for different threads after every cycle, while coarse-grained multithreading only switches to issue instructions from another thread when the current executing thread causes some long latency events (like page fault etc.). Coarse-grain multithreading is more common for less context switch between threads. For example, Intel's Montecito processor uses coarse-grained multithreading, while Sun's UltraSPARC T1 uses fine-grained multithreading. For those processors that have only one pipeline per core, interleaved multithreading is the only possible way, because it can issue at most one instruction per cycle.
+
 1. Explain process starvation and how aging can be used to prevent it. (6 marks)
 1. How does the dispatcher determine the order of thread execution in Windows? (6 marks)
 1. Define critical section, and explain two general approaches for handling critical sections in operating systems. (8 marks)

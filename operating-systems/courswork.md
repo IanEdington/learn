@@ -1188,7 +1188,6 @@ Main issues with Threading
         6 }
         7 fork(); /* *2 */
 
-
 ### 2.4 Process Synchronization
 OSC9ed: 5.1 to 5.11.
 
@@ -1206,7 +1205,10 @@ Key concepts and problems in this section:
 #### Learning Outcomes
 
 1. define *critical-section problem*.
+    - a section or sections of code that if executed concurrently can cause unstable data
 2. explain hardware and software solutions for the critical-section problem.
+    - hardware: atomic operations
+    - software: never work if their not built on-top of hardware solutions: spin-locks (mutex), semiphore (resource lock), Monitors, Condition
 3. describe semaphores and monitors, and explain how they are implemented.
 4. explain how to use semaphores and monitors to handle classic problems of synchronization such as bounded-buffer problems, readers-writers problems, and dining-philosophers problems.
 5. describe synchronization mechanisms in Linux, Solaris, and Windows.
@@ -1221,37 +1223,31 @@ Key concepts and problems in this section:
     - progress
     - bounded waiting
 - Peterson’s solution
-- hardware instructions executed atomically
-    - swap()
-    - testandset()
-- semaphores
-    - wait(S)
-    - signal(S)
-- mutex locks or binary semaphore
+- binary semaphore
 - counting semaphore
-- spinlock
+- spinlock: lock that is waiting using a loop
 - busy waiting
 - block() and wakeup(P)
+    - blocks a process until another process calls wakeup with that process
 - deadlocks
 - starvation or indefinite blocking
 - priority inversion
-- classic problems of synchronization
-    - bounded-buffer problem
-    - readers-writers problem
-    - dining-philosophers problem
-- monitors
-    - monitor type
-    - conditions
-- synchronization
-    - in Solaris
-    - in Windows
-    - in Linux
+    - given three priority levels of execution it is possible for a situation to arise where the middle is executed before the top when the lowest holds a resource that the top needs.
+        - bottom starts executing locks resource A
+        - middle start executing, stops bottom
+        - top starts executing, stops middle, queues for resource A
+        - middle continues executing, until finished even though top still exists.
+    - a common solution to this problem is for the bottom process/thread to temporarily receive the priority level of the waiting thread
 - atomic transaction
 - commit, abort, and roll back
 - write-ahead logging
 - log-based recovery
 - checkpoints
-- concurrent atomic transactions
+- concurrent atomic transactions (transactional memory)
+    - A section is declared atomic
+    - a log of the variables are kept
+    - at the end, all the writes are performed atomically
+    - if they fail (no the expected start values) then the transaction is rolled back and the transaction starts over
 - serializability
 - serial schedule
 - nonserial schedule
@@ -1260,6 +1256,301 @@ Key concepts and problems in this section:
 - locking protocol
 - two-phase locking protocol (2PL)
 - timestamp-based protocol
+
+#### hardware solutions
+    - stop processor from accepting interrupts during the critical area
+        - only useful on single processor machines
+    - atomic operations
+        - test_and_set(&boolean) sets boolean to true, returns original value.
+        - compare_and_swap(int *value, int expected, int new_value) if (value == expected) value = new_value
+
+A simple hardware based locking solution.
+- It spins.
+- It doesn't provide the bounded-waiting requirement, so threads can stall.
+~~~
+// shared information
+boolean lock = false;
+
+// for each thread
+    // lock or spin until lock is aquired
+    while (test_and_set(lock));
+
+    // execute critical section
+
+    // unlock
+    *lock = false;
+~~~
+
+A more complex hardware solution.
+- It spins.
+- It provide the bounded-waiting requirement since elements can't wait for longer than n threads.
+- need to know the number of threads ahead of time
+~~~
+// shared info
+int n; // number of threads
+boolean lock = false;
+boolean waiting[n] = false;
+
+// for each thread
+    int i; // thread identity number
+    waiting[i] = true;
+    key = true;
+
+    // spin until either the lock is available or another thread unblocks my waiting flag
+    while (key && waiting[i])
+        key = test_and_set(&lock)
+
+    // execute critical section
+
+    // let the next waiting process run or release the lock
+    int j = (i + 1) % n; // next thread in list
+    while ((j != i)) && !waiting[j])
+        // loop through array until you're back at the start or you've found a waiting thread.
+        j = (j + 1) % n;
+
+    if (j == i)
+        // If you're back at the start no thread is waiting for this lock and it is safe to unlock.
+        lock = false;
+    else
+        // otherwise j is waiting on the lock. Instead of unlocking, pass the lock to j.
+        waiting[j] = false;
+~~~
+
+#### mutex locks (mutual exclusion locks) (spin locks)
+    - spin lock because other threads spin while waiting from lock to be freed
+    - doesn't work on single CPU systems because of spinning
+    - doesn't require context switch so it's a good choice multi-processor system expecting short lock sections
+    - built using atomic operations
+
+~~~
+// shared information
+    boolean lock = false;
+
+    function aquire() {
+        // while (!available) /* spin */ ;
+        // available = false;
+        while (test_and_set(lock));
+    }
+
+    function release() {
+        // available = true;
+        lock = false;
+    }
+
+// for each critical section
+    aquire();
+    // critical section
+    release();
+~~~
+
+#### semaphores
+- usage:
+    - wait(S)
+    - signal(S)
+- possible to force execution order using signal() in one thread and wait() in the other.
+- possible for it to be implemented without spinning
+
+naive implementation of semaphores (without atomic operations)
+~~~
+object lock {
+    int semi;
+
+    constructor(int startingValue) {
+        semi = startingValue;
+    }
+
+    synchronized function wait() {
+        while (semi <= 0) /* busy waiting */; 
+        semi--;
+    }
+
+    synchronized function signal() {
+        semi++;
+    }
+}
+
+// shared information
+Lock lock = new lock(1);
+
+// for each critical section
+    lock.wait();
+    // critical section
+    lock.signal();
+~~~
+
+low spinning version of the semaphores
+    - still spins during the compare_and_swap but much lower than normal
+    - re-enables waiting threads one at a time.
+~~~
+typedef struct {
+    int semi;
+    struct process *list;
+
+    wait() {
+        int temp;
+        do {
+            temp = semi;
+        } while (compare_and_swap(*semi, temp, temp--));
+
+        if (temp < 0) {
+            // register process with semiphore
+            list.add(Thread.this());
+            block();
+        }
+    }
+
+    signal() {
+        int temp;
+        do {
+            temp = semi;
+        } while (compare_and_swap(*semi, temp, temp++));
+
+        if (temp <= 0) {
+            // wakeup the next item in the list
+            wakeup(list.pop());
+        }
+    }
+}
+~~~
+
+#### classic problems of synchronization
+##### bounded-buffer problem:
+a piece of shared memory is being used as a buffer. One producer, and One consumer are writing to and reading from this buffer. How do you communicate across threads what pieces of data are available and what areas of memory can be written to.
+
+~~~
+int n;
+int read = -1;
+int write = -1;
+semaphore mutex = new semaphore(1); // only one thread should be reading from or writing to the buffer at any given time
+semaphore empty = new semaphore(n); // there are n spaces in the buffer so the resources available is n
+semaphore full = new semaphore(0); // at the begining there is nothing in the buffer so there isn't anything available.
+shared memory buffer[n];
+
+// consumer
+    full.wait();
+    mutex.wait();
+
+    // remove item from buffer
+    int next;
+    do {
+        int temp = read;
+        next = temp + 1 % n;
+    } while (compare_and_swap(*read, temp, next));
+    BufferedItem item = buffer[next];
+
+    // release the lock and signal that the buffer is emptied
+    mutex.signal();
+    empty.signal();
+
+    // do something with buffer content
+
+// producer
+    // get the item to be buffered
+    BufferedItem item;
+
+    empty.wait();
+    mutex.wait();
+
+    // place item in buffer
+    int next;
+    do {
+        int temp = write;
+        next = write + 1 % n;
+    } while (compare_and_swap(*write, temp, next));
+    buffer[next] = item;
+
+    // release the lock and signal that the item is ready
+    mutex.signal();
+    full.signal();
+~~~
+
+##### readers-writers problem
+Many threads can read only one thread can write.
+If you are a reader and there is a writer waiting, pause until the writ
+
+~~~
+// shared
+Semaphore mutex = new Semaphore(1);
+Semaphore resource = new Semaphore(1);
+volatile int writers = 0;
+volatile int readers = 0;
+
+// all writer processes
+    mutex.wait();
+    writers++;
+    mutex.signal();
+    resource.wait();
+
+    // write to the resource
+
+    mutex.wait();
+    writers--;
+    mutex.signal();
+    resource.signal();
+
+// all readers
+    mutex.wait();
+    if (writers > 0 or readers == 0) {
+        mutex.signal();
+        resource.wait();
+        mutex.wait();
+    }
+    readers++;
+    mutex.signal();
+
+    // read from the resource
+
+    mutex.wait();
+    readers--;
+    if (readers == 0)
+        resource.signal();
+    mutex.signal();
+~~~
+
+##### dining-philosophers problem
+Round robin of dead-lock! The all pick up the left chopstick at the same time! No one can eat because everyone has exactly 1/2 the resources they need to continue and the other half is taken by the person to the right.
+
+Three solutions exist:
+- allow one less than the circle to try to pick up a chopstick. If there are 5 places to sit only let 4 people sit down, when the 5th tries to sit down make them wait. At least one person will be able to pick up the other chopstick.
+- only allow picking up chopsticks if both are available. Place the picking up of chopsticks in it's own critical section. This means that if a philosophers right chopstick is taken it will wait for it to be available inside a critical section but it guarnatees that the person on the right will eventually be done with the chopstick since in order for the critical section to be accessible they must have already picked up both chopsticks.
+- Use an asymmetric solution. Odd places pick up the left then the right, Even pick up the right then the left. Fight over the first chopstick and you are guaranteed that the second chopstick is available.
+
+#### monitors
+Monitors are objects that control their internal content. This internal content 
+- monitor type
+- conditions
+#### OS implementations of synchronization
+- in Solaris
+    - adaptive mutex: has a how bunch of potential implementations that change based on the system being used.
+    - condition variables and semaphores are used for longer code segments
+    - turnstile: each kernel thread can only be blocked on one lock at a time so instead of having a queue for each lock, solaris uses a turnstile in each thread. The first time a thread blocks, that threads turnstile becomes the locks turnstile. When the first item gives up the lock, it gets assigned a new turnstile from the operating system bank of blank turnstiles. These turnstiles also help implement a priority sequence. A higher priority thread will always move to the front of the turnstile, and a higher priority waiting element will bump the thread being waited on up to that priority.
+- in Windows
+    - multithreaded
+    - on single threaded systems it pauses interrupts
+    - on multi-systems it uses spin locks
+    - provides semaphores
+    - mutex dispatcher objects
+    - critical section object. Spins for a given amount of time. After-which it uses a kernel mutex. This is usually very efficient since it only creates a mutex when it's locked.
+- in Linux
+    - non-premptive before 2.6
+    - mutex_lock() and mutex_unlock() - a second element is put into sleep and awakened when mutex_unlock() is called.
+    - semaphores and spinlocks are available
+        - multiprocessor version
+            - acquire spin lock
+            - release spin lock
+        - single processor version
+            - disable kernel interrupts - preempt_disable()
+            - enablet kernel interrupts - preempt_enable()
+    - lots of atomic support:
+
+        atomic t counter;
+        int value;
+
+        atomic set(&counter,5); /* counter = 5 */
+        atomic add(10, &counter); /* counter = counter + 10 */
+        atomic sub(4, &counter); /* counter = counter - 4 */
+        atomic inc(&counter); /* counter = counter + 1 */
+        value = atomic read(&counter); /* value = 12 */
 
 #### Study Questions
 
@@ -1272,23 +1563,20 @@ Key concepts and problems in this section:
 
 #### Learning Activities
 
-- Try Exercises 5.7 of *OSC9ed*.
-    - 5.8
-    - 5.11
-    - 5.17
-    - 5.34
-- Read “Producer-Consumer Problem” in the Programming Projects section of Chapter 5 of *OSC9ed*, to see whether a similar programming project might interest you for Assignment 4.
-- Try to run the following [animations provided on the website of *OS6ed*](http://williamstallings.com/OS/Animation/Animations.html):
-    - [Process Synchronization: Producer/Consumer Problem](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/processsync.htm)
-    - [The Critical Section Problem: Algorithm 3](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/criticalsection.htm)
-    - [Mutual Exclusion Achieved through Semaphores](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/semaphore.htm)
-    - [Producer/Consumer Workbench Semaphore Solution](http://cs.gmu.edu/cne/workbenches/pcsem/pcsem.html)
-    - [Producer/Consumer Workbench Monitor Based Solution](http://cs.gmu.edu/cne/workbenches/pcmon/pcmon.html)
-    - [Simple Solution to the Bounded Buffer Problem](http://williamstallings.com/OS/Animation/Queensland/BB.SWF)
-    - [Implementation of the Bounded Buffer Problem Using a Counter Variable](http://williamstallings.com/OS/Animation/Queensland/BB_COUNT.SWF)
-    - [Mutex: A Binary Semaphore](http://williamstallings.com/OS/Animation/Queensland/SEMA.SWF)
-    - [Process Synchronization with Semaphores](http://williamstallings.com/OS/Animation/Queensland/SYNC.SWF)
-- Download the [PowerPoint slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777) or pdf for Chapter 6 of *OSC9ed*.
+- Try Exercises of *OSC9ed*.
+    - 5.7: Race conditions are possible in many computer systems. Consider a banking system that maintains an account balance with two functions: deposit(amount) and withdraw(amount). These two functions are passed the amount that is to be deposited or withdrawn from the bank account balance. Assume that a husband and wife share a bank account. Concurrently, the husband calls the withdraw() function and the wife calls deposit(). Describe how a race condition is possible and what might be done to prevent the race condition from occurring.
+    - 5.8: The first known correct software solution to the critical-section problem for two processes was developed by Dekker. The two processes, P0 and P1, share the following variables: The structure of process Pi (i == 0 or 1) is shown in Figure 5.21. The other process is Pj (j == 1 or 0). Prove that the algorithm satisfies all three requirements for the critical-section problem.
+
+        boolean flag[2]; /* initially false */
+        int turn;
+
+    - 5.11: Explain why interrupts are not appropriate for implementing synchronization primitives in multiprocessor systems.
+        Interrupts are sent to each processor so the cost of stopping all interrupts is high in a multiprocessor CPU.
+    - 5.17: Assume that a system has multiple processing cores. For each of the following scenarios, describe which is a better locking mechanism—a spinlock or a mutex lock where waiting processes sleep while waiting for the lock to become available:
+        The lockistobeheldforashortduration.: spinlock
+        Thelockistobeheldforalongduration: mutex
+        A thread maybeputto sleepwhileholdingthelock: mutex
+    - 5.34: Suppose we replace the wait() and signal() operations of moni- tors with a single construct await(B), where B is a general Boolean expression that causes the process executing it to wait until B becomes true.
 
 ### 2.3 CPU Scheduling
 OSC9ed: 6.1 to 6.9.

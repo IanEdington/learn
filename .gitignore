@@ -3,6 +3,6 @@
 !.gitignore
 !*/
 !*.md
-!*.png
+*.png
 
 resource/

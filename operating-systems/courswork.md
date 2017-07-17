@@ -1583,82 +1583,373 @@ OSC9ed: 6.1 to 6.9.
 
 CPU scheduling is the basis of modern operating systems that can execute multiple processes and threads simultaneously. This section covers the concepts, criteria, algorithms, and examples of CPU scheduling, and introduces scheduling issues related to *thread* (thread scheduling), *multiple-processors* (multiple-processor and multicore processor scheduling), and *virtualization*.
 
-#### Learning Outcomes
-
-1. define *CPU scheduling*, and explain the rationale for using it in modern operating systems.
-2. explain the concepts and criteria associated with various CPU scheduling algorithms.
-3. explain the implementation of CPU scheduling in current operating systems such as Linux, Solaris, and Windows.
-4. describe and evaluate methods for CPU scheduling algorithms for a particular system.
-
 #### Key Concepts and Topics
-
 - CPU scheduling
     - process scheduling
     - thread scheduling
 - CPU burst and I/O burst
-- CPU scheduler or short-term scheduler
-- pre-emptive scheduling
-- non-pre-emptive or cooperative scheduling
-- dispatcher
-- dispatcher latency
-- scheduling criteria
-    - CPU utilization
-    - throughput
-    - turnaround time
-    - waiting time
-    - response time
-- Gantt chart
-- scheduling algorithms
-    - first-come, first-served (FAFS)
-    - shortest-job-first (SJF)
-    - shortest-next-CPU-burst
-    - shortest-remaining-time-first
-    - priority scheduling
-    - aging
-    - starvation of indefinite blocking
-    - round-robin (RR) scheduling
-    - multilevel queue scheduling
-    - multilevel feedback queue scheduling
-- thread scheduling
-    - process-contention scope (PCS)
-    - system-contention scope (SCS)
-    - Pthread scheduling
-- multiple-processor scheduling
-- asymmetric multiprocessing
-- symmetric multiprocessing (SMP)
-- processor affinity
-    - soft affinity
-    - hard affinity
-    - load balancing
-- multicore processor scheduling
+    processes either are CPU intensive or IO intensive. A burst is defined as a sequential segment without a software interrupt:
+        - CPU burst: Starts with a new process or a return from a wait interrupt, has a continual calculation being preformed until the end of the process or a software interrupt is called).
+        - IO burst: any-time the process is waiting for IO
+    The length of CPU bursts is usually exponential, large number of short CPU bursts with very few long CPU bursts.
 - scheduling in virtual machines
-- Linux scheduling
-- Windows scheduling
-- Solaris scheduling
-- scheduling algorithm evaluation
-    - deterministic modeling
-    - queueing model
-    - Little’s formula
-    - queueing-network analysis
-    - simulation
-    - implementation
+
+##### CPU Scheduling algorithms
+CPU scheduler or short-term scheduler:
+- The CPU scheduler is invoked when a process:
+    1. moves from the running state to the waiting state (new process must be chosen)
+    2. moves from running to ready (ie. interrupt) (could be given back to same process)
+    3. moves from waiting to ready (ie. IO is completed) (could be given back to original process)
+    4. is terminated. (new process must be chosen)
+- non-pre-emptive or cooperative scheduling: lets the process continue until it yields the CPU. This is the only option on systems that don't have a timer. Scheduling only happens after situation 1 and 4 otherwise the originally executing process continues. Doesn't work in multi-core CPU's
+- pre-emptive scheduling: interrupts a process after a given amount of time with a timer. This causes race conditions since different processes can be at different points in their programs. This also affects the kernel since an interrupt can cause the entire kernel to be at the mercy of race conditions. Some kernels switch to non-preemptive scheduling while in the kernel. However, this isn't a good long term solution as CPU's get more and more cores. This also makes it impossible to make any guarantees about real-time systems. Another solution is to guard against them in the kernel.
+- However, there are still a special type of process that can't be interrupted. Interrupt handlers. If an interrupt handler is not allowed to fire, information could be lost or overwritten. In a kernel the Interrupt handler will turn off interrupts while it is in running (very short) and turn it back on afterwards
+
+dispatcher:
+in charge of the context switch (switch context, switch to user mode, jump to the proper point in the user code)
+dispatcher latency: amount of times this takes. This is a measure of how long a context switch takes.
+
+Scheduling criteria:
+for each set of processes there exists a God algorithm that perfectly decides which process to run when. However, because of the complex nature of scheduling an optimal algorithm is different for many factors in the set of processes. There isn't one master algorithm that solves for all possible factors. For all these criteria there are algorithms that do a better or worse job at optimizing for them. We usually optimize based on the averages but sometimes the variance is a better measure, for example user systems, users are happier with a predictably slower computer than a faster on average computer (within reason).
+    - CPU utilization: what percentage of the CPU is being used at any given time.
+    - throughput: number of processes completed in an hour.
+    - turnaround time: amount of time from process start to process completion
+    - waiting time: how long a process has to wait in the ready queue.
+    - response time: amount of time from starting the process to getting the first response. 
+
+###### First-come, first-served (FCFS)
+- non-preemptive scheduler
+- easy to implement with a FIFO queue.
+- can result in long average waiting time especially when CPU bursts vary greatly.
+- When IO and long CPU bursts are involved it can also lead to flip flopping between waiting for CPU and waiting for IO
+- bad for time-sharing systems (since it's non-preemptive / cooperative)
+
+###### Priority scheduling
+- shortest-job-first, shortest-next-CPU-burst, shortest-remaining-time-first are special cases of priority scheduling
+- Can be prioritized based on internal or external factors.
+    - Internal: time limits job or burst, memory requirements, files requered, ratio of average IO to CPU bursts.
+    - External: importance as declared by humans, funds allocated for the process, or any other factor.
+- subject to starvation and indefinite blocking. A processes never runs because it's of such a low priority.
+    - aging: increasing the priority of a process after x amount of time. Eventually even the lowest priority item, given enough time, will be a high priority item.
+
+###### Shortest-job-first (SJF) (shortest-next-CPU-burst)
+- implement with a priority queue based on next CPU burst's length, shortest first
+- hard to know how long the next CPU burst will be:
+    - in a job system it's possible since people put in the estimated job length
+    - in a short-term scheduler it's possible to guess using past values for that process using exponential average of previous CPU bursts (shortest-remaining-time-first)
+
+###### Round-robin (RR) scheduling: First-come, First-served with preemption.
+- the ready queue is a circular FIFO Queue. Items are added to the tail as the CPU progresses through the Queue.
+- the dispatcher choses the next processes, sets a timer for 1 quantum, loads the registers, starts the process. One of two things happens, The timer goes off or the process waits, with the timer, the processes is changed from running to ready and placed at the back of the ready queue, for waiting the processes is placed in the queue it's waiting for. The dispatcher then context switches from the current process to the next process, timer is set, and the next processes starts.
+- average waiting is often long but response time and average runtime are usually lower
+- How well the RR performs depends on the size of the Quanta.
+    - If the Quanta is large it won't be any different than the FCFS algorithm.
+    - If the Quanta is small it will spend a lot of time in the dispatcher. More wasted work the CPU is doing in the form of context switching.
+    - General rule of thumb is that 80% of the CPU bursts should be shorter than the time quantum
+
+###### multilevel queue scheduling
+    - number of queues
+    - how is the queue of a process determined
+    - scheduling algorithm per queue
+- Jobs can usually be classified into different section. For example foreground, background, batch, student processes. If the ready queue is split into these different queues for each type of process then each can have their own scheduling algorithm that optimizes for whatever is most needed for that group of processes.
+- items are usually given a fixed priority for their lifetime
+- because it's a priority queue starvation and indefinite blocking can happen. Aging is a solution to this.
+
+###### multilevel feedback queue scheduling
+- all of multilevel queue plus
+    - when to promote a process to a higher queue
+    - when to demote a process to a lower queue
+- The most adaptive solution (can implement any triage you want)
+- The most complex to implement
+
+##### thread scheduling
+process-contention scope (PCS)
+    On many to one and many to many thread libraries the lib has it's own dispatcher and scheduler that decides what user level thread to be scheduled on to the LWP. Since this adds another layer of dispatching and scheduling it makes it difficult to maintain a strong scheduling algorithm. Often a priority queue or FIFO algorithm is used, often leading to starvation of threads. They are fighting over which one is running on a process, therefore process-contention scope.
+
+system-contention scope (SCS)
+    a kernel thread is treated the same as a process in most systems meaning it contends with all the other threads in a system. Therefore system-contention scope.
+
+Pthread scheduling
+- PTHREAD SCOPE PROCESS
+- PTHREAD SCOPE SYSTEM
+
+Linux and Mac OSX only allows System-contention scope!
+
+##### multiple-processor scheduling
+Asymmetric multiprocessing
+- one core runs kernel processes the others run user processes
+
+Symmetric multiprocessing (SMP)
+- All cores run the same stuff
+- more difficult because right down to the bare metal the software has to implement concurrent programs
+- this is the current default.
+
+Processor affinity
+When a process is running on a processor it's L1, L2, L3 caches get built up and reduce the number of memory misses. This process is said to have affinity for the processor. OS's can implement two types of affinity soft and hard.
+- soft affinity: OS will try to keep the process on the same processor
+- hard affinity: OS will definitely keep the process on the same processor
+
+Load balancing
+Generally an OS wants all it's CPU's to be doing an equal amount of work.
+When a CPU gets too much work it is sometimes beneficial to move a process to a new CPU even though it will take the hit. This can be done in two ways either through push, where a kernel process readjusts the CPU load, or through pull, where an empty process pulls a process from another CPU when it's empty.
+When to move a process is tricky because it's always a trade-off, and isn't predictable. Some systems do it right away, others wait for a certain threshold.
+This is a systems engineering problem with clear trade-offs.
+
+Multicore processor scheduling - Multi-Threaded CPU's - Threads within a CPU
+On some new CPU's there are multiple thread registers available within the core. This is a strategy to increase CPU efficiency given cache misses. By having a second set of registers it's possible to work on a second thread while the first one is waiting for instructions or cache from main memory.
+This opens up the need for two levels of scheduling, the normal OS process scheduling and hardware scheduling within the CPU. Two examples of this are intel and solaris. Solaris does round robin between it's 8 threads per core. Intel has a priority from 1-7 that determines which thread to go next.
+- coarse-grained - Context switching like with processors but within the CPU (similar to cooperative scheduling)
+- Fine-grained (interleaved) - switching between CPU threads pretty much on every instruction (similar to time-sliced)
+
+##### Real-time Scheduling
+Different requirements than regular scheduling since there are definite points where the calculation is no longer useful. Either get it by this time or it's not valid.
+Two types of guarantees, Soft and Hard.
+Soft gives no guarantees about time, but guarantees that it will happen before any other process.
+Hard gives specific guarantees about when a process will be complete.
+
+Latency is the enemy of real-time systems:
+- preemptive systems have lower latency because a interrupt is dealt with immediately instead of waiting for the original task to complete.
+- dispatch latency: preemptive kernels keep dispatch latency low.
+
+###### Priority-Based Scheduling
+There are both Hard and Soft schedulers
+
+scheduler needs some or all of the following information
+- period: how often the task arrives
+- runtime of the task
+- deadline: how long after it arrives is it due
+
+Some schedulers have admission control. Determines if a thread is allowed to run on the system or not.
+
+####### Rate-Monotonic Scheduler
+- Tasks must arrive at a steady period
+
+- implements an admission control
+- if admitted provides hard guarantees on deadlines
+
+Real-time ready queue is a priority queue based on it's period. The shorter the period the higher the priority.
+
+If we have runtime and deadline, this becomes a problem where we have full knowledge.
+We can predict if the CPU will be able to fulfil this task.
+If it is possible to do the task we have a Hard guarantee of the deadline.
+If it is not possible we can issue a denial of entry.
+
+This is an optimal solution for fixed priorities. However, a dynamic priority algorithm can do better.
+
+####### Earliest-deadline-first scheduler
+- deadline is needed
+
+Real-time ready queue is a priority queue based on the inverse of the deadline. This leads to dynamic priority values since a new process might bump down the value of existing processes.
+
+If runtime and period are known, we have full knowledge of the problem.
+- Hard guarantees
+- Admission control
+
+This has the disadvantage of changing priorities which increases dispatch time.
+
+####### Proportional-share scheduling
+The CPU time is broken into 100 shares.
+Each task requests a portion of the CPU.
+An admission controller denies entry when all the shares have been requested.
+The scheduler then guarantees that the process will receive it's alloted number of shares.
+
+This scheduler cannot provide hard guarantees.
+
+####### POSIX real-time scheduling
+SCHED_FIFO: first-come, first-serve | priority can be assigned | no time-slicing between threads
+- The highest priority RT thread gets the entire CPU until it finishes.
+SCHED_RR: Round Robin | priority can be assigned | time-slicing between threads of the same priority.
+- The highest priority RT thread shares the CPU with all the other RT threads of the same priority.
+SCHED_OTHER: undefined and changes based on OS
+
+##### OS Implementations
+###### Linux scheduling
+pre v2.5: traditional UNIX scheduling system | non-preemptive | didn't work well on SMP systems or systems will large number of runnable processes.
+v2.5: O(1) scheduler (ran in constant time regardless of number of processes) | preemptive | poor response times for interactive systems
+v2.6: Completely Fair Scheduler (CFS) classes - highest priority task from highest priority class runs
+- uses red-black tree for O(log n)
+- aging
+    - tracks virtual run time (vruntime)
+    - decay factor based on priority of task (low priority tasks have big decay factors)
+    - decay factor * vruntime affects priority
+    - IO task that doesn't use a lot of CPU will eventually be of a higher priority than a long running CPU bound task.
+
+- priority rage: realtime 0 to 99 | normal 100 to 139 (nice value of -20 to 19)
+
+###### Windows scheduling
+
+Priorities: variable class 1 to 15 | real-time class 16 to 31
+Windows API provides two values that determine priority number, priority class and relative priority within the class. The just map to priority numbers
+
+- Preemption of lower priority threads.
+- Highest priority task runs with time slice.
+- for Variable priority threads
+    - If time quantum runs out, it's priority is lowered. This limits the CPU consumption of compute bound threads.
+    - When it waits, it's priority is raised, based on what type of wait (large for keyboard, small for disk). This tends to give good response times for interactive systems and gives IO bound threads the ability to keep the IO device busy.
+    - Foreground vs background: The gui in the foreground gets a temporary increase (usually 3) in order to provide better response times.
+
+UMS is a user space threads helper built into the windows kernel. It doesn't provide everything you need but it does provide a single thread with multiple TEB's. This helps libraries provide better one-to-many and many-to-many implementations.
+
+###### Solaris scheduling
+
+Multi-level feedback queue. With default being time-sharing.
+
+Priorities vs classes:
+- Interrupt threads = 160 - 169
+- real-time threads = 100 - 159
+- System (sys) threads = 60 - 99
+- Normal threads = 0 - 59
+    - Fair Share Threads (FSS)
+    - Fixed priority (FX) threads
+    - timeshare (TS) threads
+    - interactive (IA) threads
+
+Normal threads are time-shared and include a feedback
+- feedback: when time-share expires it moves down in priority, when returning from wait it moves up in priority
+
+Other Classes have different scheduling options but the default is the time-sharing with feedback.
+
+##### scheduling algorithm evaluation
+First you need to determine what criteria you will evaluate schedulers on. ie.
+- Maximize CPU utilization given a maximum response time of 1 sec
+- Maximize throughput
+
+###### deterministic modeling
+- given specific processes, calculate the actual value
+- doesn't generalize well, limited to being valid on those processes
+
+###### queueing model
+Based on accounting date about the processes run on a system it is possible to create distributions of CPU vs IO bursts, and the arrival time. We can get probabilities from these distributions.
+
+Queueing-network analysis
+Based on arrival rates and service rates, we can calculate utilization, average queue lenght, average wait time.
+Little's Formula:
+n = average queue length
+W = average waiting time in the queue
+λ = average arrival rate
+
+$$ n = W * λ $$
+
+Because these calculations are based on averages of distributions they often don't give an accurate answer.
+
+###### simulation
+Simulations based on models using the distributions generated from accounting data.
+
+Running these models is usually very intense, however, their results are more accurate.
+
+###### implementation
+Implementing the algorithm and testing it in the real world is the most effective solution, however, it is also the most expensive.
 
 #### Study Questions
 
-1. Why is CPU scheduling very important in modern operating systems?
-2. What are the differences between pre-emptive and cooperative scheduling? How are pre-emptive scheduling and cooperative scheduling used in operating system design?
-3. What are the main CPU scheduling algorithms, and how do they work?
-4. What are the issues unique to multiple processor scheduling compared to single CPU scheduling?
-5. In practice, how do operating systems perform CPU scheduling?
+define *CPU scheduling*, and explain the rationale for using it in modern operating systems.
+explain the concepts and criteria associated with various CPU scheduling algorithms.
+explain the implementation of CPU scheduling in current operating systems such as Linux, Solaris, and Windows.
+describe and evaluate methods for CPU scheduling algorithms for a particular system.
 
-#### Learning Activities
+1. Why is CPU scheduling very important in modern operating systems?
+    - the basis of resource management (it affects both IO and CPU usage)
+    - the right algorithm can either optimize for throughput or responsiveness
+2. What are the differences between pre-emptive and cooperative scheduling? How are pre-emptive scheduling and cooperative scheduling used in operating system design?
+    Preemptive processes stop other processes in order to run a different process. This happens with an interrupt. ie. IO interrupt, process stops, swapped for process needing the IO. or timer interrupt (time slice for the process is up), context switch to next process in the ready queue (based on scheduling algorithm).
+3. What are the main CPU scheduling algorithms, and how do they work?
+    - fcfs: FIFO queue of processes, without preemption
+    - priority scheduling: priority queue based on some factor of the process
+        - starvation: aging is a solution
+        - types:
+            - shortest-job-first: based on the time alloted for the job
+            - shortest-next-cpu-burst: ordered based an estimate of the next CPU bust using a quadratic formula of past CPU bursts for that process.
+            - shortest-remaining-time-first: ordered based on the estimate of remaining time
+    - round robin: FCFS with quantum preemption
+        - given an quantity of time, schedule the first task, when the time is up put that task at the end of the queue and start the next task.
+    - multi-level (feedback) queue
+        - How many queues?
+        - What is each queues scheduler?
+        - How is it decided which queue a processes is placed in?
+        - When is a process bumped up? (feedback)
+        - when is a process bumped down? (feedback)
+4. What are the issues unique to multiple processor scheduling compared to single CPU scheduling?
+    - symmetric vs asymmetric processing
+    - processor affinity
+    - load balancing
+    - multi-threaded CPU's
+5. In practice, how do operating systems perform CPU scheduling?
+Most have some kind of priority queue, with a separate real-time system, and some kind of aging policy. Solaris has the most flexible with a multi-level feedback scheduler, windows has the most complex balancing policy for interactive systems, Linux is a good mix of programmer flexibility and has a decent balancing policy.
 
 - Try Exercises of *OSC9ed*.
-    - 6.1 - 6.9
-    - 6.16 - 6.20
-    - 5.1
-    - 5.8 
-- Test the [sample c source code of Pthread scheduling](http://people.westminstercollege.edu/faculty/ggagne/osc/osc8e-src.zip) provided on the website of *OS6ed*.
+    - 6.1. A CPU-scheduling algorithm determines an order for the execution of its scheduled processes. Given n processes to be scheduled on one processor, how many different schedules are possible? Give a formula in terms of n.
+        n!
+    - 6.3. Suppose that the following processes arrive for execution at the times indicated. Each process will run for the amount of time listed. In answering the questions, use nonpreemptive scheduling, and base all decisions on the information you have at the time the decision must be made.
+            Process Arrival Time Burst Time
+                P1    0.0    8
+                P2    0.4    4
+                P3    1.0    1
+        a. What is the average turnaround time for these processes with the FCFS scheduling algorithm?
+                    0    8    12   13
+                    | P1 | P2 | P3 |
+        turnaround:   8    12   12      avg: 11
+        b. What is the average turnaround time for these processes with the SJF scheduling algorithm?
+                    0    1    2    6    13
+                    | P1 | P3 | P2 | P3 |
+        turnaround:        1    5    13  avg: 6.33
+        c. The SJF algorithm is supposed to improve performance, but notice that we chose to run process P1 at time 0 because we did not know that two shorter processes would arrive soon. Compute what the average turnaround time will be if the CPU is left idle for the first 1 unit and then SJF scheduling is used. Remember that processes P1 and P2 are waiting during this idle time, so their waiting time may increase. This algorithm could be called future-knowledge scheduling.
+                    0  1    2    6    14
+                    |  | P3 | P2 | P3 |
+        turnaround:          5    13  avg: 6.86
+    - 6.4. What advantage is there in having different time-quantum sizes at different levels of a multilevel queueing system?
+        - Processes that require higher responsiveness can have a lower time-quantum trading turnaround for responsiveness. Processes that aren't optimizing for responsiveness can still receive longer time-quants giving bettern turnaround time.
+        - If the CPU bursts are of different sizes than it is possible to spend less time in the dispatcher, 80% rule.
+    - 6.5. Many CPU-scheduling algorithms are parameterized. For example, the RR algorithm requires a parameter to indicate the time slice. Multilevel feedback queues require parameters to define the number of queues, the scheduling algorithm for each queue, the criteria used to move processes between queues, and so on. These algorithms are thus really sets of algorithms (for example, the set of RR algorithms for all time slices, and so on). One set of algorithms may include another (for example, the FCFS algorithm is the RR algorithm with an infinite time quantum). What (if any) relation holds between the following pairs of algorithm sets?
+        a. Priority and SJF: Shortest-Job-First is a priority queue where the formula for determining priority is based on the length of the job.
+        b. Multilevel feedback queues and FCFS: FCFS is a MLFQ with 1 queue, priority based on entry time, 0 feedback factor
+        c. Priority and FCFS: FCFS is a Priority Scheduler based on entry time
+        d. RR and SJF: none
+    - 6.6. Suppose that a scheduling algorithm (at the level of short-term CPU scheduling) favors those processes that have used the least processor time in the recent past. Why will this algorithm favor I/O-bound programs and yet not permanently starve CPU-bound programs?
+        > IO bound have short CPU-bursts. As they progress they will get a higher and higher ranking, however, they will still have a lower ranking than new CPU-bound processes. Also if they start to take a long time they will eventually be lower than a CPU-bound program starting at the same time.
+    - 6.7. Distinguish between PCS and SCS scheduling.
+        > Process-contention scope: All user level threads compete for CPU time on a single kernel level thread per-process
+        > System-contention scope: All threads on the system compete for CPU time.
+    - 6.8. Assume that an operating system maps user-level threads to the kernel using the many-to-many model and that the mapping is done through the use of LWPs. Furthermore, the system allows program developers to create real-time threads. Is it necessary to bind a real-time thread to an LWP?
+        Yes.
+    - 6.9. The traditional UNIX scheduler enforces an inverse relationship between priority numbers and priorities: the higher the number, the lower the priority.
+        The scheduler recalculates process priorities once per second using the following function:
+        Priority = (recent CPU usage / 2) + base where base = 60
+        and recent CPU usage refers to a value indicating how often a process has used the CPU since priorities were last recalculated. Assume that recent CPU usage is 
+        What will be the new priorities for these three processes when priorities are recalculated?
+        Based on this information, does the traditional UNIX scheduler raise or lower the relative priority of a CPU-bound process?
+        40 for process P1: 40/2 + 60 = 80
+        18 for process P2: 18/2 + 60 = 69
+        10 for process P3: 10/2 + 60 = 65
+        lowers priority for CPU-bound processes
+    - 6.16 Consider the following set of processes, with the length of the CPU burst given in milliseconds:
+
+            Process Burst Priority
+                P3    8    4
+                P5    5    3
+                P1    2    2
+                P4    4    2
+                P2    1    1
+
+        | FCFS:                    |0| P1 |2| P2 |3| P3 |11| P4 |15| P5 |20|
+        | SJF:                     |0| P2 |1| P1 |3| P4 |7| P5 |12| P3 |20|
+        | nonpreemptive priority:
+        | RR (quantum = 2):
+
+    - 6.17 The following processes are being scheduled using a preemptive, round- robin scheduling algorithm. Each process is assigned a numerical priority, with a higher number indicating a higher relative priority. In addition to the processes listed below, the system also has an idletask (which consumes no CPU resources and is identified as Pidle). This task has priority 0 and is scheduled whenever the system has no other available processes to run. The length of a time quantum is 10 units. If a process is preempted by a higher-priority process, the preempted process is placed at the end of the queue.
+    - 6.18 The nice command is used to set the nice value of a process on Linux, as well as on other UNIX systems. Explain why some systems may allow any user to assign a process a nice value >= 0 yet allow only the root user to assign nice values lt 0.
+        - Kernel processes generally have a value lt 0. the lower the nice value the higher the priority. Users shouldn't have the power to be more important than the all knowing kernel!
+    - 6.19 Which of the following scheduling algorithms could result in starvation?
+        a. First-come, first-served: no
+        b. Shortest job first: true
+        c. Round robin: false unless there is priority
+        d. Priority: true
+    - 6.20 Consider a variant of the RR scheduling algorithm in which the entries in the ready queue are pointers to the PCBs.
+        a. What would be the effect of putting two pointers to the same process in the ready queue?
+            - they would get 2x the CPU time of all the other processes
+        b. What would be two major advantages and two disadvantages of this scheme?
+            - advantage, fast to access process, no extra data in the ready queue
+            - disadvantage, slower access time because of following links, there are two pointers in each spot
+        c. How would you modify the basic RR algorithm to achieve the same effect without the duplicate pointers?
 
 ### 2.5 Deadlocks
 OSC9ed: 7.4 to 7.7.

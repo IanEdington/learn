@@ -1956,60 +1956,94 @@ OSC9ed: 7.4 to 7.7.
 
 The final section in this unit discusses deadlocks, which may occur when several processes compete for a finite number of resources. Topics in this section include techniques to detect, prevent, and avoid deadlocks. As operating systems typically do not provide deadlock-prevention facilities, programmers are responsible for ensuring that the programs they design are deadlock free. The information in this section will help well-trained programmers to analyze and address deadlock-related issues in their programs.
 
-#### Learning Outcomes
+#### Key Concepts and Topics
+
+##### What is a deadlock?
+2 or more processes are blocked indefinitely because they all need something that one of the others in the group has.
+
+necessary conditions for a deadlock to arise
+- mutually exclusive resources: two or more resources in the system must be limited in the number of processes that can access them.
+- non-preemptive resources: none of the resources involved can preempt the access a process has. The process must release the resource on its own.
+- wait and hold: all the processes involved have to acquire one resource at a time with some kind of wait between them, aka non-atomic operations.
+- circular waiting: a loop must exists between the processes that are deadlocked.
+
+##### How can we detect if a deadlock has occurred?
+resource-allocation graph
+    A visual/CS representation of a deadlock
+    - Two types of nodes: Processes (P) and Resources (R)
+    - A directed edge from P -> R means a process has requested but not received a resource
+    - A directed edge from R -> P means a resource is acquired by a process
+    - multiple R -> P edges can exist since R can have multiple instances
+
+##### How can we deal with deadlocks?
+1. do nothing (Linux and Windows)
+2. prevent deadlocks (deadlock prevention)
+    - prevent one of the 4 deadlock events:
+        - Mutual exclusion: Not possible to prevent
+        - Hold and Wait: two possible ways
+            - process must request all resources up front. A process is only allowed to run when it has the required resources.
+            - process can only request resources when it has non.
+            - resource utilization is low
+            - starvation is possible if a process needs multiple resources and they are always given to other processes
+        - No Preemption: Allow preemption
+            - When a process is waiting for a resource, the resources it holds can be preempted in another process asks for it. The waiting process is now waiting on two resources.
+            - This does not work on stateful resources like memory (semaphores, mutex locks). It does work for printers, registers, swap memory space, ect.
+        - Circular wait: total ordering on resources.
+            - programs can only request resources in ascending/descending order. This eliminates the possibility that a circle is formed. P_a requests R_1 then R_2, P_b requests R_2 then R_1 = deadlock, vs P_b requests R_1 then R_2.
+            - developers need to follow it for it to work
+            - Can lead to strange situations when resources aren't logically requested in the order they are needed.
+            - Doesn't work when resources are requested dynamically
+3. avoid deadlocks (deadlock avoidance)
+    - requires additional information about which processes request which resources
+    - track resources requested and only allow a process to get a resource when it leaves the system in a safe state.
+    - a safe state is a state where no deadlock is possible.
+    - Resource-Allocation-Graph Algorithm:
+        - the resource allocation graph + a claim edge: any resource a process might request
+        - when a process requests a resource, the graph is checked for a cycle using the acquired edges, request edges, and claim edges of processes already given resources. For every resource that is given out, the system in guaranteed not to have created a potential cycle.
+        - downside: checking for a cycle takes n^2 time where n = number of processes.
+        - doesn't work on resources with multiple instances
+    - Bankers algorithm:
+        - requires more complicated data structures
+            - resources available: int array[m] holding the number of each resource type
+            - max: int array[n][m] holding the max number of resources each process might need
+            - Allocation: int array[n][m] the currently allocated number of resources each process has
+            - Need: max - allocation
+        - slower runtime
+        - safety algorithm: m × n^2, where m = resource types
+        - allocation algorithm: does it exceed what the process said it needed? is the resource available? If the resource is given does it remain in a safe state?
+4. detect and recover after entering a deadlocked state
+    - detection algorithm
+        - wait-for graph: collapsed resource graph with only processes, showing which processes are waiting on which other processes.
+            - only useful for resources with single instances
+        - modification of bankers algorithm:
+            - requires more data structures and takes longer to run
+        - deadlock detection algorithms should be run according to how often deadlocks occur. This depends on the system and the programs. Might be useful to check it when CPU usage drops bellow a certain threshold since deadlocks decrease ready processes.
+    - recovery algorithm
+        - let the admin know
+        - abort one or more of the deadlocked processes
+        - preempt one or more of the resources from the deadlocked processes
+
+#### Study Questions
 
 1. define *deadlock*, and discuss the conditions under which a deadlock may arise.
 2. summarize the different ways of and methods for handling deadlock.
 3. describe how to realize deadlock prevention, deadlock avoidance, deadlock detection, and deadlock recovery.
 4. explain the resource-allocation-graph algorithm, Banker’s algorithm, and deadlock detection algorithm.
 
-#### Key Concepts and Topics
-
-- deadlock
-- necessary conditions for a deadlock to arise
-    - mutual exclusion
-    - hold and wait
-    - no pre-emption
-    - circular wait
-- resource-allocation graph
-- deadlock prevention
-- deadlock avoidance
-- safe state
-- safe sequence
-- resource-allocation-graph algorithm
-- Banker’s algorithm
-    - safety algorithm
-    - resource-request algorithm
-- deadlock detection
-- wait-for graph
-- detection algorithm
-- recovery from deadlock
-
-#### Study Questions
-
 1. Why is it important to learn to handle deadlock issues?
 2. What are the necessary conditions for a deadlock to happen, and how can knowledge of these conditions be used in deadlock prevention?
 3. How can one determine whether a state is safe state (deadlock free)?  How can this knowledge be used to avoid deadlock?
 4. What data structures are used in deadlock avoidance and deadlock detection?
 
-#### Learning Activities
-
-- Try Exercises *OSC9ed*.
-    - 7.1
-    - 7.9 
-    - 7.10
-    - 7.11
-    - 7.20
-    - 7.21
-- Try to run the [Resource Allocation Graph animation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/deadlock.htm) provided on the website of *OS6ed*.
-- Download and review the [PowerPoint slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777) or pdf for Chapter 7 of *OSC9ed*.
-
-### Supplementary Unit Activities
-
-- Explore surveys and technical documents about process management such as processes, threads, CPU scheduling, process synchronization, and deadlock handling in widely used systems such as Linux, Mac, Windows, and Solaris.
-- You may also explore Linux processes, threads, CPU scheduling, and process synchronization to see what features are provided.
-- Compare other operating systems such as PDA, cell phone, and iPhone, and see whether their operating systems have the same issues in process management as those discussed in this unit, and explain why or why not.
-- Share your findings and opinions with your classmates and tutor on the course discussion forum.
+7.1 List three examples of deadlocks that are not related to a computer-system environment.
+7.9 Suppose that you have coded the deadlock-avoidance safety algorithm and now have been asked to implement the deadlock-detection algorithm. Can you do so by simply using the safety algorithm code and redefining Maxi = Waiting_i + Allocation_i, where Waiting_i is a vector specifying the resources for which process i is waiting and Allocation_i is as defined in Section 7.5? Explain your answer.
+7.10 Is it possible to have a deadlock involving only one single-threaded process? Explain your answer.
+7.11 Consider the traffic deadlock depicted in Figure 7.10.
+    a. Show that the four necessary conditions for deadlock hold in this example.
+    b. State a simple rule for avoiding deadlocks in this system.
+7.19 Consider the version of the dining-philosophers problem in which the chopsticks are placed at the center of the table and any two of them can be used by a philosopher. Assume that requests for chopsticks are made one at a time. Describe a simple rule for determining whether a particular request can be satisfied without causing deadlock given the current allocation of chopsticks to philosophers.
+7.20 Consider again the setting in the preceding question. Assume now that each philosopher requires three chopsticks to eat. Resource requests are still issued one at a time. Describe some simple rules for determining whether a particular request can be satisfied without causing deadlock given the current allocation of chopsticks to philosophers.
+7.21 We can obtain the banker’s algorithm for a single resource type from the general banker’s algorithm simply by reducing the dimensionality of the various arrays by 1. Show through an example that we cannot implement the multiple-resource-type banker’s scheme by applying the single-resource-type scheme to each resource type individually.
 
 ## Assignment 2
 
@@ -2051,7 +2085,6 @@ Instructions: Please answer the following questions in complete sentences. Your 
     - speedup processing time
     Challenges:
     - cache coherency
-    - 
 
 1. Define coarse-grained multithreading and fine-grained multithreading, and explain their differences. (6 marks)
     from wikipedia: 
@@ -2059,12 +2092,15 @@ Instructions: Please answer the following questions in complete sentences. Your 
     - Interleaved multithreading: Interleaved issue of multiple instructions from different threads, also referred to as temporal multithreading. It can be further divided into fine-grained multithreading or coarse-grained multithreading depending on the frequency of interleaved issues. Fine-grained multithreading—such as in a barrel processor—issues instructions for different threads after every cycle, while coarse-grained multithreading only switches to issue instructions from another thread when the current executing thread causes some long latency events (like page fault etc.). Coarse-grain multithreading is more common for less context switch between threads. For example, Intel's Montecito processor uses coarse-grained multithreading, while Sun's UltraSPARC T1 uses fine-grained multithreading. For those processors that have only one pipeline per core, interleaved multithreading is the only possible way, because it can issue at most one instruction per cycle.
 
 1. Explain process starvation and how aging can be used to prevent it. (6 marks)
+    Process starvation is when a process doesn't receive the resources it requires to make progress. If it continues to starve it might never execute. This can occur with any type of priority scheduling algorithms. Aging is a process where processes that have spent a certain amount of time waiting get bumped up a priority level. Any type of aging eliminates starvation since processes will eventually become a high priority task.
 1. How does the dispatcher determine the order of thread execution in Windows? (6 marks)
 1. Define critical section, and explain two general approaches for handling critical sections in operating systems. (8 marks)
+    A critical section is a area of code where an executing process/thread modifies a shared data structure. Critical sections only exist in systems that run concurrently since only in concurrent systems can two processes be modifying a data structure at the same time. There are two main ways of dealing with critical section, either move the processor into a single threaded mode and disable interrupts so the section is guaranteed not to be messed with, or set a lock in order to force only one thread to use the area at a time. 
 1. Describe the dining-philosophers problem, and explain how it relates to operating systems. (6 marks)
 1. Define the two-phase locking protocol. (6 marks)
 1. Describe how an adaptive mutex functions. (6 marks)
 1. Describe a scenario in which the use of a reader-writer lock is more appropriate than using another synchronization tool, such as a semaphore. (6 marks)
+    - a database is read very often and written not so often. This is a perfect candidate.
 1. What is the difference between deadlock prevention and deadlock avoidance? (6 marks)
 1. Describe a wait-for graph, and explain how it detects deadlock. (6 marks)
 1. Describe how a safe state ensures that deadlock will be avoided. (6 marks)

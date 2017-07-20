@@ -2575,16 +2575,7 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 ## Unit 5: Distributed, Real-Time, and Multimedia Systems
 Unit 5 reviews distributed systems and special-purpose operating systems, such as real-time systems, embedded systems, mobile systems, and multimedia systems. This unit serves as an extension to the core topics of the course.
 
-### Unit Overview
-
 Unit 5 provides an extension to the core topics of operating systems. It introduces distributed systems and special-purpose operating systems such as real-time systems and multimedia systems. This extension introduces the ever-changing information technologies and products in which operating systems play an important role. In fact, with many operating systems, different versions are developed for different computing environments to meet the needs of different applications. For instance, both Linux and Windows have desktop, server, mobile, and embedded system versions for different devices and applications.
-**Note:** The learning activities in this unit consist primarily of readings.
-
-Unit 5 is divided into two sections:
-
-**5.1 Distributed Systems Overview**
-
-**5.2 Virtual Machines**
 
 ### Learning Objectives
 
@@ -2649,70 +2640,225 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
  or pdf for Chapter 17 of *OSC9ed*.
 
 ### 5.2 Virtual Machines
-
-#### Overview
+OSC9ed: 16
 
 This section covers types of virtual systems, and differences in purpose and implementation. It is not that important to go into details of memory management and tables, as much as knowing general configurations and structure.
 
-#### Learning Outcomes
-
-After you have completed Section 5.2, you should be able to
-
-1. describe various virtual machines technologies.
-2. describe methods used to implement virtualization.
-3. list the most common hardware features that support virtualization.
-
-#### Reading Assignment
-
-- *Operating System Concepts* (9th ed.): Chapter 16: Virtual Machines.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-3 above.
-
 #### Key Concepts and Topics
-
-- virtual machines
+Started with IBM trying to make their mainframes usable by multiple OS's.
+- virtual machines: guest operating systems that 
 - virtual machine manager (VMM)
-- hypervisor
-- Paravirtualization
-- Emulators
+    - type 0: hardware based systems like IBM LPAR and Oracle LDOM
+    - type 1: purpose built OS based systems like VMware's ESX
+    - also type 1: general purpose OS with VM capabilities, linux kvm, windows hyperV
+- Paravirtualization: when a guest OS helps be a better guest (aka it knows)
+- Emulators: 
 - Disk partitioning
-- Xen
-- VMware
-- Live migration
-- Cloud computing
-- Virtual CPU (VCPU)
-- Page tables
 - Virtual machine control structure
 - Control partition
+
+##### Overall structure of VM's
+VM's have been implemented by many companies using different systems.
+All VMM's have certain things in common. This is what's considered the core of what it means to be a VMM.
+These three tennants are that the VMM will provide an environment virtually identical to the system the original software would have run on, there is only minor efficiency losses due to virtualization, and the VMM maintains complete control of the underlying hardware.
+By maintaining these three characteristics across all VMM's means that certain principles need to be maintained.
+- virtualization can't rely on emulation for it's instructions and must instead provide processor parity to the guest OS.
+- The virtual processor 
+- virtual machines are 
+The fundamentals of a 
+- The Virtual Machine Manager (VMM) provides an environment that is basically identical to the system a guest would run on.
+- There are only minor performance decreases compared with running on bare metal.
+- The VVM maintains complete control of the underlying hardware.
+
+Benefits:
+- OS's are isolated from eachother. One bad program doesn't automatically have access to all the servers on the machine.
+
+Disadvantage:
+- Processes on different guests on the same machine can't share resources.
+    - share file system volume .: files can be shared
+    - virtual network of VM .: message passing (on the same machine, but through a software network)
+
+- freeze / copy / restore (snapshots)
+    - very easy in VMM's
+- possible to develop the system a lot easier
+    - snapshots
+    - development is done on the VM.
+    - multiple VM's can be running on a host at the same time, giving oportunity for faster iterations
+    - Because a bad OS can cause a system crash, (and make it hard to reboot) It takes a long time to develop
+    - with VM's this is easier because the VMM means that a system crash doesn't affect the host OS only the guest OS which can be easily be restored to a previous state using snapshots.
+    .: decrease in System Development Time
+    - multiple OS's on the same host make porting and testing programs easier across OS's because you don't have to boot up in separate modes each time you want to make a change.
+
+- For data-centers VM's help to increase average load on the data-center by taking lots of smaller systems and putting them on a single large machine. The resulting machine is usually more cost efficient than the large number of smaller lightly used machines.
+- VM templating allows for management of many more servers than is usually possible with a given number of people (100 servers with 20 VM's each = 2000 virtual servers)
+    - managing the patching of all guests
+    - backing up all guests
+    - managing resource use
+- VMM's usually provide a way for VM's to be ported form one VMM system to another without downtime.
+    - This allows Systems with high workload to offload VM's to systems with lower workload.
+    - This allows hardware that needs maintenance to offload VM's, get maintenence, then get VM workloads back, without interruption to service.
+- With these benefits it almost becomes more beneficial for each application to run in it's own machine and for that machine to be tuned for the workload being managed. The result is that the VM revolution has changed the way apps are developed.
+
+##### Building blocks
+VCPU: the state of the CPU according to the VM.
+The VCPU acts much line the PCB does but for the system as a whole.
+
+Because of User Kernel mode, the VCPU must also be able to track a virtual user and kernel mode.
+This is accomplished by catching exceptions thrown when a guest OS tries to execute a privileged instruction.
+When a guest OS executes a privileged instruction it thinks it's in kernel mode, however, it is still in guest mode. The CPU throws a trap because this is an error. The trap is then handled by the host OS and the action the Guest was trying to do is emulated for them.
+All non-privileged instructions run on the hardware at the same speed running on bare metal would give you, however, because of the trap and emulate, privileged instruction do not. This is where the performance decrease comes from! Plus it might be sharing the CPU between multiple VM's meaning more slowdown.
+- Software solutions
+    - Binary translation: Then in user-mode the CPU executes normally. When in Kernel mode the host analyses the next few instructions and swaps privileged instructions for an equivalent non-privileged instructions/ system calls.
+        - Very hard
+        - caching makes this better
+    Another problem page tables
+    - nested page tables (virtual page tables like the vCPU)
+        - increase TLB misses
+- Hardware solutions that help this problem.
+    - extra-modes (taken away from VCPU management)
+    - triaged privileges (CPU's have larger range in what the can allow)
+
+- Virtual machine control structure (VMCS) is a hardware accelerated way to increase performance.
+
+Intel and AMD both provide hardware solutions for:
+- vCPU: host and guest mode in CPU alongside kernel/user mode
+- NPT in hardware: 
+- IO: hardware is aware of sections within the VM making it possible for an guest OS to use DMA.
+- Interrupt remapping: sends the right interrupt to the right guest OS without VMM interference.
+
+##### VM's implementations
+Startup:
+- the VMM defines the system available to the VM
+- VMM makes the VM 'hardware'
+    - in type 0: hardware is dedicated so if the resources don't exist the request will fail.
+    - in type 1: hardware might be virtualized based on the type of resource. Often vCPU's are multiplexed onto physical CPU's. Memory is also often virtualized. IP addresses on the other hand cannot be shared.
+- The VMM then starts the VM with the image provided. Instead of an installation disk, VM's are usually a ready to run OS environment that don't require the initial setup steps. This results in lightning fast startup times. Just copy the image and start execution.
+
+Type 0 Hypervisor
+- proprietary
+- hardware
+- limited features
+- dedicated hardware
+
+Type 1 Hypervisor
+- Software
+- hardware assisted
+- possible to virtualize CPU's, memory, networking, IO
+- also possible to have dedicated CPU, and others
+- Most used
+- custom proprietary (VMware, XenServer)
+- general (Windows, Linux)
+
+Type 2 Hypervisor
+- Poor overall execution because it's just a process
+- good for experimentation
+
+Paravirtualization
+A guest knows it's being virtualized and plays ball.
+- Can help increase performance especially of IO using a shared buffer.
+- requires complicated recompilation of OS instructions
+Xen is no longer using this and is instead using the hardware accelerated solutions.
+
+Virtual programming environment
+- Java Virtual Machine (JVM)
+- a set of instructions
+- virtual environment based on a set of API's
+
+Emulation
+- 10x slower
+- each non native instruction can take up to 10 instruction in a new architecture.
+- easy to make mistakes in the emulator since you need to create a software implementation of a hardware device.
+
+Application Containment
+- if the main goal is Application containment and portability, sometimes other solutions are better
+- applications think they are the only process running on the system.
+- might have their own networking, IO, memory, CPU, system and user processes.
+- many implementations (Redhat Jail, Solaris zones)
+
+
+##### OS components in VM's
+CPU scheduling:
+- multiprocessor system
+- vmm or guest threads
+- overcommitment -> more vCPU than CPU's 
+- timers can drift since they aren't running on a hardware CPU
+- realtime systems suffer the most
+- sometimes counteracts the scheduling optimizations that the guest OS does
+
+Memory use:
+- Efficient memory use is very important for an efficient machine
+- VMM's often over commit memory
+- guest thinks it's hitting a page-table, when it's actually hitting a nested page table (npt)
+Some solutions for over-commitment of memory
+- npt tell the guests pt where to look
+    - when system is full, npt swaps to disk. Guest thinks memory is still in memory.
+    - downside: VMM has less info about memory usage so swapping is less efficient.
+- sudo-device driver or kernel module (balloon method)
+    - when memory gets low on the system.
+    - driver or module requests chunk of memory from guest
+    - memory is pinned in the OS's page-table
+    - Since VMM knows memory won't be used by guest it allocates it elsewhere
+    - guest manages it's own memory knowing it has less.
+- doubling up on memory
+    - many functions use the same block of memory over and over again (text for the linux kernel)
+    - hashes of the memory are taken and compare.
+    - if a hash matches the entire block is compared
+    - both guest OS's get a pointer to one read-only version of the block.
+
+IO drivers: device drivers and devices allow a lot of flexibility in their implementation
+- the host presents a simple IO device to the guest that is actually backed by a more complicated IO device
+- or the host has it's own custom driver that acts as an intermediary between the guest and host for IO.
+
+networking IO
+- bridging: guest is seen by outside world
+- NAT (Network Area Translation) local to the machine but allows for external connections
+
+Booting
+- type 0 hypervisor: dedicated hardware makes this possible but also less flexible
+- type 1 hypervisor: stores a virtual disk, which has it's own bootloader
+    - virtual disk allows easy copying and migration
+- type 2 hypervisor: keeps this info within the host filesystem
+
+Live migration
+- with type 1: very little noticeable disruption
+How?!
+- connection between source and destination is established
+- dest creates vCPU
+- src sends all read-only pages
+- src sends all rw pages, marking them clean
+- loop over rw pages and resend modified pages
+- as the loop gets tighter and tighter eventually the src will decide to move it.
+- stops the vm, sends final rw pages, current vCPU state, tells dest to start running
+
+##### Compare VMware and JVM
+
+###### VMware workstation
+- type 2 hypervisor
+
+###### JVM
+- Programming-environment virtualization
 - Java virtual machine (JVM)
 - Memory overcommitment
 - Network address translation (NAT)
 - Bytecode
 - Garbage collection
 
+Because it's a 
+
+Implements JIT compilation
+
 #### Study Questions
+
+1. describe various virtual machines technologies.
+2. describe methods used to implement virtualization.
+3. list the most common hardware features that support virtualization.
 
 1. What are the three types of traditional virtualization?
 2. What are four benefits of virtualization?
 
-#### Learning Activities
-
-- Find some articles and technical documents on modern
- virtual machines. Explain the reason behind the recent success of
- virtual machines, although they have been around for a long time.
- What forms of virtualizations are expected in the future?
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 16 of *OSC9ed*.
-
-### Supplementary Unit Activities
-
-- Explore surveys and technical documents about distributed operating
- systems, and virtual machines. Try to identify an existing problem
- of interest and a possible solution to it. You may consider this
- problem for Assignment 4 of the course.
-- Share your findings and opinions with your classmates and tutor on
- the course discussion forum.
+Find some articles and technical documents on modern virtual machines.
+Explain the reason behind the recent success of virtual machines, although they have been around for a long time.
+What forms of virtualizations are expected in the future?
 
 ## Assignment 4
 
@@ -2790,5 +2936,3 @@ The examination will be in three parts (total 100%), as follows:
 - Part I (30%): four (4) short-answer or calculation questions (to be answered in about 150 words each) about essential concepts, principles, and methods.
 - Part II (60%): thirty (30) multiple-choice questions.
 - Part III (10%): related to your research and/or programming project work for Assignment 4. Please ensure that you have submitted this assignment prior to writing the final exam.
-
-If you are unsure about an answer, please write whatever you know about the question rather than leaving it unanswered. Include any assumptions you are making when answering the questions.

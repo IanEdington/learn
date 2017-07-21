@@ -1898,60 +1898,20 @@ resource-allocation graph
 ## Unit 3: Storage Management
 This unit covers memory management, virtual memory, file system management, disk management, mass storage structures, and I/O systems.
 
-### Unit Overview
+### Intro
 
-Unit 3 discusses how memory, file systems, mass storage, and I/O
-(input/output) are handled in modern computer systems.
-
-In a multiprogramming system, a process may change its state from
-“waiting” to “running” several times before completing its task. Clearly, if each process were loaded from secondary storage into the main memory in its entirety, a large fraction of machine time would be wasted on loading and unloading processes to and from the main memory during each section of process execution. To minimize the “overhead”
-associated with loading and unloading, operating systems allocate memory to several processes simultaneously. This complex task requires effective memory management schemes and their hardware support (major topics in this unit).
+In a multiprogramming system, a process may change its state from “waiting” to “running” several times before completing its task. Clearly, if each process were loaded from secondary storage into the main memory in its entirety, a large fraction of machine time would be wasted on loading and unloading processes to and from the main memory during each section of process execution. To minimize the “overhead” associated with loading and unloading, operating systems allocate memory to several processes simultaneously. This complex task requires effective memory management schemes and their hardware support (major topics in this unit).
 
 The other major topic in this unit is secondary storage, in particular, file systems and disk management. Disks serve as extensions and backup for the main memory, and as economical online storage devices for program and data files. The operating system organizes files in the framework of a file system. Disk access is much slower than access to memory and, in general, several processes compete for disk access. For these reasons, in many computers, disk access is the main bottleneck to improved performance. As such, section 3.4 examines the software and hardware mechanisms employed to improve disk performance.
 
 Input-output operations are among the main jobs of a computer system. As various I/O devices vary widely in their function and speed, different methods are needed to control them, and those methods form the I/O subsystem of the kernel. The final section of this unit covers the structure, principles, and performance aspects of I/O hardware and software.
 
-Unit 3 is divided into five sections:
-
-**3.1 Main Memory**
-
-**3.2 Virtual Memory**
-
-**3.3 File-System Interface and Implementation**
-
-**3.4 Mass-Storage Structure**
-
-**3.5 I/O Systems**
-
-### Learning Objectives
-
 When you complete Unit 3, you will be able to describe the different strategies that operating systems employ to manage memory, with knowledge of the benefits, limitations, resource overhead (such as fragmentation and data structures), and hardware requirements of each management technique. You will also learn how developers can write applications (program and data structures) that reduce overhead for memory in a shared environment and that use memory more efficiently. In modern application environments, in which virtual memory is becoming increasingly important, it is important that you can explain this concept and its importance, and that you can list and describe several strategies that systems software uses to manage disks and other devices. Finally, you should be able to describe the structure, principles, and performance issues of I/O hardware and software.
 
 ### 3.1 Main Memory
-
-#### Overview
+OSC9ed: 8.1 to 8.7.
 
 This section focuses on memory management in the main system. Memory is an important finite resource that has a significant impact on system throughput. As such, it must be managed carefully. In a multiprogramming environment, the operating system attempts to complete as much work as possible at one time by allowing processes to share memory. To do this, it is critical that the operating system manage memory in such a way that many processes may share it and that the memory space for each process is protected from other processes. This security measure requires that all memory addresses be validated. The overhead resource cost of verifying every memory access makes hardware support necessary.
-
-#### Learning Outcomes
-
-After you have completed Section 3.1, you should be able to
-
-1. describe address binding at compile, load, and execution time.
-2. explain the different strategies that operating systems use to
- manage the sharing and allocation of memory among several processes,
- including contiguous allocation, paging, segmentation, and
- segmentation with paging.
-3. discuss how relocation, sharing, and protection are considered in
- memory management.
-4. describe how an operating system may implement shared memory.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 8: Main Memory: 8.1
- to 8.7.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-4 above.
 
 #### Key Concepts and Topics
 
@@ -1993,76 +1953,32 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
+1. describe address binding at compile, load, and execution time.
+2. explain the different strategies that operating systems use to manage the sharing and allocation of memory among several processes, including contiguous allocation, paging, segmentation, and segmentation with paging.
+3. discuss how relocation, sharing, and protection are considered in memory management.
+4. describe how an operating system may implement shared memory.
+
 1. What is *address binding*?
-2. What are the main purposes of swapping, paging, and segmentation in
- memory management?
-3. When should an operating system designer consider using hashed
- paging and inverted paging instead of hierarchical paging?
+2. What are the main purposes of swapping, paging, and segmentation in memory management?
+3. When should an operating system designer consider using hashed paging and inverted paging instead of hierarchical paging?
 4. How does an Intel architecture support both paging and segmentation?
 
-#### Learning Activities
-
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 8 of *OSC9ed*.
 - Try 8.1-8.5 of *OSC9ed*.
-- Complete Exercises 8.11, 8.20, and 8.28 of *OSC9ed*. You may check
- the answers to these questions at Operating System Concepts (9th
- ed.): [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
-- Try to run the following animations from the website of *OS6ed*:
-    - [Overlays for Primitive Memory
- Management](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/overlays.htm)
-    - [Dynamic Relocation Using a Relocation
- Register](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/relocation.htm)
-    - [Multiple Partition Contiguous Memory
- Allocation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/multiplepartcma.htm)
-    - [Compaction](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/compaction.htm)
-    - [Paging
- Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/paginghardware.htm)
-    - [Paging Model of Logical and Physical
- Memory](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingmodel.htm)
-    - [Paging Example for a 32-Byte Memory with 4-Byte
- Pages](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingexample.htm)
-    - [Segmentation
- Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/segmentation.htm)
-    - [Paged
- Segmentation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagedsegmentation.htm)
+- Complete Exercises 8.11, 8.20, and 8.28 of *OSC9ed*
+- [Overlays for Primitive Memory Management](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/overlays.htm)
+- [Dynamic Relocation Using a Relocation Register](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/relocation.htm)
+- [Multiple Partition Contiguous Memory Allocation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/multiplepartcma.htm)
+- [Compaction](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/compaction.htm)
+- [Paging Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/paginghardware.htm)
+- [Paging Model of Logical and Physical Memory](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingmodel.htm)
+- [Paging Example for a 32-Byte Memory with 4-Byte Pages](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingexample.htm)
+- [Segmentation Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/segmentation.htm)
+- [Paged Segmentation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagedsegmentation.htm)
 
 ### 3.2 Virtual Memory
-
-#### Overview
+OSC9ed: 9.1 to 9.10.
 
 For users, the tangible benefit of virtual memory is that it removes the restriction that the size of the computer’s memory places on the size of an executable program. The key idea behind virtual memory is easy to state but much harder to implement: keep only those (code and data) parts of a process in the memory that are needed in the current CPU burst of the process. This section examines the software and hardware mechanisms needed to implement virtual memory.
-
-#### Learning Outcomes
-
-After you have completed Section 3.2, you should be able to
-
-1. explain the concept of *virtual memory*, and discuss the benefits,
- implementation, and overhead.
-2. define *demand paging* and *page replacement*.
-3. describe the page replacement algorithms and strategies listed below
- in terms of algorithms, data structures, overhead, and benefits.
-    - first-in first-out (FIFO)
-    - optimal
-    - least-recently-used (LRU) and variations
-    - page buffering
-4. outline the decision problems associated with frame allocation.
-5. explain the phenomenon of thrashing and the strategies and
- techniques deployed to deal with this problem.
-6. describe how memory mapping files and shared memory operate in the
- Win32 API.
-7. discuss the following factors that affect the character and
- performance of a paging system: prepaging, page size, program
- structure, and I/O interlock.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 9: Virtual Memory:
- 9.1 to 9.10.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-7 above.
 
 #### Key Concepts and Topics
 
@@ -2093,167 +2009,31 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
+1. explain the concept of *virtual memory*, and discuss the benefits, implementation, and overhead.
+2. define *demand paging* and *page replacement*.
+3. describe the page replacement algorithms and strategies listed below in terms of algorithms, data structures, overhead, and benefits.
+    - first-in first-out (FIFO)
+    - optimal
+    - least-recently-used (LRU) and variations
+    - page buffering
+4. outline the decision problems associated with frame allocation.
+5. explain the phenomenon of thrashing and the strategies and techniques deployed to deal with this problem.
+6. describe how memory mapping files and shared memory operate in the Win32 API.
+7. discuss the following factors that affect the character and performance of a paging system: prepaging, page size, program structure, and I/O interlock.
+
 1. Why is virtual memory an important feature of modern operating
  systems?
 2. What is page replacement? How should different page replacement
  algorithms be chosen?
 3. How are memory-mapped files used for memory sharing?
 
-#### Learning Activities
-
-- Download and review [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 9 of *OSC9ed*.
 - Try Exercises 9.3, 9.6, 9.8, 9.21, 9.27, and 9.32 of *OSC9ed*.
 
-### 3.3 File-System Interface and Implementation
-
-#### Overview
-
-The main criterion for a good file system is that it provide the user with convenient (user friendly), effective, and secure means of organizing and accessing his or her files. This section examines the file-system concepts familiar to most users, such as file names, file types, directory structures, and file protection. Section 3.3 also discusses some of the practical problems, block-allocation schemes, performance criteria, and backup and recovery schemes that system designers must consider when they implement file systems on disk.
-
-#### Learning Outcomes
-
-After you have completed Section 3.3, you should be able to
-
-1. explain the function of file systems and their interfaces.
-2. describe the concepts of file, file attributes, file operations,
- file organization, and file access.
-3. outline the different directory structures.
-4. describe file system mounting and file sharing.
-5. describe the nature of protection schemes, including the concept of
- owner, group, and universe (world) categories, and the concept of
- access lists.
-6. explain the layered approach to file system organization.
-7. describe the implementation of a local file system and directory.
-8. explain contiguous, linked, and indexed disk allocation strategies,
- and the overhead, benefits, and problems associated with each.
-9. discuss free-space management and its possible implementations.
-10. discuss the importance of backup and recovery.
-11. discuss efficiency and performance issues related to file systems
- and organization.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 11: File-System
- Interface: 11.1 to 11.6.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-5 above.
-
-#### Key Concepts and Topics
-
-- open file table
-- file organization
-- file structure
-- packing
-- internal fragmentation, files
-- access method
-- sequential access
-- relative access
-- logical record
-- random access
-- indexed
-- indexed sequential access
-- relative block number
-- directory
-- tree structured directory
-- subdirectory
-- device directory
-- acyclic graph directory
-- symbolic link
-- mount point
-- immutable shared files
-- access control list
-
-#### Study Questions
-
-1. What are the different file access methods? How are they related to
- file organization?
-2. How does access control support file sharing and file protection?
-
-#### Learning Activities
-
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 11 of *OSC9ed*.
-- Complete Practice Exercises 11.1 to 1.9 of *OSC9ed*. You may check
- the answers to these questions at Operating System Concepts (9th
- ed.): [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
-- Try Exercises 11.10 to 11.13 and 11.17 of *OSC9ed*.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 12: File-System
- Implementation: 12.1 to 12.9.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 6-11 above.
-
-#### Key Concepts and Topics
-
-- basic file system
-- logical file system
-- file-control block
-- mount table
-- virtual file systems
-- dynamic storage allocation
-- external fragmentation
-- file allocation table (FAT)
-- index block
-- linked allocation
-- combined index
-- backup
-- recovery
-- consistency checking
-
-#### Study Questions
-
-1. What are the drawbacks of a layered structure in a file-system
- implementation?
-2. When would you consider designing a special file system instead of
- using the one distributed with an operating system?
-3. What are the two most important functions of the Virtual File
- System (VFS) layer?
-4. What are the problems associated with linked allocation of disk
- space routines?
-
-#### Learning Activities
-
-- Complete Practice Exercises 12.1 to 12.8 of *OSC9ed*. You may to
- check the answers to these questions at Operating System Concepts
- (9th ed.): [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
-- Try Exercises 12.11, 12.15, 12.16, and 12.20 of *OSC9ed*.
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 12 of *OSC9ed*.
-- Analyze a file system familiar to you, and list the features and
- characters introduced in this section.
-
 ### 3.4 Mass-Storage Structure
-
-#### Overview
+OSC9ed: 10.1 to 10.9.
 
 A file system can be viewed logically as consisting of three parts: the interface to the file system (for users and programmers), the internal data structures and algorithms for implementing the interface, and the secondary and tertiary storage structures. The first two parts were covered in Section 3.3; this section addresses the third. Secondary storage structure topics include the physical structure of disks, disk-scheduling algorithms, disk management (disk formatting, boot block, and bad blocks), and swap-space management. Section 3.4 also introduces RAID structure, stable-storage, and tertiary storage structure.
 
-#### Learning Outcomes
-
-After you have completed Section 3.4, you should be able to
-
-1. describe overall disk structure.
-2. explain and compare several algorithms for scheduling disk requests,
- including FCFS, SSTF, SCAN, C-SCAN, and LOOK.
-3. describe issues related to disk management such as disk
- initialization, booting from disk, and bad-block recovery.
-4. describe swap-space management, disk reliability, RAID structure,
- and tertiary storage structures.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 10: Mass-Storage
- Structure: 10.1 to 10.9.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-4 above.
 
 #### Key Concepts and Topics
 
@@ -2292,6 +2072,11 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
+1. describe overall disk structure.
+2. explain and compare several algorithms for scheduling disk requests, including FCFS, SSTF, SCAN, C-SCAN, and LOOK.
+3. describe issues related to disk management such as disk initialization, booting from disk, and bad-block recovery.
+4. describe swap-space management, disk reliability, RAID structure, and tertiary storage structures.
+
 1. What is disk attachment? Name several kinds of disk attachment,
  outline their differences, and outline their differences
  in usability.
@@ -2301,39 +2086,101 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
  for a specific computer system?
 5. What technologies are used in new tertiary storage devices?
 
-#### Learning Activities
-
-- Try Practice Exercises 10.1 to 10.7 of *OSC9ed*. You may check the
- answers to these questions at Operating System Concepts (9th ed.):
- [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
+- Try Practice Exercises 10.1 to 10.7 of *OSC9ed*
 - Try Exercises 10.11, 10.13, and 10.17 of *OSC9ed*.
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 12 of *OSC9ed*.
+
+### 3.3.1 File-System Interface and Implementation
+OSC9ed: 11.1 to 11.6.
+
+The main criterion for a good file system is that it provide the user with convenient (user friendly), effective, and secure means of organizing and accessing his or her files. This section examines the file-system concepts familiar to most users, such as file names, file types, directory structures, and file protection. Section 3.3 also discusses some of the practical problems, block-allocation schemes, performance criteria, and backup and recovery schemes that system designers must consider when they implement file systems on disk.
+
+
+#### Key Concepts and Topics
+
+- open file table
+- file organization
+- file structure
+- packing
+- internal fragmentation, files
+- access method
+- sequential access
+- relative access
+- logical record
+- random access
+- indexed
+- indexed sequential access
+- relative block number
+- directory
+- tree structured directory
+- subdirectory
+- device directory
+- acyclic graph directory
+- symbolic link
+- mount point
+- immutable shared files
+- access control list
+
+#### Study Questions
+
+1. explain the function of file systems and their interfaces.
+2. describe the concepts of file, file attributes, file operations, file organization, and file access.
+3. outline the different directory structures.
+4. describe file system mounting and file sharing.
+5. describe the nature of protection schemes, including the concept of owner, group, and universe (world) categories, and the concept of access lists.
+
+1. What are the different file access methods? How are they related to
+ file organization?
+2. How does access control support file sharing and file protection?
+
+- Complete Practice Exercises 11.1 to 1.9 of *OSC9ed*
+- Try Exercises 11.10 to 11.13 and 11.17 of *OSC9ed*.
+
+### 3.3.2 File-System Interface and Implementation
+OSC9ed: 12.1 to 12.9.
+
+#### Key Concepts and Topics
+
+- basic file system
+- logical file system
+- file-control block
+- mount table
+- virtual file systems
+- dynamic storage allocation
+- external fragmentation
+- file allocation table (FAT)
+- index block
+- linked allocation
+- combined index
+- backup
+- recovery
+- consistency checking
+
+#### Study Questions
+
+6. explain the layered approach to file system organization.
+7. describe the implementation of a local file system and directory.
+8. explain contiguous, linked, and indexed disk allocation strategies, and the overhead, benefits, and problems associated with each.
+9. discuss free-space management and its possible implementations.
+10. discuss the importance of backup and recovery.
+11. discuss efficiency and performance issues related to file systems and organization.
+
+1. What are the drawbacks of a layered structure in a file-system
+ implementation?
+2. When would you consider designing a special file system instead of
+ using the one distributed with an operating system?
+3. What are the two most important functions of the Virtual File
+ System (VFS) layer?
+4. What are the problems associated with linked allocation of disk
+ space routines?
+
+- Complete Practice Exercises 12.1 to 12.8 of *OSC9ed*
+- Try Exercises 12.11, 12.15, 12.16, and 12.20 of *OSC9ed*.
+- Analyze a file system familiar to you, and list the features and characters introduced in this section.
 
 ### 3.5 I/O Systems
-
-#### Overview
+OSC9ed: 13.1 to 13.7.
 
 Input-output (I/O) is one of the two main jobs of a computer (the other is processing/computing). This section briefly introduces I/O systems, including I/O hardware, services, and interfaces. It covers some concepts that are basic to computer systems such as bus structure, device drivers, direct memory access (DMA), kernel I/O subsystems, and I/O performance issues.
-
-#### Learning Outcomes
-
-After you have completed Section 3.5, you should be able to
-
-1. describe (briefly) I/O hardware components and mechanisms such as
- bus, interrupt-driven I/O cycles, and DMA.
-2. outline and describe the main functions of the kernel I/O subsystem.
-3. briefly explain how I/O requests are transformed to
- hardware operations.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 13: I/O Systems: 13.1
- to 13.7.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-3 above.
 
 #### Key Concepts and Topics
 
@@ -2355,34 +2202,20 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
+1. describe (briefly) I/O hardware components and mechanisms such as bus, interrupt-driven I/O cycles, and DMA.
+2. outline and describe the main functions of the kernel I/O subsystem.
+3. briefly explain how I/O requests are transformed to hardware operations.
+
 1. How are data transferred between an I/O device and memory?
-2. What is DMA, and why do we need it as an alternative to standard
- memory access systems such as programmed I/O?
+2. What is DMA, and why do we need it as an alternative to standard memory access systems such as programmed I/O?
 3. What is the purpose of device drivers in operating systems?
 4. What are the main tasks of the kernel I/O subsystem?
 
-#### Learning Activities
-
-- Complete Practice Exercises 13.1 to 13.6 of *OSC9ed*. You may check
- the answers to these questions at Operating System Concepts (9th
- ed.): [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
+- Complete Practice Exercises 13.1 to 13.6 of *OSC9ed*
 - Try Exercises 13.9, 13.10, and 13.12 of *OSC9ed*.
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 13 of *OSC9ed*.
 
-### Supplementary Unit Activities
-
-- Explore surveys and technical documents about the memory,
- file-system, mass-storage and I/O subsystems. Try to identify an
- existing problem of interest and a possible solution to it (you may
- continue this work in the following units until you find a suitable
- topic for Assignment 4 of this course).
-- You may also explore Linux kernel to see what features it provides
- for file-system interface and implementation, storage management,
- and I/O systems. Share your findings and opinions with your
- classmates and tutor on the course discussion forum.
+- Explore surveys and technical documents about the memory, file-system, mass-storage and I/O subsystems. Try to identify an existing problem of interest and a possible solution to it (you may continue this work in the following units until you find a suitable topic for Assignment 4 of this course).
+- You may also explore Linux kernel to see what features it provides for file-system interface and implementation, storage management, and I/O systems. Share your findings and opinions with your classmates and tutor on the course discussion forum.
 
 
 ## Assignment 3
@@ -2864,7 +2697,7 @@ What forms of virtualizations are expected in the future?
 
 This assignment should be submitted after you have finished Unit 5. It is worth 15% of your final grade for this course.
 
-### Part 1: Concepts (20 marks; 4 marks each)
+**Part 1: Concepts (20 marks; 4 marks each)**
 
 Please answer the following questions in complete sentences. Your answer for each question should be about 150 words.
 
@@ -2874,7 +2707,7 @@ Please answer the following questions in complete sentences. Your answer for eac
 1. What is the difference between symmetric encryption and asymmetric encryption?
 1. What are the two main varieties of authentication algorithms?
 
-### Part 2: Research Project (80 marks)
+**Part 2: Research Project (80 marks)**
 
 In Part 2, you will investigate technical problems of operating systems, and provide a written report. Your research should focus on an in-depth topic about theories, algorithms, approaches, mechanisms, or implementation of one of the following fields of operating systems:
 
@@ -2899,7 +2732,7 @@ To ensure that your topic has adequate depth and coverage, you MUST write a one-
 
 In your paper (expectations outlined below), make sure you highlight your work and outcomes in your own words. You must also properly cite any viewpoints, methods, algorithms, data, results, figures, tables, etc. that you borrow from other papers or contributors that you discuss or include in your paper/report. All references cited should be published, or at least be publicly available, stable, and accessible online (referenced in APA or IEEE Style). Using the work of others without proper credit in your paper/report may lead to a form of plagiarism, which is not tolerated in AU courses. Please review the Student Academic Misconduct Policy for more details.
 
-#### Research Paper Your investigation will be based on recent publications (i.e., published in the past five years) such as journal/conference papers and technical documents, and the applicable software packages (open source preferred). You are encouraged to read some papers about new techniques in operating systems. You can access the following resources via the ACM Digital Library and IEEE/IEE Electronic Library databases in the Athabasca University Library.
+**Research Paper Your investigation will be based on recent publications (i.e., published in the past five years) such as journal/conference papers and technical documents, and the applicable software packages (open source preferred). You are encouraged to read some papers about new techniques in operating systems. You can access the following resources via the ACM Digital Library and IEEE/IEE Electronic Library databases in the Athabasca University Library.**
 
 SOSP: ACM Symposium on Operating Systems Principles (ACM) ACM SIGOPS Operating Systems Review (ACM) ACM Transactions on Computer Systems (ACM) IEEE Transactions on Computers (IEEE) ACM Computing Surveys (ACM) Communications of the ACM (ACM) IEEE Computer. . . (IEEE) Linux Journal (ACM)
 

@@ -1915,65 +1915,250 @@ This section focuses on memory management in the main system. Memory is an impor
 
 #### Key Concepts and Topics
 
-- address binding
-- compile time binding
-- execution time binding
-- load time binding
-- logical address
-- virtual address
-- memory management unit (MMU)
-- dynamic loading
-- static and dynamic linking
-- swapping
-- contiguous allocation
-- partitioning
-- variable-partition scheme
-- fragmentation
-    - external fragmentation
-    - internal fragmentation
-- compaction
-- paging
-- page
-- frame
-- page table
-- frame table
-- page-table base register (PTBR)
-- translation look-aside buffer (TLB)
-- hit-ratio
-- frame protection
-- multilevel paging
-- hash-page table
-- inverted page table
-- segment
-- segment table
-- segmentation
-- segmentation with paging
-- local descriptor table (LDT)
-- global descriptor table (GDT)
+The CPU doesn't have direct access to any memory storage other than CPU registers, cache and main memory.
+If the data isn't in one of these places, it needs to be moved there before it can be operated on.
+From the view of the memory unit, they don't care what the CPU is doing only the stream of addresses coming over the bus.
+
+Speed:
+CPU registers - ~1 cycle
+L1 CACHE hit  - ~4 cycles
+L2 CACHE hit  - ~10 cycles
+L3 line unshared - ~40 cycles
+L3 shared line in another core - ~65 cycles
+L3 modified in another core - ~75 cycles
+Main memory - 100's of cycles
+
+Protecting memory:
+- An OS executing in kernel mode has unlimited access to all the system memory.
+- Using a privileged instruction the OS sets the limit and base registers for a process before moving from kernel to user mode.
+- These registers are used to give a limit to what a process can access.
+    - Base register (or relocation register) - starting memory range for process
+    - Limit register: how much memory it can access.
+    - relocation register - every time a user program accesses a piece of memory the relocation register is added to the request meaning the user program only ever sees the address space from 0 to limit register.
+
+How a user program is compiled
+- source program
+- through compiler
+- becomes object module
+- plus other object modules
+- through linkage editor
+- becomes load module
+- plus statically linked system library
+- through loader
+- becomes an in-memory binary (block of physical memory)
+- with dynamic linking
+- can attach dynamically loaded system library
+
+Static linking: When a program is loaded a copy of all the system library routines used by the program are copied into it's memory space. This is necessary for systems that don't use a MMU, however duplicates code in main memory and requires everything to be defined ahead of time.
+Dynamic linking: When a program is loaded, it has stubs for each system library that is required. The first time the stub is called it requests a link to the code from the kernel. The code is added to the programs memory space and it then accessible. The stub is then replaced with a link to the executable code. This requires hardware and OS support. This also means the libraries can be updated without the link being updated. Libraries are versioned so you don't get a newer version that is incompatible.
+Dynamic loading: similar to dynamic linking. Programs need to be in main memory for them to execute, however, most programs today are too large to fit. Dynamic loading is the process of getting instructions from disk, and attaching them to main memory. This requires Hardware support but the OS doesn't need to be part of this process.
+
+Types of addresses:
+- logical address: the address used in the CPU
+- physical address: the address used by memory unit
+- virtual address: the term used for the logical address when it's not the same as the physical address
+Address Binding:
+- Symbolic binding: User program usually stores data in symbolic addresses
+- Relocatable binding: The compiler binds these symbolic address to relocatable addresses (ie. 14 bytes from the beginning of this module).
+- Physical binding: The linkage editor or loader binds these relocatable addresses to physical addresses (ie. 74014).
+When is an address bound? Address binding can be done at different points in the user program loading diagram
+- Compile time (by compiler, logical = physical) - used by MS-DOS. When the code is compiled it determines where in main memory it will be located.
+- Load time (by loader, logical = physical) - when a program is loaded into main memory it's addresses are calculated based on the relocatable address
+- Execution time (by dynamic linking, logical ≠ physical) - addresses are determined dynamically at runtime. Most flexible but requires special hardware.
+
+Memory management unit (MMU) - hardware device that translates between virtual (logical) addresses and physical addresses in memory.
+- User program in CPU uses logical address (ie. 378)
+- When the CPU requests that memory, it first adds the relocation register (ie. 378 + 74014 = 74392)
+- The MMU takes the address from the CPU and translates it into the physical address before accessing it from memory (ie. MMU(74392) = 29379842).
+
+#### Swapping
+Moving process memory to a backing store (disk).
+This makes it possible for physical memory addresses to exceed the physical memory on a machine.
+- swapping takes a long time (2 sec for 100mb, 60 sec for 3gb)
+- IO - a processes is swapped to disk and is waiting for IO the data from the IO might be sent directly back to memory, overwriting the process that was swapped in, and being lost to the process that was swapped out. This can be fixed by only allowing IO to Kernel buffers, but then the data needs to be copied from the kernel buffer to the program (double buffering).
+- Modern OSs don't uses traditional swapping. Although variations exist:
+    - swapping portions of programs instead of the entire program (used with virtual memory)
+    - mobile IOS - ask applications to relinquish memory, read-only data is removed and later reloaded. Otherwise applications are terminated.
+    - mobile Android - terminates and saves application state to disk (not entire memory). It starts where it left off.
+
+#### Contiguous allocation
+Old way of doing it. This is what I learned about when I first learned about disk-management.
+
+Each processes is contained in a single continuous block of memory.
+This makes protection easy. The relocation and limit registers define the size of the continuous block.
+Memory is partitioned into OS and User space. OS is usually in low memory to be close to the interrupt vector.
+
+Fixed-partition scheme (very old) - The remaining memory is divided into partitions and each partition can run one program. A program can't get more memory than is available in the partition, and the system can't run more programs than there are partitions. Lots of wasted memory.
+
+Variable-partition scheme (old) - The OS maintains a table of all user memory blocks (started at a byte).
+- As memory gets larger the table gets harder to maintain. At a certain point it makes sense to make the memory block larger. The larger the block the smaller the memory allocation table.
+Hole - A group of unused memory blocks
+job queue - list of processes waiting for a memory
+The OS takes the each job and sees if there's a hole big enough for it.
+
+Dynamic-allocation-storage problem: first fit and best fit are the best and change based on type of load.
+- first fit: the first hole that will fit the program
+- best fit: search for the smallest hole that will still fit the program
+- worst fit: find the biggest hole.
+
+Fragmentation: The big problem with all these strategies is fragmentation. Unusable holes in memory.
+- External fragmentation: As a system continues to free and allocate memory, holes will appear between programs. Since none of these holes are big enough they can't be used for a program and are external fragmentation. Memory holes between programs. Statistically 1/3 of memory will be unusable.
+- Internal fragmentation: If a program requests a smaller amount of memory than a block, the system will round up. This unused rounded memory is the internal fragmentation.
+- Compaction: Moving the program and data from one part of memory to another in order to move the holes together. Must have hardware support (registers) and is very expensive.
+
+#### Segmentation
+If the space between processes was able to be allocated to other systems much more of the main memory could be used by processes.
+Programmers don't need big chunks of data they think in methods, objects, stack, heap, module, ect.
+
+A segment is a chunk of data assigned to a user-program. Each process has multiple segments that are defined using a segment number and an offset. The number is how the program refers to the segment and the offset determines where the data resides in memory. Program refers to address with two dimensions (segment, offset) but physical memory is still a one dimensional array.
+
+Hardware is needed to translate the two dimensional address into one dimensional memory. There exists a table that knows all the segments on in main memory. It stores the segment limit and the segment base.
+When the user-program requests a piece of memory it sends segment and the offset. The segment table looks up the limit and the base for that segment. If (offset lteq limit){return offset + base} else {throw trap}. The resulting address is fetched from memory.
+
+Still suffers from fragmentation but at a lower level.
+Requires programmer support.
+
+#### Paging
+
+Break all storage into fixed-sized blocks of the same size:
+- for physical memory and the backing store they're called frames.
+- for logical memory they are called pages.
+
+Each process gets their own page table.
+Each page table holds a set of pages allowed by the process.
+The process indexes into the page table as if it were one long array.
+If the index is greater than the allocated pages a trap is thrown.
+The index is split into the page part and the offset part.
+The page part is used to look up the frame that is mapped to that page.
+The frame + offset is looked up in main memory.
+
+Because of this separation of virtual and physical memory:
+- 0 external fragmentation: any program that can fit into the remaining pages can be held in memory
+- 1/2 page internal fragmentation expected per process: Since a process can request an arbitrary size of data we would expect that each program will have some internal fragmentation. If it's evenly distributed across the page size, then the average will be 1/2 a page per process.
+
+Management by OS
+- OS needs to know how many frames are available on the system, and how many are allocated.
+- Frame table: one entry per frame - free or allocated - to which page of which process
+- Page table: stored in kernel either as part of PCB or as one or more large tables.
+    - OS maintains a copy of the page table for each process
+    - for context switch
+    - for mapping a logical address in a process needs to a physical address
+    - for Mapping IO to the right spot in memory
+
+Hardware:
+- defines the page/frame-size
+- Registers:
+    - If only a few pages are used per process a set of registers can be used to hold the table.
+    - Entire page-table has to be sent to registers from memory on every context switch
+    - only useful for up to 256 entries (at 4kb = 1mb of data .: not enough!)
+- TLB Translation look-aside buffer: key-value lookup with 0 penalty
+    - a cache specifically for page lookups. A key (index) is checked against all entries, and if it exists the value is returned.
+    - ASIDs - address space identifiers - used to identify the process making the TLB request
+        - TLB might be able to hold page lookups for multiple processes using ASIDs or might have to flush every time a context switch happens.
+    - if it fails it either has to look at a L2 cache (6 cycles) or loop back to main memory.
+    - often there are two sets one for instructions, one for data. Since lookups happen in each step of the pipeline.
+    - (PTBR) page-table base register - address to memory where the page table resides
+    - (PTLR) page-table length register - (only on some systems) the limit for the page length.
+    - instead of the entire page-table being moved into registers only the PTBR needs to be moved on a context switch.
+    - TLB miss - interrupt to OS or hardware - we lookup the missing address and add it to the TLB
+        - LRU - round robin - locked down - 
+    - Hit ratio - up to 99%
+
+Protection (mostly implemented in hardware)
+- bits in the value retrieved from the page table are used to determine if a piece of physical memory should be allowed to be used for a specific purpose. Hardware trap on invalid operation.
+    - read-write
+    - read bit, write bit, execute bit
+    - valid-invalid bit: for page misses
+- For systems with a PTLR the function `if (page lteq PTLR) {return TLB(page) + offset} else {trap illegal page }`
+
+Does not require user-programmer support.
+Does not suffer from fragmentation .: no compaction.
+Can be applied to swap disks (backing stores).
+Shared Pages! Since read only pages are possible an OS can have multiple processes running with their text sections overlapping.
+Also makes shared memory pages easier.
+Requires hardware support.
+
+#### How are page tables implemented
+Page tables
+- are usually large (2^32 or 2^64 addressable space)
+- grow and shrink
+- are very sparse
+So how do you manage the manager?
+
+Hierarchical paging / forward-mapped page table / multilevel paging (most common)
+- table of tables each one getting closer to the address
+- the address is split into sections | p_1 | p_2 | ... | d
+- for each section there is a table with an address that points to the next section until you reach the address d.
+- This was one of the first approaches but became unmanageable as tables grew large.
+
+Hashed page table
+- hash table - key: virtual page address, value: physical page address
+- linked list to next address
+
+Clustered page tables
+- hash table with a block of physical addresses
+- key: shift right virtual page address, use shifted bits to index into resulting array.
+
+Inverted page table
+- uses the frame table for page lookup using the pid.
+- difficult to implement shared memory since one frame can't point to two pages, but two pages can point to one frame.
+
+#### Intel
+IA-86
+segmentation with paging
+
+First the logical address is converted from a segment and offset into a 'linear address' using segmentation.
+Then the 'linear address' is converted to a physical address using paging.
+First bit of the page directory address denotes if it's a 4kb or 4mb block
+If it's a 4mb block the offset is added to the directory address.
+If not a second lookup is needed.
+
+local descriptor table (LDT)
+global descriptor table (GDT)
+
+Intel x86-64
+- still uses the same system but with 4 levels of paging hierarchy
+
+Why segmentation plus paging? Seems like a waste.
 
 #### Study Questions
 
 1. describe address binding at compile, load, and execution time.
+    > address binding can happen at one of three levels
+    1. compile time. msdos. physical addresses are hardcoded into the code
+    2. load time. unasisted software. physical addresses are fixed when the binary is linked into memory
+    3. execution time. hardware assisted. physical addresses are determined when the code is running.
 2. explain the different strategies that operating systems use to manage the sharing and allocation of memory among several processes, including contiguous allocation, paging, segmentation, and segmentation with paging.
+    - continues allocation was back in the day. Each process had a chunk of memory.
+    - segmentation, split up those chunks so one processes could have multiple chunks.
+    - paging, blows it away by allowing an arbitrary number of chunks associated with each process, while giving the processe the illusion that it is only accessing one chunk.
 3. discuss how relocation, sharing, and protection are considered in memory management.
+    - relocation only works with execution time address binding. a chunk of memory can be moved to make the memory more efficient
+    - sharing only works when there's a read write flag. Two processes can read from the same code.
+    - or sharing happens when two processes agree so share a section, the physical memory is linked into both their pages.
+    - protection: each memory model has a way to make sure the process isn't addressing memory outside of it's own space.
+        - for continuous this means having a limit that the process is allocated. The process is allowed to access 0 to limit, and is bumped by the base.
+        - for segmentation, that means having a segment limit associated with each segment.
+        - for paging, that means having an page limit register that tells the CPU how many pages a process has available
 4. describe how an operating system may implement shared memory.
+    - an os might implement shared memory by having a page linked into two processes page tables.
 
-1. What is *address binding*?
 2. What are the main purposes of swapping, paging, and segmentation in memory management?
+    - swapping is in order to move memory off memory to save space. paging makes this very easy. Only the least used pages are moved off. Since they are small unused sections of programs can be swapped without much problem.
+    - mobiles don't usually use this since rw isn't as reliable with flash.
 3. When should an operating system designer consider using hashed paging and inverted paging instead of hierarchical paging?
+    - when the address space is sparse
 4. How does an Intel architecture support both paging and segmentation?
+    - first segment, then page = stupid!
 
-- Try 8.1-8.5 of *OSC9ed*.
-- Complete Exercises 8.11, 8.20, and 8.28 of *OSC9ed*
-- [Overlays for Primitive Memory Management](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/overlays.htm)
-- [Dynamic Relocation Using a Relocation Register](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/relocation.htm)
-- [Multiple Partition Contiguous Memory Allocation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/multiplepartcma.htm)
-- [Compaction](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/compaction.htm)
-- [Paging Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/paginghardware.htm)
-- [Paging Model of Logical and Physical Memory](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingmodel.htm)
-- [Paging Example for a 32-Byte Memory with 4-Byte Pages](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagingexample.htm)
-- [Segmentation Hardware](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/segmentation.htm)
-- [Paged Segmentation](http://cs.uttyler.edu/Faculty/Rainwater/COSC3355/Animations/pagedsegmentation.htm)
+8.2 logical are in the cpu, need to be translated, physical are on disk
+8.2 extra register, what if instructions can be modified? faster lookups.
+8.3 so they corespond with a number of bits to be addressed by. If not there would be unaddressed bits, or unused memory
+8.5 The memory would be imediately accessible by the other process. edits would be reflected in both pages.
+
+8.11 
+8.20
+8.28
 
 ### 3.2 Virtual Memory
 OSC9ed: 9.1 to 9.10.

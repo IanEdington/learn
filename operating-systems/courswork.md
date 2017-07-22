@@ -2047,6 +2047,10 @@ Management by OS
 
 Hardware:
 - defines the page/frame-size
+    - larger: leads to wasted memory
+    - smaller:
+        - more page faults
+        - larger page table
 - Registers:
     - If only a few pages are used per process a set of registers can be used to hold the table.
     - Entire page-table has to be sent to registers from memory on every context switch
@@ -2165,37 +2169,335 @@ OSC9ed: 9.1 to 9.10.
 
 For users, the tangible benefit of virtual memory is that it removes the restriction that the size of the computer’s memory places on the size of an executable program. The key idea behind virtual memory is easy to state but much harder to implement: keep only those (code and data) parts of a process in the memory that are needed in the current CPU burst of the process. This section examines the software and hardware mechanisms needed to implement virtual memory.
 
-#### Key Concepts and Topics
+#### Virtual memory
+In an operating system with paging it is possible for an OS to implement a virtual view of the memory space available to user programs.
+This is accomplished by promising a program as much memory as it needs, and then only give it to the program when it actually uses it.
+- logical address space is very large and programs can take up huge amounts of space in virtual memory
+- programmers don't have to think about program size
+- more programs can fit in memory, since only the parts of a program being used are in memory.
+- shared pages:
+    - easy to share files
+    - easy to share memory
+    - libraries can be linked in
+    - provides efficient methods for process creating (fork, vfork)
+- the space between the stack and the heap aren't actually being used unless necessary.
 
-- virtual memory
-- demand paging
-- lazy swapper
-- pager
-- page fault
-- locality of reference
-- page fault rate
-- copy-on-write
-- page replacement
-- reference string
-- first-in first-out page replacement
-- optimal page replacement
-- Belady’s anomaly
-- least-recently-used page replacement
-- page-buffering algorithm
-- frame allocation
-    - global page replacement
-    - local page replacement
-- thrashing
-- working-set model
-- memory-mapped files and I/O
-- shared memory
-- prepaging
-- I/O interlock
+This technique relies heavily on the page-table and MMU.
+
+#### Demand paging (How virtual memory is implemented in practice)
+For an instruction/data to be used executed/used it must be in memory!
+But most instructions/data of a program are never used.
+
+Demand paging only brings a page into memory when it is used
+
+Lazy swapper(pager) - only bring page into memory when it is referenced in execution
+
+Hardware needed:
+- page tables
+- valid-invalid bit in the lookup value of page-table
+- ability to restart any instruction
+- secondary memory (swap space)
+
+Page fault:
+1. The process references a page that doesn't exist in physical memory.
+1. The value of the address returned from the TLB has the invalid bit set.
+1. A trap is called to the OS.
+1. Context switch
+1. Interrupt handler for page faults
+1. The OS checks to see if the address is valid in a table usually in the PCB
+1. If not the process is terminated
+1. The OS finds a free frame
+1. The OS makes an IO call to bring the page from storage into the frame
+1. Interrupt and context switch
+1. When IO completes The OS updates the page-table with the new address
+1. The OS starts the process back at the instruction that caused the trap
+
+Page fault rate
+- Number of times a page fault will occur.
+- effective access time = (1 - pfr) x (access time) + pfr x (page fault access time)
+                        = access time + (page fault access time - access time) x pfr
+
+Locality of reference:
+- If an instruction needed addresses from multiple places it might cause multiple page faults leading to poor performance.
+- This is exceedingly rare because programs tend to reference things close to them or close to other referenced things.
+
+Zero-fill-on-demand frames: OS's usually use zero-fill-on-demand page allocation
+- A new frame is filled with zero's and placed in a ready queue.
+- This way when the frame is assigned to a frame the data is consistent.
+
+Pure demand paging(extreme) - When the OS sets the process to start it doesn't load anything.
+- when the PCB tries to execute the first instruction it causes a page fault
+- only pages that are used are ever loaded
+- in practice not efficient because of IO
+
+Page Replacement: When a system runs out of memory it must choose a page to move to the backing store.
+1. Find desired page on disk
+1. Find free frame
+    - if free frame exists use it
+    - or use the page-replacement algorithm to select frame
+        - and change victim page and frame tables
+        - and write victim frame to disk (IO operation!)
+1. Read page from disk into frame (IO operation!)
+1. Change page and frame tables
+
+#### Efficiency
+Page faults and page replacement is VERY slow!
+Any decrease has HUGE performance improvements!
+
+Ways to speed it up:
+- Frame allocation algorithm: if we can accurately decide how much and which pages to give to process it will decrease page faults.
+- Page replacement algorithm: if we can efficiently decide which pages to remove from a process we will decrease page faults.
+- Buffers strategies: free frames pool, free frames with link maintained, write modified frames to disk
+
+Non-Uniform Memory Access (NUMA) - these algorithms change on boards with non-uniform memory access.
+- processes running on the same chip should have their memory on the same board.
+- similar processes should be scheduled together.
+- duplication of read only pages might be beneficial for programs with multiple threads running across the entire system.
+
+How to measure?
+- It's possible to record or generate a list of address lookups for a system but page faults are only affected when the page being addressed changes.
+- reference string: A list of address lookups stripped of offsets and with duplicate sequential entries removed.
+- With a reference string, a number of frames, and an algorithm we can determine the efficiently of that algorithm
+
+Certain apps know their memory and IO use better than an OS.
+Raw memory and IO is sometimes available from an OS.
+
+##### Frame Allocation Algorithms
+Scheduling frames for processes has many overlapping strategies that perform differently for different workloads.
+There are some best practices:
+- Min # of frames per process
+    - Minimum number of frames strategy: It usually makes sense to have a min num of frames allocated per process. This reduces the page faults at startup especially if the OS has historical data on what the program usually needs.
+    - some also define a max (windows)
+- Proportional allocation based on process priority & memory requirements
+    - Evenly split: easiest way to split frames between processes
+    - Proportional:
+        - to size of memory requested: simple but easy to trick
+        - adjusted for process priority
+
+##### Page Replacement Algorithms
+
+Replacement policy: Global
+- Where do we take the paging frames from?
+- Local replacement
+    - set of pages in a process can only be affected by itself
+    - makes thrashing local to a process
+    - gives more benefit to the individual task at the expense of the system
+- Global replacement
+    - process can't control it's own frames
+    - leads to varied performance based on external factors
+    - more commonly used because it leads to better overall system performance
+
+Belady’s anomaly
+- Sometimes adding more frames to an algorithm makes it performs worse.
+- This usually happens with non-optimal algorithms but might be 
+
+**Replacement Algorithms**
+FIFO: First page in is the last page out
+- easy to implement without hardware support
+- not very good
+- Belady's anomaly
+
+Optimal page replacement
+- If we could see ahead in time we would remove the page that will next used in the most amount of time.
+- NO Belady's anomaly!!!
+
+Last Recently Used (LRU) replacement
+- next best to OPR without foreknowledge
+- requires special hardware to implement (else it is VERY inefficient)
+    - Counter: update access time - search to find LRU (short constant, long search)
+    - DLL stack: every page is moved to top of stack and replacement is taken from tail (long constant, short search)
+- NO Belady's anomaly!!!
+
+Additional-Reference-Bits Algorithm: approximation of LRU
+- When a page is referenced a reference bit is set for that page
+- at a specific time period the bits all switch right
+- if a byte is available 8 periods are kept
+- the lowest number gets replaced
+- low Belady's anomaly
+
+Second-Chance Algorithm
+- FIFO with one ARB bit
+- If the bit is 1 move to end of queue and reset bit
+- if the bit is 0 take the frame.
+- often implemented with circular array queue
+- Belady's anomaly
+
+Second-Chance + Modification
+- Modify bit:
+    - If the victim in memory page has been modified since the last read from storage, it can be replaced without writing.
+    - removes need for one IO operation
+- Replace the page in the lowest non empty class
+    - (0,0) not recently used - not modified
+    - (0,1) not recently used - modified
+    - (1,0) recently used - not modified
+    - (1,1) recently used - modified
+
+Least-frequently used & Most-frequently used
+- keep counter of number of times used
+- Neither are very useful
+
+##### Other Strategies
+Frame Buffer (or pool)
+- The OS keep a certain number or percentage of free frames
+- When a process needs them they are available from the buffer
+- usually a very low priority task in the system
+- optionally zero out the frames ahead of use (doesn't work with next strategy)
+
+Frame Pool with original reference maintained
+- pages that are moved to the frame pool can be reclaimed
+- Keep address on where the frames in the pool came from
+- incompatible with pre-wiped frames
+- very useful in conjunction with FIFO algorithm
+- somewhat useful with second-chance algorithm
+
+Modified page queue
+- Pages that have been modified are written to disk
+- Very low priority task
+
+Prepaging
+- Bring into memory working set
+- very hard to make efficient
+
+Page clustering
+- Bring in a few pages after the page fault
+
+#### Thrashing
+When a system or process doesn't have enough memory and the paging replacement system is trying to provide it by paging.
+Basically a live lock in a paging algorithm.
+
+Locality (scope) - the pages a process is currently using
+- A process works within a locality at any given time.
+- A process moves from locality to locality over the course of it's life (some overlapping).
+- A process can't make progress without the pages in that locality.
+- If a process doesn't have enough memory for it's locality it will thrash.
+
+Local frame allocation makes thrashing local to a process.
+
+** Working set model **
+- An attempt to define locality.
+- A set of pages being used by a process over a given period.
+- keeps degree of multi-programing as high as possible while preventing thrashing (If ∆ is set correctly)
+- hard to calculate working set
+
+How:
+- Working set window: ∆ - an amount of time used to define the working set.
+    - Accuracy of working set depends on how you define ∆
+- Demand = sum of working sets for all processes
+- Suspend a process when the demand is above the available memory
+
+** Page Fault Frequency **
+- Track page fault rate per process
+- define upper and lower bounds
+- take and remove frames from programs based on bounds
+- suspend a process if a page fault rate is high and there are no free frames
+
+#### I/O interlock
+HUGE Problem!
+
+1. Process makes IO request - waiting for IO
+2. Process in CPU page faults
+3. Frame from IO requests is returned to pool and allocated to process
+4. IO returns and writes to frame that is linked to new process
+
+Allow locked memory - locked memory can not be replaced
+Never allow IO to user memory - double copying causes performance decrease.
+
+Locking or pinning is often useful
+- kernel
+- databases
+- low priority process that gets preempted by high priority processes never gets to use the frame it brought in from disk.
+    - The LPP is constantly just requesting the frame (extra work for pager) and never executes... sad ;(
+
+#### Other Efficiencies made possible by Virtual Memory
+
+##### Copy-on-write
+Pages can be marked as copy on write.
+This allows new processes to be created without copying private memory block.
+If either process edits the block a copy will be made before editing.
+This is usually stored in a bit from the page table address.
+Only modifiable blocks need this. Read only blocks can just use the original rw bit.
+
+vfork: makes a copy of the PCB but not the virtual memory. The old process is halted and the new process uses the old processes virtual memory. This is useful for fork() exec() but can be dangerous if exec isn't called right away.
+
+##### Memory-Mapped files
+
+Any block on disk can be used as the backing store for a section of virtual memory.
+A file mapped to virtual memory has all the same properties as the rest of virtual memory
+- Efficient paging
+- Efficient IO writes
+    - Writes are done to memory and moved to disk as a block
+- Copy on write for processes
+- Shared between processes
+- Read only between processes
+
+Some systems implement MMF even over standard IO syscalls:
+- mmap() maps to process memory
+- read() maps to kernel memory
+
+##### Memory-Mapped IO
+
+Like with Memory Mapped files the IO registers can also be mapped to memory.
+Memory is mapped to device registers and accessed by the device.
+
+Control register: register in IO device that lets the CPU know the device is available
+
+Ways for IO device and Memory-Mapped IO to work together:
+- Programmed IO (PIO) - Pole the control register
+- Constantly fill the memory - used by GPU's
+- Interrupt driven - IO device sends interrupt when it's done
+
+#### Kernel Memory
+- Kernel needs access to physical memory block for certain operations like IO.
+- Needs to manage memory the way any process would (inside a page)
+- Has better knowledge of it's need so can allocate memory differently based on need.
+- Kernel processes are almost always higher priority than system processes
+
+Buddy system
+- One chunk is split into two until it is the size needed for a structure
+- lots of wasted space
+
+Slab system:
+- A separate cache for each type of kernel object (semaphore, PCBs, TBS, ect.)
+- Each cache can span multiple slabs
+- When the kernel needs an object it just asks the cache
+    - caches are either empty, partial, or full
+    - if one exists it is returned
+    - if not a new slab is added to the cache
+- No wasted space from fragmentation - The only wasted space is for not full caches
+- Works best for objects that are allocated and deallocated often.
+    - Instantiation is fast (return pointer). Destruction is free (mark as available)
+- SLUB: Linux's optimized version of slab
+
+SLOB (simple list of blocks)
+- slob with 3 caches (small lt 256bytes, medium - lt 1024 bytes, large = lt x)
+- first fit algorithm
+
+#### Windows
+Demand paging with clustering: page fault -> page and a few after it (IO efficient)
+Memory management is done on a process by process basis.
+- each processes is given a memory range on startup
+    - working set minimum: the minimum amount of physical memory a process gets
+    - working set maximum: the max pages
+- local LRU: when a process is over it's max it must select a page to let go from it's own pages
+- trimming: when the free memory is below the threshold processes are trimmed up to their minimum.
+
 
 #### Study Questions
 
 1. explain the concept of *virtual memory*, and discuss the benefits, implementation, and overhead.
+    > Virtual memory is the idea that the logical memory understood by programs and the CPU does not need to parallel the physical memory on the system.
+    > By having a translation from physical to virtual and back, sections of virtual memory can be kept on disk without the knowledge of the processes.
+    > This allows the use of memory as a cache.
+    > This also applies to any arbitrary file on disk
+    > physical memory can be mapped into the virtual memory of multiple programs
 2. define *demand paging* and *page replacement*.
+    > demand paging
+    >     A process is not all loaded at once into memory.
+    >     When a process requests an address that is not in memory the pager fetches it from the backing store.
+    >     In this way the process is loaded as it is needed
+    > page replacement
+    >     Because of demand paging the physical memory can be over-promised
+    >     When we run out of physical memory a victim piece of memory is chosen to be replaced
 3. describe the page replacement algorithms and strategies listed below in terms of algorithms, data structures, overhead, and benefits.
     - first-in first-out (FIFO)
     - optimal
@@ -2203,13 +2505,18 @@ For users, the tangible benefit of virtual memory is that it removes the restric
     - page buffering
 4. outline the decision problems associated with frame allocation.
 5. explain the phenomenon of thrashing and the strategies and techniques deployed to deal with this problem.
+    > working set
+    > - based on process locality
+    > - a working set time is decided upon
+    > - any references used during this time is known as the working set
+    > - the demand is the total working set of all processes in a system
+    > - When demand exceeds supply a process is chosen to be stopped.
+    > frequency of page fault
 6. describe how memory mapping files and shared memory operate in the Win32 API.
 7. discuss the following factors that affect the character and performance of a paging system: prepaging, page size, program structure, and I/O interlock.
 
-1. Why is virtual memory an important feature of modern operating
- systems?
-2. What is page replacement? How should different page replacement
- algorithms be chosen?
+1. Why is virtual memory an important feature of modern operating systems?
+2. What is page replacement? How should different page replacement algorithms be chosen?
 3. How are memory-mapped files used for memory sharing?
 
 - Try Exercises 9.3, 9.6, 9.8, 9.21, 9.27, and 9.32 of *OSC9ed*.

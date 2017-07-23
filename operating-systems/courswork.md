@@ -2526,41 +2526,121 @@ OSC9ed: 10.1 to 10.9.
 
 A file system can be viewed logically as consisting of three parts: the interface to the file system (for users and programmers), the internal data structures and algorithms for implementing the interface, and the secondary and tertiary storage structures. The first two parts were covered in Section 3.3; this section addresses the third. Secondary storage structure topics include the physical structure of disks, disk-scheduling algorithms, disk management (disk formatting, boot block, and bad blocks), and swap-space management. Section 3.4 also introduces RAID structure, stable-storage, and tertiary storage structure.
 
-
 #### Key Concepts and Topics
 
-- magnetic disk and tape
-- logical block
-- constant linear velocity (CLV)
-- constant angular velocity (CAV)
-- host-attached and network-attached storage
-- SCSI
-- fiber channel (FC)
-- storage-area network
-- disk scheduling
-- seek time
-- rotational latency
-- bandwidth
-- first-come, first-served (FCFS)
-- shortest-seek-time-first (SSTF)
-- scan scheduling (SCAN) or elevator algorithm
-- circular SCAN (C-SCAN)
-- look scheduling (LOOK)
-- disk formatting
-- logical formatting
-- physical formatting
-- boot block
-- master boot record (MBR)
-- bad blocks
-- swap-space management
-- redundant arrays of independent disks (RAIDs)
-- data striping
-- bit-level striping
-- block-level striping
-- RAID levels
-- stable-storage implementation
-- tertiary-storage structure
-- removable media
+- magnetic disk
+    - logical block: smallest unit of transfer - usually 512 bytes
+    - constant linear velocity (CLV) the head travels over the disk at the same speed no matter how far out it is.
+    - constant angular velocity (CAV) the disk spins at the same speed
+- host-attached
+    - SCSI - small computer system interface
+    - fiber channel (FC) - high-speed serial (1-128gb/sec)
+- network-attached storage - over RPC - iSCSI pretends its attached
+- storage-area network - NAS eats up bandwidth - SAN is a storage only network
+    - storage is shared between servers
+    - allows dedicated storage for servers
+
+#### Magnetic Disk scheduling
+OS is responsible for effectively using system resources including IO.
+Disks are slow due to head movement and rotation.
+It's possible to improve them with a good queue.
+
+Modern disks don't usually give this kind of info to the OS.
+Usually a bunch of requests are made and the device decides how to do them.
+Sometimes order matters though so the OS sometimes sends one request at a time (critical write order)
+
+Seek time: amount of time it takes to move the head over the cylinder
+Rotational latency: amount of time it takes for the disk to rotate into place
+Bandwidth: amount of data moved divided by the amount of time it takes to move it.
+
+FCFS (First come first served) algorithm
+- fair but not very efficient
+
+SSTF (Shortest seek time first) algorithm
+- performs well except for starvation
+- Priority queue by head distance
+- May cause starvation
+- better than FCFS but not optimal
+
+SCAN (elevator) algorithm
+- sweeps back and forth across the disk servicing every request in its path
+- when it starts to go back the area it did most recently gets done again.
+C-SCAN (circular) variant
+- sweeps in one direction than restarts at beginning
+- performs well when heavily loaded
+LOOK and C-LOOK algorithm don't actually sweep entire disk unless needed
+
+#### Disk formatting
+
+Low-level formatting or physical formatting:
+- divide into sectors (blocks)
+- header and trailer: holds Error Correcting Code
+- data usually 512, can be 256, 1024
+
+Logical formatting: creation of file system
+- partitioning into groups of cylinders
+- usually low-level blocks are chunked into clusters
+
+#### swap-space management
+Location
+- large file in file system
+    - easy to implement
+    - inefficient multiple seeks due to traversing file system data structure
+- raw partition
+    - many different ways of implementing
+
+Page slots - holds an Memory page
+swap map - array of shorts, 0 = available, n = number of processes using this data
+
+#### Other
+
+Boot block: fixed location on disk where bootstrap program is stored
+- computer firmware usually allows you to choose what IO devices you want to be allowed to boot from.
+- usually the first sector of the hard disk
+- (MBR) master boot record: the mini partition used by OSX and Windows for booting
+- boot sector of a partition (first sector) - if a partition can be booted from this is where the boot loader will be.
+
+Bad blocks: blocks sometimes go bad.
+- Most of the time the hard disk will manage this.
+- Sometimes OS's have to deal with it.
+    - OS requests block of data
+    - IO device checks the ECC and it is unrecoverable - notifies OS
+    - OS flags block so that next time it reboots it tells the IO device to replace the block
+- devices usually have spare blocks scattered throughout disk.
+- slipping is sometimes used within a sector
+
+Redundant arrays of independent disks (RAIDs)
+    - parallel storage in order to increase access speed and redundancy
+    - parity: ECC that can recalculate 4 bits for every 1 bit
+    - data striping: keeping data across multiple disks increases access speed
+    - bit-level striping: each disk holds one bit each, 4 disk accesses are needed for 1 block
+    - block-level striping: each disk holds a sequence of blocks
+        - getting 1 block accesses 1 disks
+        - getting 4 blocks accesses 4 disks
+    - RAID levels
+        - 0 - block striping
+        - 1 - mirroring
+        - 0+1 - block striping then mirroring
+        - 1+0 - mirroring then block striping
+        - 2 - bit level striping with ECC
+        - 3 - bit level striping with parity bit using knowledge of sector failures
+        - 4 - block level striping with parity blocks using sector failures
+        - 5 - spread parity across all disks
+        - 6 - extra redundancy Reed-Solomon codes
+
+Stable-storage implementation
+- Disk write results in:
+    - success
+    - partial failure - in the middle of failure
+    - total failure - failed before anything changed
+- Recovery
+    1. Write onto first block
+    1. Write onto second block
+    1. Declare complete
+- Failure:
+    1. Are they the same? nothing to do
+    1. If one block contains an error than we replace with the other block
+    1. If neither has error we replace first block with contents of second (rollback)
 
 #### Study Questions
 
@@ -2569,13 +2649,11 @@ A file system can be viewed logically as consisting of three parts: the interfac
 3. describe issues related to disk management such as disk initialization, booting from disk, and bad-block recovery.
 4. describe swap-space management, disk reliability, RAID structure, and tertiary storage structures.
 
-1. What is disk attachment? Name several kinds of disk attachment,
- outline their differences, and outline their differences
- in usability.
+1. What is disk attachment?
+1. Name several kinds of disk attachment, outline their differences, and outline their differences in usability.
 2. What are the main disk scheduling algorithms, and how do they work?
 3. What are the main tasks in disk management?
-4. What are RAID levels, and how does one determine which level to use
- for a specific computer system?
+4. What are RAID levels, and how does one determine which level to use for a specific computer system?
 5. What technologies are used in new tertiary storage devices?
 
 - Try Practice Exercises 10.1 to 10.7 of *OSC9ed*

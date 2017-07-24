@@ -2664,46 +2664,247 @@ OSC9ed: 11.1 to 11.6.
 
 The main criterion for a good file system is that it provide the user with convenient (user friendly), effective, and secure means of organizing and accessing his or her files. This section examines the file-system concepts familiar to most users, such as file names, file types, directory structures, and file protection. Section 3.3 also discusses some of the practical problems, block-allocation schemes, performance criteria, and backup and recovery schemes that system designers must consider when they implement file systems on disk.
 
-
 #### Key Concepts and Topics
 
-- open file table
-- file organization
-- file structure
-- packing
-- internal fragmentation, files
-- access method
-- sequential access
-- relative access
-- logical record
-- random access
+Partitions: A disk can be split into separate entities, each with their own file system.
+Volume: a logical disk from the perspective of the OS / User
+- can be a subset of a disk (Partition), or span across several disks or partitions
+
+File Systems:
+- Set of standards for the meaning of a specific sequence of bits in a logical disk.
+- Any OS or privileged program can define their own file system.
+- In order to use a specific file system an OS needs to know how to access and use it.
+
+#### Directory
+Directory Structure
+- Directory and file information is stored together in order to provide quick access to the available files.
+- Usually a file will have name and address in directory structure.
+- Single level directory: must have unique names, hard to keep track
+- Two level directory: separate directory per user, isolation,
+- Tree structured directory: a tree of directories
+- Acyclic graph directory: tree with links (symbolic and/or hard) - used by Unix and Windows
+    - Links:
+        - Symbolic - a special directory entry provides a jump to another file or directory
+        - Hard - a copy of the directory info of a file is made. This is very difficult to track deletions, moving 
+    - Link Deletion
+        - Leaves links hanging (used for symbolic in Windows and Unix)
+        - Tracking both Hard and Symbolic is very hard. Reference list or File counter. Used by Unix for hard links.
+    - Avoiding cycles
+        - Garbage collection is expensive on directories because of their size
+        - Detecting a cycle before creating a link is expensive
+        - Usually links are just not followed (doesn't work with hard links)
+- General Graph Directory: tree with links with cycles
+
+Directory Operations
+- Create a file: find disk blocks and mark as occupied, add entry to directory
+- Delete a file: mark disk blocks as unoccupied, remove entry from directory
+- List a director: retrieve and list the files and directories within a directory
+- Rename file or directory:
+- Travers
+- Search
+
+Search path ($PATH)
+- can be defined per user
+- most used way for user systems to provide scope and needed OS functionality
+- search checks current directory, then any other locations in the path
+
+#### Mounting a logical drive
+Just like with files, file systems need to be opened before the can be accessed.
+
+Device directory: some OS's define all logical drives to be top level directories (windows)
+Mount point: the directory where the file system is mounted (usually empty directory)
+- When files exist in the mount directory, usually they are hidden behind the new file systems directories
+
+#### Files
+File structure
+- Named collection of related information recorded on secondary storage
+- Arbitrarily long sequence of bytes. Structure is defined by user and programmers.
+- Smallest unit of secondary storage from user perspective
+- File attributes - different for each File System / OS
+    - Name - human readable file name
+    - Identifier - machine ID for file given by OS
+    - Type - OS defined
+    - Location - pointer to device and location on device
+    - Size - current and sometimes max
+    - Protection - who has what permissions
+    - Times (creation, modification, last read)
+    - Char encoding
+    - Checksum
+
+File Operations
+- Creating: find space on disk, make new entry in directory
+- Writing: name of file, write pointer, data to be written
+    - Take address of file + write pointer and write data
+    - Update pointer
+- Reading: name of file, read pointer, amount to read, place in process memory
+    - Take address + read pointer, write from IO to memory
+    - Update pointer
+- Repositioning pointer: move the pointer within the file. Doesn't usually take IO
+- Delete File: file name
+    - delete entry from directory table
+    - mark disk space as empty
+- Truncating file: file name
+    - update size in directory table to 0
+    - mark disk space as empty
+- Renaming a file: file name, new name
+    - update name in directory and in processes
+- Appending new information: 
+
+#### Other
+
+Open file table: keeps list of open files
+- Many systems require files be opened before they are used.
+- `open()` system call
+- Some systems do this automatically on first reference and on process close.
+- This allows the OS to cache the file location on disk instead of looking it up each time.
+- complicated when two processes can access the file at the same time.
+    - two tables are kept. Per process and for the system.
+    - per process:
+        - kept in PCB
+        - rw pointer, access mode
+    - per system:
+        - cached list, reusable entries
+        - disk location, dates, file open count, locks
+
+File locks: Some OS's provide file locking
+- sections or entire files
+- reader writer locks or exclusive locks
+- Mandatory or advisory: mandatory will not let an exclusive lock be broken.
+
+File Types:
+- Usually kept as part of extension
+- sometimes kept in file attributes
+- used as hit about what file can be opened by what application
+- does not preclude an app from opening a file type it's not associated with
+- OS decides what types to support
+    - executable files need a format to determine what to bring into memory and which instruction to start at.
+    - sequence of bytes
+    - each file type needs associated code for OS support, more supported file types, more code
+
+Files on Disk
+- packing: how a File system splits hardware blocks into bytes
+- logical record: the size a disk block is broken into
+- Disks are broken into blocks
+- each file is given a certain number of blocks
+- internal fragmentation: by block - wasted space occurs at the end of each file
+
+Access method
+- sequential access: moves forward and backwards like seeking on a tape
+- direct access / relative access / random access:
+    - indexing into an array of blocks
+    - indexed by beginning of file (like memory)
+- Custom files often have other index methods that help search large files
 - indexed
 - indexed sequential access
 - relative block number
-- directory
-- tree structured directory
-- subdirectory
-- device directory
-- acyclic graph directory
-- symbolic link
-- mount point
-- immutable shared files
-- access control list
+
+File System Failures:
+- disk failure
+- meta data (directory structure, management info)
+- host-adapter
+- controller
+- cable
+- network interruption
+- DNS corruption
+
+#### File Sharing
+
+Access control and protection
+- user (owner) - defines the owner of the file
+- group - defines a group that is allowed access
+- does not protect disks moved across systems
+
+Distributed Information Systems - Across network
+- LDAP, Active Directory, NIS
+
+Access control list
+
+Consistency Semantics
+- How to make sure shared files are consistent when shared by multiple users
+- Unix (Two modes)
+    - Writes are atomic and visible to other users immediately
+    - Pointers are updated together
+- Andrew (AFS)
+    - Session management. All operations are considered to have happening at the moment `close()` is called
+    - Sessions before a user calls `close()` see the original file, sessions opened after see all the changes from the session.
+- immutable
+    - read only access, versions are created 
+
+#### Protection
+Protection is only necessary when multiple users can access a system.
+If only one user has access to the system there is no reason for protection.
+
+Acyclic and graph file structures
+- a user might have different permissions to a file based on the path used to access the file!
+
+Controlled Access - access is permitted and denied by user characteristics and file permission
+- read (copy, print, ect.)
+- write
+- execute
+- append
+- delete (change name, move)
+- list
+
+Access Control List:
+- More generalized approach
+- List of users or groups with specific permissions
+
+Passwords - Another protection method
 
 #### Study Questions
 
 1. explain the function of file systems and their interfaces.
+> hold persistent data on disk
 2. describe the concepts of file, file attributes, file operations, file organization, and file access.
+> A grouped sequence of bytes
+> Held in a file system
+> for a user, with a type, access privileges, type -> structure, encoding
+> create delete, open close, read write, set get pointer, set get attribute
+> permissions -> using a network (NIS, Active director, LDAP) or local matrix UGW or Access Control list
 3. outline the different directory structures.
+> Single level
+> two level
+> tree (unlimited level hierarchy)
+> acyclic graph - links that aren't followed (don't follow links when searching or deleting)
+> graph - links that are followed (search and deletion require garbage collector and marked search)
 4. describe file system mounting and file sharing.
+> file systems need to be opened before they can be modified
+> can be mounted into a directory structure (UNIX)
+> can be mounted into top level two-level directory system (windows)
 5. describe the nature of protection schemes, including the concept of owner, group, and universe (world) categories, and the concept of access lists.
+> owner group world rwx
+> access list - more complicated version with list of who has what permission
 
-1. What are the different file access methods? How are they related to
- file organization?
+1. What are the different file access methods? How are they related to file organization?
 2. How does access control support file sharing and file protection?
 
 - Complete Practice Exercises 11.1 to 1.9 of *OSC9ed*
+11.1 - protection of user information vs recovery and stateful sessions - saves space
+11.2 - depends on use. For systems where users are pro's leave it up to user. When users need protection from themselves, types in file attributes is appropriate
+11.3 - lots of programming in OS more ease of use for programmers and users - max flexibility, more work for programmers
+11.4 - yes. FS browser built with special char defined for directory splits. Functions for renaming dir would have to name large groups of files. Use a map from arbitrary name to file system name.
+11.5 - marks file for read/write OS can keep track of who is using file. Optimize access with paged access ect. Manage sharing. Cache IO location. Link file to Process for management by OS.
+11.6 - read and write to directories is a problem because they don't usually have a section on disk available to them. 
+    - file location - If a user can edit the location of his directory he could potentially give himself access by moving it up the dir structure.
+    - Provide syscall for directory operations
+11.7 - ACL access control lists - each file can have a list of users associated with it, or Group - all but one user is placed in group.
+    - Graph of users, Groups and files - 
+    - Graph can be condensed to users to files
+    - problem with their solution, Any new users auto receive access.
+11.8 - users generally have longer file lists, files have smaller user lists
+    - searching through users lists would be massive
+11.9 - file could be linked to a different link
+    - garbage collection or File ID's or just let it happen and the user will notice that its not the right file.
+
 - Try Exercises 11.10 to 11.13 and 11.17 of *OSC9ed*.
+11.10 - open file table
+    - File sharing isn't affected by users, it's affected by processes with users, No different if two processes across users are sharing or two processes within a users is sharing. Same conflicts occur. Open file tables should be managed per process and per system.
+    - one per system - allows knowledge about shared files, along with which users and processes are using them
+    - one per process - multi-user processes have to manage their own sharing
+11.11 - Mandatory locks make deadlock possible, might be forgotten by a bad user program. Advantage, know that file won't be modified while in use, prevents corruption.
+11.12 - music video playback - database lookup
+11.13 - process might not need the file the entire time.
+11.17 - multiple edits are possible per process. Mering those edits or deciding who gets the final say is difficult.
 
 ### 3.3.2 File-System Interface and Implementation
 OSC9ed: 12.1 to 12.9.

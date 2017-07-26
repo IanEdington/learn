@@ -3410,46 +3410,12 @@ Instructions: Please answer the following questions in complete sentences. Your 
 ## Unit 4: Protection and Security
 Protection and security issues covered in Unit 4 include access matrix and its implementations, authentication, viruses (and other intruders), and encryption.
 
-### Unit Overview
-
-Protection and security have become major issues influencing the advancement of computing and information systems in the last two decades, especially for network and operating systems. Protection and security have become a necessary part of modern operating systems. Unit
-4 provides a brief introduction to these related issues. The learning activities in this unit consist primarily of readings.
-
-Unit 4 is divided into two sections:
-
-**4.1 Protection**
-
-**4.2 Security**
-
-### Learning Objectives
-
-When you complete Unit 4, you will be able to explain the nature of protection and security problems of operating systems, and discuss the protection features that are built into operating systems and supporting hardware to enhance security. You will also be able to describe the main mechanisms used to ensure security, such as cryptography, encryption/decryption, and authentication.
+Protection and security have become major issues influencing the advancement of computing and information systems in the last two decades, especially for network and operating systems. Protection and security have become a necessary part of modern operating systems. Unit 4 provides a brief introduction to these related issues. The learning activities in this unit consist primarily of readings.
 
 ### 4.1 Protection
-
-#### Overview
+OSC9ed: 14.1 to 14.9.
 
 Computer systems contain many objects that need to be protected from misuse. Protection refers to mechanisms for controlling access to objects such as programs, processes, data, and files. *Protection* can be regarded as internal security, whereas *security* (discussed in Section 4.2) is external. This section discusses the goals and principles of protection, and introduces several mechanisms such as access matrix, capability-based protection, and language-based protection.
-
-#### Learning Outcomes
-
-After you have completed Section 4.1, you should be able to
-
-1. explain the nature of policies, mechanisms, and domains of
- protection, and discuss the alternatives for the representation of
- an access matrix.
-2. explain revocation of access rights.
-3. outline the main features, advantages, and disadvantages of
- language-based protection.
-4. discuss protection implementation, using an example such as UNIX,
- Cambridge CAP, Hydra, or Java.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 14: Protection: 14.1
- to 14.9.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-4 above.
 
 #### Key Concepts and Topics
 
@@ -3466,45 +3432,28 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
-1. Why is it important to distinguish between mechanisms and policies
- of protection?
-2. What are the differences between capacity-based protection and
- language-based protection?
+1. explain the nature of policies, mechanisms, and domains of protection, and discuss the alternatives for the representation of an access matrix.
+2. explain revocation of access rights.
+3. outline the main features, advantages, and disadvantages of language-based protection.
+4. discuss protection implementation, using an example such as UNIX, Cambridge CAP, Hydra, or Java.
+
+you will be able to explain the nature of protection and security problems of operating systems
+discuss the protection features that are built into operating systems and supporting hardware to enhance security
+describe the main mechanisms used to ensure security
+cryptography
+encryption/decryption
+authentication
+
+1. Why is it important to distinguish between mechanisms and policies of protection?
+2. What are the differences between capacity-based protection and language-based protection?
 3. What is *access matrix*, and how is it implemented?
 
-#### Learning Activities
-
-- Try Practice Exercises 14.1 and 14.5 to 14.10 of *OSC9ed*. You may
- check the answers to these questions at Operating System Concepts
- (9th ed.): [Solutions to Practice
- Exercises](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33732).
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 14 of *OSC9ed*.
+Practice Exercises 14.1 and 14.5 to 14.1
 
 ### 4.2 Security
-
-#### Overview
+OSC9ed: 15.1 to 15.9.
 
 Security is a much broader topic than protection. Security requires not only an adequate protection system but also consideration of the external environment within which the system operates. Security measures aim to safeguard computer systems against unauthorized access by intruders, against malicious destruction, and against accidental inconsistency.
-
-#### Learning Outcomes
-
-After you have completed Section 4.2, you should be able to
-
-1. discuss security threats and attacks (viruses, Trojan horses, trap
- doors, worms, human intruders, etc.).
-2. explain the fundamentals of cryptography, encryption/decryption, and
- authentication; and examine their uses for security purposes.
-3. outline some of the physical and human security issues that are
- external to operating systems.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 15: Security: 15.1
- to 15.9.
-
-As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-3 above.
 
 #### Key Concepts and Topics
 
@@ -3548,61 +3497,25 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
-1. What are the common program threats, and how can people protect
- computer systems from these threats?
-2. How can symmetric encryption and asymmetric encryption help in
- authentication?
-3. What are the user authentication methods, and how are they
- effective?
+1. discuss security threats and attacks (viruses, Trojan horses, trap doors, worms, human intruders, etc.).
+2. explain the fundamentals of cryptography, encryption/decryption, and authentication; and examine their uses for security purposes.
+3. outline some of the physical and human security issues that are external to operating systems.
 
-#### Learning Activities
+1. What are the common program threats, and how can people protect computer systems from these threats?
+2. How can symmetric encryption and asymmetric encryption help in authentication?
+3. What are the user authentication methods, and how are they effective?
 
-- Try Exercises 15.2, 15.4, and 15.9 to 15.14 of *OSC9ed*.
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 15 of *OSC9ed*.
-
-### Supplementary Unit Activities
-
-- Explore surveys and technical documents about the protection and
- security that an operating system provides. Try to identify an
- existing problem of interest and a possible solution to it. Check to
- see whether this may be a suitable topic for Assignment 4 of
- this course.
-- You may also explore Linux kernel to see what protection and
- security features are provided and how they are realized. Share your
- findings and opinions with your classmates and tutor on the course
- discussion forum.
+Exercises 15.2, 15.4, and 15.9 to 15.14 of *OSC9ed*.
 
 ## Unit 5: Distributed, Real-Time, and Multimedia Systems
 Unit 5 reviews distributed systems and special-purpose operating systems, such as real-time systems, embedded systems, mobile systems, and multimedia systems. This unit serves as an extension to the core topics of the course.
 
 Unit 5 provides an extension to the core topics of operating systems. It introduces distributed systems and special-purpose operating systems such as real-time systems and multimedia systems. This extension introduces the ever-changing information technologies and products in which operating systems play an important role. In fact, with many operating systems, different versions are developed for different computing environments to meet the needs of different applications. For instance, both Linux and Windows have desktop, server, mobile, and embedded system versions for different devices and applications.
 
-### Learning Objectives
-
-When you complete Unit 5, you will be able to define the terms
-*distributed operating system*, *distributed file system* (DFS), and
-*real-time computer system*. You will move on to describe the general structure of distributed systems and the way in which real-time operating systems must be constructed to meet stringent timing requirements. Finally, you will be able to identify the characteristics of multimedia data and indicate how multimedia operating systems can meet the requirements of continuous-media data.
-
 ### 5.1 Distributed Systems Overview
-
-#### Overview
+Chapter 17: Distributed System.
 
 This section briefly introduces distributed systems and discusses the general structures and interconnections in a distributed system. This section also discusses concepts directly related to distributed operation systems, such as distributed file systems (DFS).
-
-#### Learning Outcomes
-
-After you have completed Section 5.1, you should be able to
-
-1. describe the overall structure of distributed systems.
-2. discuss communications in a distributed system.
-3. outline the particulars of a distributed file system.
-
-#### Reading Assignment
-
-- *Operating system concepts* (9th ed.): Chapter 17:
- Distributed System.
 
 As you do the assigned reading, focus on the Key Concepts and Topics outlined below to ensure that you can meet Learning Outcomes 1-3 above.
 
@@ -3630,16 +3543,20 @@ As you do the assigned reading, focus on the Key Concepts and Topics outlined be
 
 #### Study Questions
 
-1. What is a distributed operating system, and what are the main tasks
- that a distributed system supports?
-2. What is a distributed file system, and what are the naming schemes
- of DFS?
+1. describe the overall structure of distributed systems.
+2. discuss communications in a distributed system.
+3. outline the particulars of a distributed file system.
 
-#### Learning Activities
+*distributed operating system*
+*distributed file system* (DFS)
+*real-time computer system*.
+Describe the general structure of distributed systems
+the way in which real-time operating systems must be constructed to meet stringent timing requirements.
+Identify the characteristics of multimedia data
+indicate how multimedia operating systems can meet the requirements of continuous-media data.
 
-- Download and review the [PowerPoint
- slides](http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=7887&itemId=1118063333&resourceId=33777)
- or pdf for Chapter 17 of *OSC9ed*.
+1. What is a distributed operating system, and what are the main tasks that a distributed system supports?
+2. What is a distributed file system, and what are the naming schemes of DFS?
 
 ### 5.2 Virtual Machines
 OSC9ed: 16

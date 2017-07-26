@@ -2909,40 +2909,262 @@ Passwords - Another protection method
 ### 3.3.2 File-System Interface and Implementation
 OSC9ed: 12.1 to 12.9.
 
-#### Key Concepts and Topics
+#### Layered access to a hard disk
 
-- basic file system
-- logical file system
-- file-control block
-- mount table
-- virtual file systems
-- dynamic storage allocation
-- external fragmentation
-- file allocation table (FAT)
-- index block
-- linked allocation
-- combined index
-- backup
-- recovery
-- consistency checking
+1. IO device
+1. IO controller - physical connection between disk and computer
+1. Device Driver - knowledge of device, sets bits in controller to send or request data from target device
+1. Basic File System - read and write physical blocks
+1. File-organization module
+    - Takes physical blocks and organizes them into files.
+    - Files often aren't continues block sectors.
+1. Logical File System - Organize files into a FS structure with metadata.
+1. Virtual File system interface
+    - Provides a seamless interface across diverse FS without having detailed info about the FS
+    - Organizes the many types of file systems into a single view for the user
+    - Takes user file-system syscalls and directs them to the file system using the correct FS call
+    - does this across remote file systems as well
+    - ext3, ext4, NTFS, and NAS volumes are all mounted on a system in different mapped directories. Virtual File System Interface takes the system call, figures out which FS the file is on and issues the correct call to that FS.
+    - uses OOP to do this using:
+        - Objects:
+            - inode object - unique file in FS
+            - file object - open file
+            - directory object - a single directory entry
+            - superblock object - entire dir struct
+        - Methods:
+            - open
+            - close
+            - read
+            - write
+            - mmap - memory map a file
+1. File-System Interface - what we see as users
+
+#### Data Structures for File-System management
+Boot control block (aka Boot Block or partition boot sector)
+- First block of every volume
+- Contains information about how to boot an OS from that volume
+- Empty if there is no OS on volume
+
+Volume Control Block (aka Super Block or in the Maser File Table)
+- Information about the volume (# of blocks, block size, free-block count, free-block pointers)
+
+Directory Structure
+- The structure of the files (names and address of FCB)
+
+File Control Block (FCB)
+- Unique ID for entry into Directory Structure
+    - ownership - user group ACL
+    - permissions - rwx and extended
+    - date-time - create, write, read
+    - size
+    - location of file data blocks
+- Stored in Master file table, or with the file
+
+In Memory Mount Table
+- Info about each mounted volume
+- Pointer to the on disk superblock or Master Boot Record
+- List of mount positions (path names) mapped to devices
+- To find a file
+    - the path is passed to the mount table
+    - The mount table finds the longest matching prefix
+    - returns the device
+
+In Memory Directory Structure
+- Holds dir struct according to OS
+- Mounted volumes are denoted using bit flag and pointer to Mount Table
+- Stores cache of recently accessed directories.
+
+Open File Table (OFT)
+- System Wide - FCB for each open file, open count, other info.
+- Per-process - Link to System Wide OFT, plus other
+
+Buffers for holding blocks when being read to or written from disk
+
+#### Operations
+`open($filename)`
+1. Check System wide OFT for file; if no:
+    1. No other process has this file open
+    1. Search in memory directory structure for file; if no:
+        1. Search dir struct of file system
+        1. Update in memory dir struct
+    1. Access FCB and add it to the system wide OFT with empty open count
+1. Create a per-process OFT and link it to the system wide OFT
+1. Increment open count
+
+`close($filename)`
+1. Remove file from per-process OFT
+1. Decrement open count from system wide OFT
+1. If count is zero:
+    1. Write OFT info back to disk
+    1. Remove system wide OFT
+
+Mounting
+In memory dir struct modified to have 
+
+#### Directory Implementations
+
+Linear List
+- linear search
+- Doesn't help caching
+- sorted might help (tree)
+
+Hash Table
+- Linear list + hash table
+- hash table on file name
+- collisions (chained)
+
+#### File block allocation
+
+Free space list
+- bit vector - one bit per block
+    - 0=available, 1=used
+    - not useful except when in memory
+    - 1-TB disk, 4-kb block = 256-mb bit vector
+- Free list linked list of free blocks
+    - not efficient but doesn't usually have to be since one block at a time is taken.
+    - FAT does this with it's linked list
+- Grouping
+    - First Free block contains n free block + link to next block of free blocks
+    - use all block in first free block then use first block then follow to next block of blocks.
+- Counting
+    - a list of holes
+    - link to free block plus count of continuous block free
+    - store in balanced tree for efficient lookup, insertion deletion
+- Space Map
+
+How will the system be used?
+Sequential - continuous
+Random - index block
+
+CPU time is extremely cheep compared to IO read writes.
+1000s of CPU instructions might be worth optimizing 1 IO operation.
+.: In practice a complex blending of the following methods exist.
+
+Continuous allocation
+- easy to keep track of
+- access easy
+- dynamic storage allocation - Finding hole: First fit, Best fit, Worst Fit
+- External Fragmentation
+- File size changes!
+    - Move File to larger hole
+    - Fail
+
+Linked allocation
+- DLL of block locations
+- No External Fragmentation
+- High cost of seek
+- Best for sequential or small files
+- Clusters
+- If a pointer is broken it messes up the file big time
+- File allocation table (FAT)
+    - table with one entry per disk block and indexed by block number.
+    - the value of the value returned is the next block in the file.
+    - 0 means end of file
+
+Index block allocation
+- Linked Allocation with all pointers in one block per file
+- Blocks all over a volume leads to poor seek times for sequential read/write
+- Directory points to index block - index block points to all the blocks used by the file
+- Pointer block is often not very full
+- Allows direct access when index block is brought into memory.
+- Large vs small file strategies
+    - Large files - link several index blocks together
+    - Multilevel index block - for large files the first block contains pointers to another block
+    - Combined - x pointers in directory are data block pointers, then a single indirect, double indirect, triple indirect
+
+Extent allocation
+- List of two values, start block and number of continuous blocks
+- Multiple block segments are strung together to form a file
+- A mix of Index Block and Continuous allocation
+
+#### Efficiency
+
+Unix spreads inodes across system: having file info close to file data decreases seek time.
+BSD Varies cluster size by file size.
+Should last read time be kept? This requires a read and write for every read
+Pointer size - to big and 1/2 your memory for dir struct is wasted (for the unused part of the pointer)
+    - too small you will change it in a few years costing millions to thousands of companies
+Fixed length vs variable structure - fixed saves CPU cycles, variable will work in the future
+
+Buffer in hard drive
+File caching
+
+Unified buffer cache
+- Treats Memory Mapped IO, regular IO, and Virtual Memory paging the same
+- This has the benefit of maximizing Memory use decreasing thrashing
+
+IO Paging algorithms
+- LRU - depending on file, LRU often isn't the most effective caching mechanism for on disk files
+- Read-ahead - grabs a chunk of data in front of read()
+- Free-behind - drops pages recently read.
+
+#### Recovery
+Interrupted IO
+
+Dir struct
+- bit is set to indicate in process of mod
+- after recovery if the mod bit is set run consistency checker
+- consistency checker uses the dir struct and info found on disk to fix consistency issues
+    - efficiency depends heavily on FS
+    - Usually prefers consistent state over recovering data
+- Even with consistency checking a file system can become broken (blocks lost, dir broken, ect.)
+
+Journaling (log based transaction-oriented)
+- each transaction is first created as a log.
+- the log is then played out across the FS.
+- This way any incomplete action is recorded and can be played back on recovery.
+- The file system can never be broken.
+
+Backups
+- full backup
+- incremental backup
+
+#### NFS RPC Protocol
+Mounted NFS volumes can have directories within it mounted by other volumes.
+The in memory file system keeps track of which volumes are mounted where. !WOW!
+NFS uses the host OS to translate to file server so a client machine can access a FS type it doesn't recognize if the Server does.
+
+- attach to remove file system (server:director)
+- search file in dir
+- read and set dir entries
+- manipulate links and dir
+- Get handle to a file
+- access file attributes
+- read write files
 
 #### Study Questions
 
 6. explain the layered approach to file system organization.
+    - multiple layers of abstraction in order to make the job of programming easier
+        1. syscalls to OS
+        2. Unified paging strategy - cache using memory to hold reads (read-ahead, free-behind, LRU)
+        3. Virtual File System
+            1. in memory directory tells which device to use
+            1. Mount table contains device info (file system type)
+            1. translates syscalls to the appropriate logical file system function
+        1. Logical File system (NFTS, FAT, ext3, ext4)
+            - organization of blocks
+            - packing algorithms (optional)
+            - block allocation algorith
+            - directory implementation
+        1. File system organization
+        1. Basic file system - sends blocks to driver
+        1. driver -> controller -> disk
 7. describe the implementation of a local file system and directory.
-8. explain contiguous, linked, and indexed disk allocation strategies, and the overhead, benefits, and problems associated with each.
+8. explain contiguous, linked, and indexed disk allocation strategies
+What are the overhead, benefits, and problems associated with each.
 9. discuss free-space management and its possible implementations.
+    > bitmap
+    > linked list
+    > index block
+    > grouping
 10. discuss the importance of backup and recovery.
 11. discuss efficiency and performance issues related to file systems and organization.
 
-1. What are the drawbacks of a layered structure in a file-system
- implementation?
-2. When would you consider designing a special file system instead of
- using the one distributed with an operating system?
-3. What are the two most important functions of the Virtual File
- System (VFS) layer?
-4. What are the problems associated with linked allocation of disk
- space routines?
+1. What are the drawbacks of a layered structure in a file-system implementation?
+2. When would you consider designing a special file system instead of using the one distributed with an operating system?
+3. What are the two most important functions of the Virtual File System (VFS) layer?
+4. What are the problems associated with linked allocation of disk space routines?
 
 - Complete Practice Exercises 12.1 to 12.8 of *OSC9ed*
 - Try Exercises 12.11, 12.15, 12.16, and 12.20 of *OSC9ed*.
@@ -2953,41 +3175,155 @@ OSC9ed: 13.1 to 13.7.
 
 Input-output (I/O) is one of the two main jobs of a computer (the other is processing/computing). This section briefly introduces I/O systems, including I/O hardware, services, and interfaces. It covers some concepts that are basic to computer systems such as bus structure, device drivers, direct memory access (DMA), kernel I/O subsystems, and I/O performance issues.
 
+#### Interrupts
+Non-Maskable Interrupt (NMI)
+- the CPU can't stop it
+- non recoverable hardware errors
+- This is used for hardware traps in the CPU
+Maskable - the system can ignore them.
+
+Interrupt address
+- attached to the interrupt.
+- indicates which interrupt handler from the interrupt vector to use
+- Usually there are more interrupt handlers than there are addresses
+- address usually points to a list of Interrupt handlers
+
+Interrupt Priority
+- It's possible for an interrupt to interrupt an interrupt handler
+- 1-31 are usually high priority
+- 32-255 are user defined
+- Within user defined there are priorities
+    - Solaris uses thread priorities
+
 #### Key Concepts and Topics
 
 - device drivers
 - bus structure
 - memory-mapped I/O
 - registers for I/O ports
-- busy-waiting or polling
-- interrupt-driven I/O
-- programmed I/O (PIO)
-- DMA
-- block and character devices
-- blocking and nonblocking I/O
-- kernel I/O subsystem
-    - I/O scheduling
-    - buffering
-    - caching
-    - spooling
+    - Status - read by host - completed? error? ready?
+    - Control - host writes settings to the IO device
+    - data-in
+    - data-out
+
+- busy-waiting or polling - spin on the status register for the busy bit
+- interrupt-driven I/O - IO Controller sends interrupt on hardware interrupt wire
+
+Programmed I/O (PIO)
+    - CPU transfers bits from IO Controller to Memory one by one
+DMA Control block
+    - CPU writes instructions to an in memory command block
+    - CPU signals DMA controller where the command block is
+    - DMA reads command block and Orchestrates the transfer to memory
+        - sets up the request with the IO Controller
+        - DMA request wire - IO Controller signals that the word of data is available
+        - DMA takes control of the Memory Bus
+        - DMA writes to address bus
+        - DMA acknowledge wire - tell IO Controller to send data to memory
+
+Device qualities
+- block or character - Does the device transfer by block or by word
+- sequential or random access
+- synchronous or asynchronous - 
+- sharable or dedicated - Can more than one thread use a device concurrently
+- device speed
+- read only, write only, read/write
+- blocking and nonblocking
+    - A device can only service one request at a time, a queue is needed for more calls.
+    - Multiple read, call-back functions
+    - vectored IO
+
+Standard device Types - Most devices fall into one of these categories.
+- Block device interface - read() write()
+    - random access - seek()
+- Character-stream interface - get() put()
+- Network interfaces - socket
+    - wall socket, anything can be plugged in
+    - create() a socket
+    - listen() - for a remote item to plug into socket
+    - send() receive() - packets
+    - select() - finds a socket that has a packet waiting
+- Clocks and timers
+    - Give current time
+    - elapsed time
+    - trigger op x at time y
+
+
+Kernel I/O subsystem
+- I/O scheduling
+- buffering
+    - use two buffers, When one is complete send it to memory and fill the second buffer, by the time the second is complete the first will be empty, repeat.
+    - fragmenting and assembling messages before write.
+- caching
+    - writing to IO is delayed until defined intervals, only the last copy of a file is written to disk
+    - read-ahead caching
+- spooling
+    - coordinate concurrent output on devices that don't support it
+    - queue for devices that can't manage themselves (printers)
+- protection
+    - all IO instructions are privileged
+    - Memory management protection- certain programs need access to memory mapped IO areas (GPU)
+    - Open file record contains info about what process is allowed to do what with a file. 
+
+STREAMS I/O
+- buffered duplex pipe for many IO functions
+- supports stacking pipes
+
+#### Performance
+- reduce interrupts
+    - large transfers
+    - polling (if efficient)
+    - buffered IO that interrupts only once per period
+- reduce context switches (moving across process boundaries)
+    - one thread to deal with a certain type of IO
+- reduce copying of data
+- increase parallel processing
+    - DMA
+- move processing to hardware
+
+User code
+kernel code
+device-driver code
+device-controller hardware code
+device hardware code
+
+Start a new optimization in user code for small dev time/cost and great flexibility.
+Move down the stack to increase efficiency, abstraction.
 
 #### Study Questions
 
 1. describe (briefly) I/O hardware components and mechanisms such as bus, interrupt-driven I/O cycles, and DMA.
+> Bus (address, control, memory)
+> DMA controller that works in parallel
 2. outline and describe the main functions of the kernel I/O subsystem.
+> take weight off user
+> provide abstraction
+> move device specific code into drivers that can be loaded as modules when they are needed
+> layered system that provides useful interfaces as syscalls
 3. briefly explain how I/O requests are transformed to hardware operations.
+> syscall
+> kernel checks mount table for device
+> kernel passes control to device driver
+> driver sets bits in controller to effect the call
+> controller sends request to device
+> device sets control bit and controller polls device
+> controller moves word/char from device to controller
+> controller sends interrupt to CPU
+> CPU fetches char/word from controller
 
 1. How are data transferred between an I/O device and memory?
+> through CPU
+> through DMA
 2. What is DMA, and why do we need it as an alternative to standard memory access systems such as programmed I/O?
+> each has certain conditions where it is more efficient
+> DMA-request wire
+> DMA-acknowledge wire
 3. What is the purpose of device drivers in operating systems?
+> abstraction, moving code out of kernel into module
 4. What are the main tasks of the kernel I/O subsystem?
 
 - Complete Practice Exercises 13.1 to 13.6 of *OSC9ed*
 - Try Exercises 13.9, 13.10, and 13.12 of *OSC9ed*.
-
-- Explore surveys and technical documents about the memory, file-system, mass-storage and I/O subsystems. Try to identify an existing problem of interest and a possible solution to it (you may continue this work in the following units until you find a suitable topic for Assignment 4 of this course).
-- You may also explore Linux kernel to see what features it provides for file-system interface and implementation, storage management, and I/O systems. Share your findings and opinions with your classmates and tutor on the course discussion forum.
-
 
 ## Assignment 3
 

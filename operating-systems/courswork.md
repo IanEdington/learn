@@ -3419,25 +3419,108 @@ Computer systems contain many objects that need to be protected from misuse. Pro
 
 #### Key Concepts and Topics
 
-- protection policies and mechanisms
-- protection domain
-- domain switching
-- access matrix
-- access list
-- capability list
-- lock-key scheme
-- access control
-- capacity-based protection
-- language-based protection
+Protection policies
+- what should be done.
+- secure policies does not mean secure systems
+Protection mechanisms
+- how it will be done
+- if they are general enough, one set of mechanisms can implement various policies
+
+Why Protection:
+- keeps people from accessing things they shouldn't access
+- warns when malfunctioning or maltious processes are accessing things they shouldn't
+- keeps them from affecting the rest of the system.
+- improves reliability
+
+Principle of least privilege
+- Time tested way of decreasing potential loss from the system.
+- Only give people/processes enough access to do their job effectively
+- If they are malicious or their access is compromized only a small section of the system is accessible
+
+Fine-graied access control
+Auditable access logs
+
+Protection domain
+- a set of privileges
+- an defined set of access to objects.
+- can be attached to a user, process, or procedure
+    - user/group - domain switching happens when you switch users
+    - process - domain access is provided per process (android)
+    - procedure - different procedures within a process can be given different domain access
+
+Domain switching
+
+#### Privilege models
+
+UNIX - SetU bit
+- Files in unix have an associated bit called a setU bit.
+- When a user executes a file when the setU bit is on,
+    - on - the file is executed in the domain of the file owner
+    - off - the file is executed in the domain of the current user
+- if a user is able to set the setU bit and change the file owner to root, it can execute any code it wants in root domain
+- if a user can get you to execute a file without the setU bit, it will run in your userspace.
+
+Access matrix
+- A [domain, object] matrix which defines the access any given domain has to an object
+- domains can also be objects allowing one domain to switch to another domain
+- The access matrix should also be an object.
+- Who can change what in the access table
+
+Role-based access Control
+- Users are assigned roles, processes are assigned roles
+- Every role is assigned a privilege for objects
+- How is this different than domains? Isn't it just a different word for the same thing?
+
+Revocation
+- immediate vs delayed
+- selected vs general
+- partial vs total
+- temporary vs permanent
+
+Implementation
+- global table - [domain, object, rights-set]
+    - simple
+    - usually too large for main memory
+    - groupings of objects are difficult (if every group can read a certain object, it must be available in every domain)
+- Access lists for objects - [domain, rights-set]
+    - When domain D performs action on object O, search list of O for domain D
+    - default set might exist
+    - easy for owner to use
+    - Isn't easy to provide list of privileges to a domain
+    - rovoking is immediate, can be partial, temporary, and is selected
+- Capability List for domain - [object, rights-set]
+    - seems to be favoured by text
+    - useful for processes
+    - hard to revoke capability because it needs to be done in every spot
+    - Very hard to Revoke - they first need to be found
+- A lock and key
+    - domains have a list of keys, objects have a list of locks - if a key fits the lock give access
+    - effective and flexible
+    - complicated
+- Hybrid Capability cache with Access List storage
+    - As the process is executing it builds up a list of capabilities
+    - usually caps are kept in File table entry
+
+Language-based protection
+- Protection is set within the language
+- Benefits
+    - Declaired rather than programmed
+    - Not provided by subsystem (program)
+    - Naturally works with data types
 
 #### Study Questions
 
 1. explain the nature of policies, mechanisms, and domains of protection, and discuss the alternatives for the representation of an access matrix.
+> policies - deciding what has access to what
+> mechanisms - implementation of protection (access list, cap list, lock-key pairs, 
+> doamins - defined area.
+> access matrix - big matrix of who can do what
 2. explain revocation of access rights.
+> revoking access rights happen when
 3. outline the main features, advantages, and disadvantages of language-based protection.
 4. discuss protection implementation, using an example such as UNIX, Cambridge CAP, Hydra, or Java.
 
-you will be able to explain the nature of protection and security problems of operating systems
+explain the nature of protection and security problems of operating systems
 discuss the protection features that are built into operating systems and supporting hardware to enhance security
 describe the main mechanisms used to ensure security
 cryptography
@@ -3448,31 +3531,88 @@ authentication
 2. What are the differences between capacity-based protection and language-based protection?
 3. What is *access matrix*, and how is it implemented?
 
-Practice Exercises 14.1 and 14.5 to 14.1
+Practice Exercises 14.1 and 14.5 to 14.10
 
 ### 4.2 Security
 OSC9ed: 15.1 to 15.9.
 
 Security is a much broader topic than protection. Security requires not only an adequate protection system but also consideration of the external environment within which the system operates. Security measures aim to safeguard computer systems against unauthorized access by intruders, against malicious destruction, and against accidental inconsistency.
 
+Purpose
+- confidential information
+- modification of data
+- availability of service - website defacement
+- theft of service - hijacking the use of another machine
+- denial of service - 
+
+How
+- Masquerading
+    - replay with modification
+    - session hijacking
+    - man in the middle
+- Physical - gaining physical access to servers
+- Human - social engineering
+- Software (Operating systems)
+    - stack overflow
+- Network
+
+Although perfect security isn't possible it is possible to make it hard enough that the benefit probably won't outweigh the cost.
+
+#### Often used tools
+Trojan Horse
+- a malicious version of a program that can be placed on the path
+- uses the calling users privileges to do bad things
+- Another version is a login window that is actually a program left by the last user
+
+Spyware
+- might be included in trusted software
+- send mail from your address
+- might call home with information
+
+Trapdoor
+- a way for programmer to access system after gaining access once
+- since they often use processes that are normal on a system
+- these are very difficult to detect
+
+Logic Bomb
+- only executes when certain parameters exist, some kind of trigger happens
+
+Stack or Buffer Overflow
+- bug exists in program
+- Overflow an input until if writes onto the stack
+- Overwrite the current return address with the exploit code address
+- Write a simple set of commands to give access
+
+Virus
+- Fragment of code in a legitimate program
+- self replicating and designed to 'infect' other programs
+- often stored in word docs through VB
+- Not as common with Unix since executables are not modifiable
+- virus dropper - shell that starts the virus on a machine
+- Types
+    - File viruses - append themselves to an executable, do their thing then return control to original program.
+    - Boot - Overwrites the boot sector - does something
+    - Macro
+    - source code
+    - polymorphic - changes itself on every run in order to avoid detection
+    - encrypted - to avoid detection
+    - stealth - modifies system to make it difficult to detect
+    - tunneling - in device drivers, interrupt handler, ect
+    - Multiparti
+    - armoured - makes it difficult for researchers to detect
+
+#### Network attacks
+Worm
+- A way for access to be programatically pulled from a system
+
+Port Scanning
+- a way to find out what is vulnerable
+- programmatically probe ports on a bunch of systems
+
+Denial of service
+
 #### Key Concepts and Topics
 
-- denial-of-service (DOS)
-- replay attack
-- man-in-the-middle attack
-- session hijacking
-- phishing
-- dumpster diving
-- back-door demon
-- Trojan horse
-- spyware
-- covert channels
-- trap door
-- logic bomb
-- virus
-- worm
-- zombie system
-- distributed DOS
 - cryptography
 - decryption
 - encryption

@@ -3837,69 +3837,6 @@ Find some articles and technical documents on modern virtual machines.
 Explain the reason behind the recent success of virtual machines, although they have been around for a long time.
 What forms of virtualizations are expected in the future?
 
-## Assignment 4
-
-This assignment should be submitted after you have finished Unit 5. It is worth 15% of your final grade for this course.
-
-**Part 1: Concepts (20 marks; 4 marks each)**
-
-Please answer the following questions in complete sentences. Your answer for each question should be about 150 words.
-
-1. Why is it important to distinguish between mechanisms of protection and policies of protection?
-1. What is an access matrix, and how can it be implemented?
-1. How does a virus differ from a worm?
-1. What is the difference between symmetric encryption and asymmetric encryption?
-1. What are the two main varieties of authentication algorithms?
-
-**Part 2: Research Project (80 marks)**
-
-In Part 2, you will investigate technical problems of operating systems, and provide a written report. Your research should focus on an in-depth topic about theories, algorithms, approaches, mechanisms, or implementation of one of the following fields of operating systems:
-
-- process management
-    - process and thread
-    - CPU scheduling
-    - synchronization
-    - deadlock handling
-- storage management
-    - main memory
-    - virtual memory
-    - file systems
-    - mass-storage and I/O
-- protection and security
-- distributed, real-time, and multimedia systems
-
-Your topic could come from a sub-problem of cutting-edge research problems discussed in the literature (i.e., investigating a technical problem).
-
-If you have trouble deciding what topic to work on, contact your tutor, who can advise you on the suitability of the topic and/or suggest modifications. Note that topic selection is part of your assignment requirements for this project, so you cannot rely on your tutor to assign a topic.
-
-To ensure that your topic has adequate depth and coverage, you MUST write a one-page proposal that outlines your area of interest and associated references you will use. Send it to your tutor for consideration before you begin your project work, preferably allowing at least two weeks for consultation.
-
-In your paper (expectations outlined below), make sure you highlight your work and outcomes in your own words. You must also properly cite any viewpoints, methods, algorithms, data, results, figures, tables, etc. that you borrow from other papers or contributors that you discuss or include in your paper/report. All references cited should be published, or at least be publicly available, stable, and accessible online (referenced in APA or IEEE Style). Using the work of others without proper credit in your paper/report may lead to a form of plagiarism, which is not tolerated in AU courses. Please review the Student Academic Misconduct Policy for more details.
-
-**Research Paper Your investigation will be based on recent publications (i.e., published in the past five years) such as journal/conference papers and technical documents, and the applicable software packages (open source preferred). You are encouraged to read some papers about new techniques in operating systems. You can access the following resources via the ACM Digital Library and IEEE/IEE Electronic Library databases in the Athabasca University Library.**
-
-SOSP: ACM Symposium on Operating Systems Principles (ACM) ACM SIGOPS Operating Systems Review (ACM) ACM Transactions on Computer Systems (ACM) IEEE Transactions on Computers (IEEE) ACM Computing Surveys (ACM) Communications of the ACM (ACM) IEEE Computer. . . (IEEE) Linux Journal (ACM)
-
-Once you have chosen your topic, you need to identify meaningful, feasible outcomes for your research on the topic. Overall, the outcomes should interest and benefit the professional community of operating system research and development. Some possible outcomes:
-
-- analysis, findings, and discovery of problems.
-- results of your tests, surveys, and comparative analysis.
-- proposals for new or improved methods, algorithms, etc.
-- meaningful implementation plans.
-- insight on future directions.
-
-Present the outcomes of your research in a 10- to 15-page paper written in a journal or conference paper format. References should be cited using APA or IEEE Style. Your paper should include the following sections:
-
-- Title
-- Abstract: no more than 300 words.
-- Introduction/background: motivation for research and introduction to the outcomes, including a literature review and reference citations.
-- Methods: describe the problem and the methods you used to explore or address the problem.
-- Results and findings: research results or exploration findings, including theoretical analysis and any experimental and implementation results you accomplished based on your methods.
-- Related work: summarize related work by others; compare your methods and results with others’ work. Cite your references.
-- Conclusion and future work: conclude your exploration and research, and suggest possible future work on the topic.
-- References: include all references cited in your paper, using APA or IEEE Style.
-- Appendix: Includes a list of your data, design/implementation, and source codes (as applicable), and software necessary for running your programs (if applicable). The Appendix isn’t part of the page count for your paper.
-
 ## Final Exam
 
 The final examination for COMP 314 will be a closed-book invigilated online exam. You have three (3) hours to complete the examination. The questions will cover Unit 1-4 of the course, and may relate to any of your assignments.

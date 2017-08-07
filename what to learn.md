@@ -1,5 +1,6 @@
 # What to learn
 https://teachyourselfcs.com/
+https://github.com/open-source-society/computer-science
 
 ## Topics
 - Computer Architecture

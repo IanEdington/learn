@@ -50,7 +50,7 @@ There are a few assumptions about the functions.
 
 - Asymptotically non-negative: only works in the positive quadrant
 
-Example of how to calculate constants & lower value: Intro to Alg(pg 46)
+Example of how to calculate constants & lower value: IntoAlg(pg 46)
 
 $$
 c_{1}n^2 \leq \frac{1}{2}n^2 - 3n \leq c_{2}n^2
@@ -76,13 +76,13 @@ The running time of an algorithm.
 Next to accuracy, time complexity is the next most optimized property. Algorithms are most often compared based on this property since space is generally inexpensive, and correctness is usually assumed.
 
 - Worst-case running times:
-    The slowest possible time an algorithm can take. ie. Bubble sorting a list that is in reverse sorted order.
+    The slowest possible time an algorithm can take, e.g. bubble sorting a list that is in reverse sorted order.
 
 - Amortized running times:
     Worst case running time of a sequence of n actions.
 
 O(m) represents that if m operations are completed the total running time will not exceed O(m) even though a specific operation may be a larger order function.
-A good example of this is the resize operation within a deque, or list operation. Even though the resize operation is expensive it is performed in proportion to the number of other operations in the sequence.
+A good example of this is the resize operation within a dequeue, or list operation. Even though the resize operation is expensive it is performed in proportion to the number of other operations in the sequence.
 
 - Expected running times:
     A type of probabilistic analysis where a random dataset is used to determine an average running time based on randomized dataset.
@@ -141,18 +141,18 @@ Item's added and removed from a data structure in order.
     interface: `add queue addFirst | remove dequeue removeLast`
 - LIFO aka Stack (Last in, First out)
     interface: `push addFirst | pop removeFirst`
-- Deque (Double Ended Queue)
+- Dequeue (Double Ended Queue)
     super set of FIFO and LIFO
     interface: `addFirst | addLast | removeFirst | removeLast`  
 - Priority Queue
-    This queue has some kind of prioritization that occurs during the add method.  
+    This queue has some kind of prioritization that occurs during the add method  
     interface: `insert_with_priority | pop_next_priority_element deleteMin`
 
 #### List
 - List or Sequence Interface
-    ![list deque and queue](img/list-deque-queue.png "list deque and queue")
+    ![list dequeue and queue](img/list-dequeue-queue.png "list dequeue and queue")
 
-Superset of Deque plus:
+Superset of Dequeue plus:
 
 x_1,x_2,...,x_(n-1)
  - `size()`: returns length of list
@@ -192,7 +192,7 @@ Introduction
 - singly-linked lists
 - doubly-linked lists
 - space-efficient linked lists
-- skiplists
+- skip-lists
 
 #### Array-Based: List
 TODO: Implement
@@ -201,17 +201,17 @@ Fast Stack Operations Using an Array
 FILO stack that is implemented using an array.
 
 Add in the middle of an array:
-    1. check if array is long enough
-        1. resize if not big enough
-    1. move items over (for loop)
-    1. assign element
+    1. Check if array is long enough
+        1. Resize if not big enough
+    1. Move items over (for loop)
+    1. Assign element
 
 Remove for middle of array:
-    1. move items left starting at item right of the item to be removed (for loop)
-    1. check if array is too long
-        1. resize
+    1. Move items left starting at item right of the item to be removed (for loop)
+    1. Check if array is too long
+        1. Resize
 
-2.2 FastArrayStack: An Optimized ArrayStack: 
+2.2 Fast Array Stack: An Optimized Array Stack: 
 There are functions that are more efficient than for loops for copying and moving elements in an array.  
 C: `memcpy(d, s, n)` and `memmove(d, s, n)`  
 C++: `std :: copy(a0, a1, b)`  
@@ -228,8 +228,8 @@ Checking if the array is to large is accomplished by taking the delta of the fir
 The array is empty if the first and last positions are equal.
 Growing or shrinking the array is accomplished using by copying to a new array and resetting the index.
 
-Fast Deque Operations Using an Array
-By treating the Deque as an "unlimited length" array we can use the same wrapping technique to optimize the shifting by only every making the shortest shift.
+Fast Dequeue Operations Using an Array
+By treating the Dequeue as an "unlimited length" array we can use the same wrapping technique to optimize the shifting by only every making the shortest shift.
 This is done by shifting on the left when the item to be shifted is on the left side and shifting on the right when the item is on the right side of centre.
 This optimizes for the smallest number of elements to be shifted.
 
@@ -315,9 +315,9 @@ It is important to understand and demonstrate the differences between AVL trees,
 
 AVL trees are often compared to red–black trees because they support the same set of operations and because red−black trees also take O(log n) time for the basic operations. AVL trees perform better than red–black trees for lookup-intensive applications. AVL trees, red–black trees, and (2,4) trees share a number of good properties, but AVL trees and (2,4) trees require extra operation to deal with restructuring (rotations), fusing, or splitting. However, red–black trees do not have these drawbacks.
 
-binary tree
+Binary tree
 
-binary search tree
+Binary search tree
 - examine a binary tree and binary search tree
 - implement a binary tree and binary search tree
 - [Binary Search Tree](http://www.cs.usfca.edu/~galles/visualization/BST.html)
@@ -371,7 +371,7 @@ Red–Black Trees
 - represent a graph in adjacency lists
 - understand the execution process of the depth-first-search and bread-first-search algorithms for traversing a graph
 - analyze the performance of the depth-first-search and bread-first-search algorithms for traversing a graph
-- implement those search algorithms for traversing a graph in pseudo-code or other programming languages, such as Java, C, or C++, etc
+- implement those search algorithms for traversing a graph in pseudo-code or other programming languages, such as Java, C, or C++, etc.
 
 #### Matrix Graphs
 TODO: Implement
@@ -601,7 +601,7 @@ In the 3rd century B.C.E., the great mathematician Euclid proposed an
 algorithm to find GCD. It was based on the facts that GCD(p, q) = GCD(q,
 p), and GCD( p, 0) = p
 
-Euclid’s algorithm:
+Euclid's algorithm:
 
 1.  Make p the larger of two numbers p and q.
 2.  Divide p by q. Let r be the remainder. If r is zero, then q is the GCD.
@@ -739,154 +739,72 @@ Continues until the second smallest card.
 
 ## Course 2
 
-### Unit 0: Orientation
+### Learning Outcomes
 
-Please let me explain some essential information that you will need to meet the course outcomes and successfully complete this course. I will discuss expectations, both those that you should have of your tutor and me, and those that I have of you. This course takes place in the Moodle course site where you are now. Here you will find the following: 
-- The units of the study guide
-- The COMP 372 General Discussion Forum where students and instructors share general information about course procedures and materials, and where you post your answers to assigned questions as part of the participation mark
-- The Assignments section where you submit completed work and check for marker evaluation and feedback
-- The Help and Resources section with links to pages that support you as a learner at AU
+Most of the emphasis of the first portion of the course will be on problems that can be solved efficiently; in the latter portion we will discuss intractability and NP-hard problems.
+Finally, we will discuss methods to approximate NP-hard problems and how to prove how close these approximations are to the optimal solutions.
 
-As a student in this course you are expected to participate in the forum discussions and ensure that you are notified of discussion posts. You should remain subscribed to the COMP 372 General Discussion Forum.
-
-#### Learning Outcomes
-
-The course consists of nine units: the first unit is a short review of some preliminary material, including asymptotics, summations, recurrences, and sorting. These have been covered in earlier courses, and so we will breeze through them pretty quickly. Next we will discuss some algorithms based on the divide-and-conquer approach. We will then discuss approaches to designing optimization algorithms, including dynamic programming and greedy algorithms.
-
-Next, we will present a very exciting topic—multithreaded algorithms.
-
-Moreover, number-theoretic algorithms, which are useful in many applications such as online banking, will be explained.
-
-Most of the emphasis of the first portion of the course will be on problems that can be solved efficiently; in the latter portion we will discuss intractability and NP-hard problems. These are problems for which no efficient solution is known. Finally, we will discuss methods to approximate NP-hard problems and how to prove how close these approximations are to the optimal solutions.
+- background
+    - asymptotic analysis
+    - summations
+    - recurrences
+    - sorting.
+- divide-and-conquer approach
+- designing optimization algorithms
+    - dynamic programming
+    - greedy algorithms.
+- topic—multithreaded algorithms.
+- number-theoretic algorithms
 
 Upon successful completion of the course, you will be able to
 
-- describe the major modern algorithms and selected techniques that are essential to today’s computers.
-- decide on the suitability of a specific algorithm design technique for a given problem.
-- apply the algorithms and design techniques to solve problems, and mathematically evaluate the quality of the solutions.
+- describe modern algorithms and design techniques
+- chose suitable algorithm design technique for a given problem
+- apply algorithms and design techniques to solve problems
+- mathematically evaluate the quality of a solutions
 
-#### Issues in Algorithm Design
+### Proofs in Algorithm Design
 
-Algorithms are mathematical objects (in contrast to the much more concrete notion of a computer program implemented in some programming language and executed on some machine). Thus we can reason about the properties of algorithms mathematically.
+Algorithms are mathematical objects (in contrast to the much more concrete notion of a computer program implemented in some programming language and executed on some machine).
+Thus we can reason about the properties of algorithms mathematically.
 
-When designing an algorithm there are two fundamental issues to be considered: correctness and efficiency. It is important to justify an algorithm’s correctness mathematically. For very complex algorithms, this typically requires a careful mathematical proof, which may require the proof of many lemmas and properties of the solution upon which the algorithm relies.
+When designing an algorithm there are two fundamental issues to be considered: correctness and efficiency.
+It is important to justify an algorithms correctness mathematically.
+For very complex algorithms, this typically requires a careful mathematical proof, which may require the proof of many lemmas and properties of the solution upon which the algorithm relies.
 
-#### What I Expect of You
+### Citation Practice
+We recommend the APA standard for citation
 
-COMP 372 is a senior-level course in an undergraduate program offered by Athabasca University. I have high expectations of you. You should be curious and willing to seek out information besides the provided textbook and learning materials. You should be willing to discuss what you discover in the COMP 372 discussion forum with the tutor and with other students. You should also be willing to ask questions in the forum or email your tutor at any time. If you see a question on a discussion forum and you know the answer, you should post a reply.
+### Assignment
 
-#### What You Can Expect of Your Coordinator and Your Tutor
-
-Your tutor is a professional who enjoys the learning experience. Your tutor wants to see you succeed and is willing to be a partner in that success. Questions regarding the learning material should be posted to the COMP 372 General Discussion Forum, where other students, your tutor, or the course coordinator may reply. Personal questions should be directed to your tutor or the course coordinator.
-
-There are policies and service standards that specify how you may contact us and how soon you should expect a reply. We take those standards seriously.
-
-#### Learning Happens in This Course—You Are in Control
-
-This course is like other undergraduate courses at Athabasca University in that it is unpaced. This means that you have registered for a 6-month contract. During those 6 months, you are in total control. The study guide presents a list of readings and activities that you must perform to successfully complete this course. The course site is laid out in a suggested 16-week progression, but you control your own schedule.
-
-The readings follow the textbook for this course, and all other materials are available on the Web. The Web is full of thousands of pages of helpful algorithm material including video lectures, slides, and source code. Please visit the Coordinator’s COMP372 web page from time to time.
-
-#### Textbook
-
-Cormen, T.H., Leiserson, C.E., Rivest, R.L., & Stein, C. (2009). Introduction to Algorithms (3rd ed.). MIT Press.
-
-#### Useful Links
-
-We strongly encourage sharing and welcome intelligent (and properly acknowledged) reuse of ideas, content, and systems, but as for any course at Athabasca University, we very strongly frown upon plagiarism, collusion, and other forms of academic misconduct; in the unlikely event that you feel tempted to do so, we will come down on you like a pile of very sharp bricks.
-
-If you use the work of others, whether explicitly using the same content or basing your ideas on theirs, you must properly list and cite your sources in all cases. It is better to do too much than too little. Failure to properly cite sources may lead to anything from censure and loss of marks in very minor cases of forgetfulness (e.g., if you provide reference to a source in your bibliography list but do not cite at the point at which you use it), to expulsion from the course and a permanent stain on your academic record if uncited work is used. We have access to automated and semi-automated tools for plagiarism detection and may use them.
-
-The good news is that there is plenty of information online to help avoid this happening, including our own Write Site, which offers great advice on the subject, and in our own school and faculty policies. We know that in by far the majority of cases, people who are guilty of academic misconduct are simply unaware of what is correct and how to avoid the pitfalls. If you have not already done so, please visit the Write Site or explore other online sources explaining plagiarism, collusion, and other forms of academic misconduct, and remember that by signing on to one of our courses, you have explicitly agreed that you will behave with total academic honesty throughout.
-
-What if you spot academic misconduct from others?
-
-First of all, tell them about it! In most cases, academic misconduct is unintentional and, if you let people know that you have identified a problem, they will nearly always try to fix it.
-
-If they don't fix it, tell us! If you suspect a fellow student of academic misconduct, then it is important to inform us of your suspicions, because there is a slight chance that we may not recognize it ourselves, and the reputation of the course (and hence of your own qualification) depends on the course maintaining high standards of reliability and trustworthiness. This is not snitching: it is for your own benefit and for the benefit of everyone on the course to ensure that the highest standards are maintained. Cheating benefits no one: the person cheating fails to learn, and your qualification loses value as a result.
-
-#### Citation Practice
-It is vitally important that when you make use of the work of someone else, that you cite it correctly. Your learning journal for each unit must contain a References section that lists all the sources you need to cite in your journal.
-
-For non-web sources such as books, journal articles, and conference papers, we recommend that you use the APA standard for citation. Information about this can be found at the Write Site.
-
-For web-based sources, it is good practice to provide a live hyperlink to the actual page that you are citing—Snot just the site on which it can be found. You should also make a note of the date when the page was accessed.
-
-Using (not abusing) Wikipedia
-
-This course makes extensive use of Wikipedia articles as learning resources to help frame ideas and discussions. We do this because Wikipedia provides quick and digestible overviews of many topics that are discussed here. Rather than paraphrase such overviews, some of which you may already know or that may be irrelevant to your needs, we think it is more sensible to send you to a source that has been edited by many individuals and is therefore likely to be reasonably clear and reliable.
-
-However, you should never rely solely on Wikipedia as an information source. We like it because it is a great way to get the general gist of many topics, but it is not always 100% reliable and, more significantly, it does not go into any significant depth on anything. It also has a tendency to gloss over big intellectual debates and differences, almost never has anything new to say on academic issues, and sometimes misses important and relevant issues. Where we think you would gain a lot from exploring further, we provide links to other sources, often to academic papers. However, we strongly encourage you to explore further links and references yourself. You might find these within Wikipedia articles, or you might search for topics that suggest themselves in Wikipedia in more diverse places, especially scholarly articles such as can usually be found through Google Scholar (http://scholar.google.com) or Microsoft's rather less well developed Academic Search (http://academic.research.microsoft.com). Remember the mantra—"Wikipedia is a great place to start and a terrible place to finish."
-
-Please note that Wikipedia is a great learning tool and can be very useful as a starting point for research, but it is not a good source to cite. This is not a properly peer-reviewed source, provides too little detail, and it cannot be called upon to provide reliable evidence to back up your own arguments and discussions. In your own work, please do not use Wikipedia articles as referenced resources. Indeed, you should avoid citing any encyclopaedia or dictionary at all, for much the same reasons. This includes Encyclopaedia Britannica.
-
-### Assessment
-
-You are required to save your answers to the exercises in Microsoft Word, plain text, or PDF files. When you complete all the exercises of an assignment, you are required to zip them into a single file and submit it via the assignment link on the course home page.
-
-The five assignments are worth 70% of the final grade:
-
-Assignment 1: Problem Set 1 – Submit all your solutions to the selected exercises in Chapters 1, 2, 3 and 4after completing Unit 2.
-
-Assignment 2: Problem Set 2 – Submit all your solutions to the selected exercises in Chapters 15 and 16after completing Unit 4.
-
-Assignment 3: Problem Set 3 – Submit all your solutions to the selected exercises in Chapters 27 and 31after completing Unit 6.
-
-Assignment 4: Problem Set 4 – Submit all your solutions to the selected exercises in Chapters 34 and 35after completing Unit 8.
-
-Assignment 5: Project – You should submit the project before writing the final exam.
+Zip into a single file.
 
 Doing the Assignments
 Throughout out this course, when you are asked to present an algorithm, this means that you need to do three things:
 
-Present a clear, simple, and unambiguous description of the algorithm (in pseudocode, for example). The key here is keeping it simple. Uninteresting details should be kept to a minimum, so that the key computational issues stand out. For example, it is not necessary to declare variables whose purpose is obvious, and it is often simpler and clearer to simply say, “Add X to the end of list L” than to present code to do this or use some arcane syntax, such as “L:insertAtEnd(X).”
-Present a justification or proof of the algorithm’s correctness. Your justification should assume that the reader is someone of similar background to yours, say another student in this class, and should be convincing enough make a skeptic believe that your algorithm does indeed solve the problem correctly. Avoid rambling about obvious or trivial elements. A good proof provides an overview of what the algorithm does and then focuses on any tricky elements that may not be obvious.
-Present a worst-case analysis of the algorithm's efficiency, typically its running time (but also its space, if space is an issue). Sometimes this is straightforward, but if not, concentrate on the parts of the analysis that are not obvious.
-Participation
-You can earn up to 5% of your final grade through participation marks. To do so, post to the COMP 372 on a regular basis. Answer the questions from the study guide, and comment on answers and respond to questions from other students. At the end of the course, you will submit a summary of your participation activities to the Participation link under Assessments on the course home page.
+1. Present a clear, simple, and unambiguous description of the algorithm (in pseudocode, for example).
+The key here is keeping it simple.
+Uninteresting details should be kept to a minimum, so that the key computational issues stand out.
+For example, it is not necessary to declare variables whose purpose is obvious, and it is often simpler and clearer to simply say, “Add X to the end of list L” than to present code to do this or use some arcane syntax, such as `L:insertAtEnd(X)`.
 
-Final Examination
-The final invigilated examination is worth 25% of your grade. It is an open book examination supervised by an invigilator authorized by Athabasca University. You are allowed to use the textbook and published articles, but NOT allowed to use solution manuals, personal notes, or to consult with other people while writing this examination. You will be allowed three hours to complete the examination.
+2. Present a justification or proof of the algorithm's correctness.
+Your justification should assume that the reader is someone of similar background to yours, say another student in this class, and should be convincing enough make a skeptic believe that your algorithm does indeed solve the problem correctly.
+Avoid rambling about obvious or trivial elements.
+A good proof provides an overview of what the algorithm does and then focuses on any tricky elements that may not be obvious.
 
-#### Plagiarism
-
-From the Athabasca University document on Academic Integrity:
-
-“Students registered in Athabasca University courses are considered to be responsible scholars and are therefore expected to conform to the highest standards of academic integrity in all written assignments, including examinations.”
-
-I also refer everyone to the Student Code of Conduct, specifically Academic Misconduct:
-
-http://calendar.athabascau.ca/undergrad/current/page11.php#acad_misconduct
-
-Specifically, you cannot copy text from a source and present it as your own words.
-
-Any quoted text should be displayed as a quotation (as I did in the first paragraph above) with a clear citation of the source. You also need to cite sources that you paraphrase, i.e., rephrase in your own words. Sources you cite must also be listed as a reference. See http://owl.english.purdue.edu/owl/resource/560/01/ for examples of how to list and cite sources using APA style, which is acceptable for COMP 372.
-
-Penalties
-http://calendar.athabascau.ca/undergrad/page11_03_new.php
-
-Specifically, the first penalty is a reduction in grade (item 'c' in the above web document). If the misconduct is repeated, further penalties are, up to and including, a failing grade in the course (d), suspension (e) or expulsion (f) from Athabasca University. All instances of plagiarism will be reported to the Dean of Faculty of Science and Technology.
-
-Be certain the words you submit as your own words are indeed your own words. You can paraphrase and quote (with proper attribution), but you cannot copy other people’s words and present them as your own.
-
-Warning: Plagiarism detection software may be used on submitted assignments to insure compliance.
-
-Finally, here is a tutorial on plagiarism developed at University of Maryland. It is very useful introduction to all aspects of citation, plagiarism, policies, etc. Please have a look at it:
-
-http://www-apps.umuc.edu/vailtutor/
-
-If you have any questions about plagiarism, please post them on the COMP 372 General Discussion Forum for discussion.
+3. Present a worst-case analysis of the algorithm's efficiency, typically its running time (but also its space, if space is an issue).
+Sometimes this is straightforward, but if not, concentrate on the parts of the analysis that are not obvious.
 
 ### Unit 1: Foundations
 
-First, I assume that you know overall the importance of algorithms and what an algorithm is. But from this unit I hope you will gain a better understanding of what kinds of problems are solved by algorithms. Also you will become familiar with the framework we will use throughout the course to think about the design and analysis of algorithms.
-
 This unit addresses the following topics of interest:
-- an overview of algorithms and their place in modern computing systems
-- a thorough examination of two different sorting algorithms (insertion sort and merge sort) to determine their running times and develop a useful notation to express them
+- overview of algorithms
+- their place in modern computing systems
+- examination of two different sorting algorithms (insertion sort and merge sort) to determine their running times and develop a useful notation to express them
 - a definition of the notation (called asymptotic notation) that we use for bounding algorithm running times from above and/or below.
 
-Why do we choose asymptotic notation and analysis for algorithm analysis? This approach allows us to focus on the “big-picture” aspects of an algorithm’s running time.
+Why do we choose asymptotic notation and analysis for algorithm analysis?
+This approach allows us to focus on the “big-picture” aspects of an algorithm's running time.
 
 #### 1.1: Problems
 
@@ -934,7 +852,7 @@ Section 2.3
 
 Exercise 2.3-5
 
-#### 1.3: Asymptotics
+#### 1.3: Asymptotic Analysis
 
 Your goals for this section are
 - to know the meaning of the asymptotic efficiency of algorithms.
@@ -963,7 +881,7 @@ What are the common abuses in the basic asymptotic notations?
 
 This unit will introduce
 - the divide-and-conquer method.
-- Strassen’s surprising method for multiplying two square matrices
+- Strassen's surprising method for multiplying two square matrices
 - solving recurrences
 - the “master method” http://freevideolectures.com/Course/1941/Introduction-to-Algorithms/3
 - methods for analyzing recursive algorithms.
@@ -977,13 +895,13 @@ Section 4.1
 
 Exercise 4.1-2
 
-#### 2.2: Strassen’s Algorithm for Matrix Multiplication
+#### 2.2: Strassen's Algorithm for Matrix Multiplication
 
-Strassen’s algorithm for matrix multiplication.
+Strassen's algorithm for matrix multiplication.
 
-#####  Strassen’s Method
+#####  Strassen's Method
 
-Describe Strassen’s method for matrix multiplication.
+Describe Strassen's method for matrix multiplication.
 Design and analyze its divide-and-conquer algorithm.
 
 Section 4.2
@@ -1024,7 +942,7 @@ Submit your solutions to the following exercises and problems:
 
 Exercise 1.1-4 from the textbook (5 marks)
 Exercise 1.2-2 from the textbook (5 marks)
-Exercise 2.1-3 from the textbook. (10 marks)
+Exercise 2.1-3 from the textbook (10 marks)
 Exercise 2.2-3 from the textbook (10 marks)
 Exercise 2.3-5 from the textbook (10 marks)
 Exercise 3.1-1 from the textbook (5 marks)
@@ -1040,7 +958,7 @@ Exercise 4.5-3 from the textbook (10 marks)
 Dynamic programming, like the divide-and-conquer method, solves problems by combining the solutions to sub-problems.
 Why do we call it programming?
 In fact, programming in this context refers to a tabular method, not to writing computer code.
-The term dynamic programming was first coined by Richard Bellman in the 1950s, a time when computing programming was an esoteric activity practiced by so few people as to not even merit a name.
+The term dynamic programming was first coined by Richard Bellman in the 1950's, a time when computing programming was an esoteric activity practiced by so few people as to not even merit a name.
 Back then programming meant planning, and “dynamic programming” was conceived to optimally plan multistage processes.
 
 Why do we need dynamic programming?
@@ -1104,8 +1022,10 @@ Like dynamic-programming algorithms, greedy algorithms typically apply to optimi
 
 The idea of a greedy algorithm is to make each choice in a locally optimal manner.
 
-A simple example is coin-changing: to minimize the number of Canadian coins needed to make change for a given amount e.g. CAD$38, we can repeatedly select the largest-denomination coin that is no larger than the amount that remains.
-We have 38-20=18, 18-10=8, 8-5 = 3, 3-2 =1, 1-1 =0. So $38 is changed to $20 + $10 + $5 +$2 + $1.
+A simple example is coin-changing: to minimize the number of Canadian coins needed to make change for a given amount e.g.
+CAD$38, we can repeatedly select the largest-denomination coin that is no larger than the amount that remains.
+We have 38-20=18, 18-10=8, 8-5 = 3, 3-2 =1, 1-1 =0.
+So $38 is changed to $20 + $10 + $5 +$2 + $1.
 
 A greedy algorithm approach provides an optimal solution for many such problems much more quickly than would a dynamic programming approach.
 However, is this approach effective? This unit will introduce matroid theory, which provides a mathematical basis that can help us to show that a greedy algorithm yields an optimal solution.
@@ -1234,9 +1154,9 @@ Explain the following elementary but important concepts:
 
 Exercise 31.1-7
 
-#### 6.2: Euclid’s Algorithm
+#### 6.2: Euclid's Algorithm
 
-Explain and analyze Euclid’s algorithm for computing the greatest common divisor.
+Explain and analyze Euclid's algorithm for computing the greatest common divisor.
 
 Section 31.2
 
@@ -1468,10 +1388,10 @@ Exercise 35.5-2 from the textbook (8 marks)
 Problem 35-3 from the textbook (12 marks)
 
 ### Assignment 5
-Assignment 5: Project
 
 Weight: 15% of your final grade
 
+Project:
 You should submit the project before writing the final exam.
 This assignment is designed to bring together what you have covered in the course into a significant working project.
 
@@ -1492,7 +1412,7 @@ Hand in one file written in English and named ‘idnumber-name-p1.zip’, where 
 
 All the following files must be included:
 - The commented source code and the executable file.
-- Experimental report. Submit a PDF or Microsoft Word.
+- Experimental report as PDF.
 
 The report should include the following: 
 1. A description of your software and hardware environment for developing the project.
@@ -1511,23 +1431,28 @@ Grading Criteria
 
 ### Participation
 Weight: 5% of your final grade
-Due: ongoing throughout the course
 
+Post to the COMP 372 on a regular basis:
+- Answer the questions from the study guide
+- comment on answers
+- post questions regarding the learning material
+- respond to questions from other students
+
+At the end of the course, you will submit a summary of your participation activities to the Participation link under Assessments on the course home page.
 Before you write the examination, copy all discussion postings that demonstrate your participation activities into a document that you will upload here.
-
 Include an introductory paragraph (or more) where you reflect on what you gained and what you were able to impart to others in the class through this activity.
 
 ### Final Examination
 
 Weight: 25% of your final grade
-Due: Week 16
 
-You will be writing a final invigilated examination. See http://calendar.athabascau.ca/undergrad/current/page07_01.php for information on the arrangements you will need to make.
+You are allowed to use the textbook and published articles, but NOT allowed to use solution manuals, personal notes, or to consult with other people while writing this examination.
 
-If you have kept up with the course work and taken time to review feedback from your tutor on the marked assignments, with a little review of the main points, you should be ready to write the final examination. The final exam consists of five parts:
+If you have kept up with the course work and taken time to review feedback from your tutor on the marked assignments, with a little review of the main points, you should be ready to write the final examination.
 
-Part I: True/False questions (15 questions, 30%)
-Part II: Short-answer questions (5 questions, 20%)
-Part III: Multiple-choice questions (10 questions, 30%)
-Part IV: Algorithm writing and analysis (2 questions, 10%)
-Part V: Proving (2 questions, 10%)
+The final exam consists of five parts:
+- Part I: True/False questions (15 questions, 30%)
+- Part II: Short-answer questions (5 questions, 20%)
+- Part III: Multiple-choice questions (10 questions, 30%)
+- Part IV: Algorithm writing and analysis (2 questions, 10%)
+- Part V: Proving (2 questions, 10%)

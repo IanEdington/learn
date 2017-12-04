@@ -1,4 +1,62 @@
 # Data Structures and Algorithms
+## Preface
+Problem - specification of generalized input and output
+- allowed inputs
+- output requirements
+    - must be specific - best vs shortest in km
+    - cannot have conflicting goals
+
+Problem Instance - a particular instance of the problem (Mary, Lou, John)
+Algorithm - procedure for solving problem
+Heuristic - procedure that does a good job but is somewhat incorrect.
+
+### Proof
+
+Some problems have no efficient solutions.
+Solutions are hard to prove incorrect, and become misleading.
+Being able to reason about correctness is important.
+The heart of any algorithm is an idea.
+If your idea is not clearly revealed when you express an algorithm, then you are using too low-level a notation to describe it.
+
+#### Prove Incorrectness
+
+Counter-example: an instance of a problem that foils a solution
+
+- Verifiability - able to calculate answer and show a better answer can be found
+- Simplicity - make it as simple as possible, boil away all unnecessary parts
+
+How?
+
+- Think small - most alg fail fast, small examples are easier to reason about
+- Exhaustively - try every small case
+- Weakness - if an algorithm uses a certain heuristic, think about what might break it
+- Go for a tie - sometimes a heuristic doesn't work well when there's a tie.
+- Extremes - often will break with enough pressure
+
+#### Induction is Recursion
+Solve the base case, and if not break the problem up smaller until you reach the base case.
+Induction is almost always the right way to prove CS theorems.
+
+1. Base case
+1. Assume that it works correctly for y = n − 1
+1. Inductive case (n + 1)
+
+Tips
+- Create other variables if needed
+- Make a stronger assumption if needed (works for y ≤ n - 1)
+
+Typical errors
+- boundary errors - what happens to edge cases?
+- inconsistent extension - induction only works when the assumption is true.
+    Convincing false claims can exist when extension produces inconsistent results.
+
+#### Summations
+
+
+### Techniques for developing algorithms
+An important and honorable technique in algorithm design is to narrow the set of allowable instances until there is a correct and efficient algorithm.
+For example, we can restrict a graph problem from general graphs down to trees, or a geometric problem from two dimensions down to one.
+
 ## Analysis of Data Structures and Algorithms
 - mathematical concepts - required to understand data structures and algorithms
 - What to measure:

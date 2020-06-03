@@ -1,8 +1,6 @@
-*
-
-!.gitignore
-!*/
-!*.md
-*.png
+.idea
+.terraform
+.ipynb_checkpoints
+terraform.tfstate*
 
 resource/

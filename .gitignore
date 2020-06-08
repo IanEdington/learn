@@ -3,4 +3,6 @@
 .ipynb_checkpoints
 terraform.tfstate*
 
-resource/
+**/resource/**
+**/data/**
+!.gitkeep

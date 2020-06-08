@@ -17,8 +17,12 @@ resource "docker_container" "data-science" {
 
   mounts {
     type   = "bind"
+    source = abspath(path.root)
     target = "/home/jovyan/work"
-    source = abspath(".")
+  }
+  volumes {
+    host_path      = "/Users/ian/.jupyter/lab/user-settings"
+    container_path = "/home/jovyan/.jupyter/lab/user-settings"
   }
   ports {
     internal = 8888

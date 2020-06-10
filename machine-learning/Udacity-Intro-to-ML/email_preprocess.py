@@ -1,9 +1,19 @@
 import pickle
+from pathlib import Path
+
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+CACHE_FILE = Path("data", "cache", "preprocess_emails.pkl")
+
 def preprocess_emails():
+    # early return if values are cached
+    if (CACHE_FILE.exists()):
+        print('restore from cache')
+        with open(CACHE_FILE, 'rb') as f:
+            return pickle.load(f)
+
     with open("data/email_authors.pkl", 'rb') as authors_file, open("data/word_data.pkl", 'rb') as word_file:
         email_authors = pickle.load(authors_file)
         word_data = pickle.load(word_file)
@@ -21,4 +31,13 @@ def preprocess_emails():
     features_train_transformed = selector.fit_transform(features_train_transformed, labels_train).toarray()
     features_test_transformed = selector.transform(features_test_transformed).toarray()
 
+    # cache values
+    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(CACHE_FILE, 'wb') as f:
+        print('save to cache')
+        pickle.dump(
+            [features_train_transformed, features_test_transformed, labels_train, labels_test],
+            f
+        )
+    
     return features_train_transformed, features_test_transformed, labels_train, labels_test

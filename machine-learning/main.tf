@@ -4,14 +4,14 @@ terraform {
   }
 }
 
-resource "docker_image" "jupyter-tensorflow-notebook" {
-  name         = "jupyter/tensorflow-notebook:latest"
+resource "docker_image" "jupyter-lab-kitted-out" {
+  name         = "jupyter-lab-kitted-out:latest"
   keep_locally = true
 }
 
 resource "docker_container" "data-science" {
   name    = "data-science"
-  image   = docker_image.jupyter-tensorflow-notebook.latest
+  image   = docker_image.jupyter-lab-kitted-out.latest
   env     = ["JUPYTER_ENABLE_LAB=yes"]
   command = ["start.sh", "jupyter", "lab", "--LabApp.token=''"]
 

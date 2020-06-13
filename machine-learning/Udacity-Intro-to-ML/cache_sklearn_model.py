@@ -13,10 +13,19 @@ def retrieve_cached_model(model, data_desciption):
         with open(file_name, 'rb') as f:
             retrieved = pickle.load(f)
             retrieved_model = retrieved.get("model")
-            if (model.get_params() == retrieved_model.get_params()):
+            
+            if (
+                model.get_params() == retrieved_model.get_params() and
+                data_desciption == retrieved.get("data_desciption")
+            ):
                 return [True, retrieved_model, retrieved.get("meta")]
             else:
+                print("model.get_params()", model.get_params())
+                print("retrieved_model.get_params()", retrieved_model.get_params())
+                print("data_desciption", data_desciption)
+                print("retrieved.get(\"data_desciption\")", retrieved.get("data_desciption"))
                 raise Exception('params are not equal, might be caused by a hash collision')
+
     return [False, model, {}]
 
 def save_cached_model(model, data_desciption, meta):
@@ -25,6 +34,6 @@ def save_cached_model(model, data_desciption, meta):
     file_name = CACHE_FOLDER / type(model).__name__ / f'{model_hash}.pkl'
 
     file_name.parent.mkdir(parents=True, exist_ok=True)
-
+    
     with open(file_name, 'wb') as f:
-        pickle.dump({"model": model, "meta": meta}, f)
+        pickle.dump({"model": model, "data_desciption": data_desciption, "meta": meta}, f)

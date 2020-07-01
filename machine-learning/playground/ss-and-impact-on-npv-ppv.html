@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!-- https://stackoverflow.com/questions/42720488/d3-v4-drag-line-chart-with-x-and-y-axes -->
+<!-- Thanks to Mark - https://stackoverflow.com/users/16363/mark -->
+<html>
+<head>
+    <style>
+        .box {
+            height: 200px;
+            width: 200px;
+            position: relative;
+        }
+
+        #TP, #TN, #FP, #FN {
+            position: absolute;
+        }
+        #TP, #TN {
+            background-color: green;
+        }
+        #FP, #FN {
+            background-color: red;
+        }
+        #TP, #FP {
+            top:0;
+        }
+        #TN, #FN {
+            bottom:0;
+        }
+        #TP, #FN {
+            left:0;
+        }
+        #FP, #TN {
+            right:0;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="root">
+    <div>
+        <form id="data-form">
+            <label for="skew">skew</label>
+            <input id="skew" name="skew" type="number" placeholder="0.5" step="0.01" min="0" max="1">
+            <label for="sensitivity">sensitivity</label>
+            <input id="sensitivity" name="sensitivity" type="number" placeholder="0.5" step="0.01" min="0" max="1">
+            <label for="specificity">specificity</label>
+            <input id="specificity" name="specificity" type="number" placeholder="0.5" step="0.01" min="0" max="1">
+            <button>compute</button>
+        </form>
+    </div>
+    <div class="box">
+        <div id="TP">TP</div>
+        <div id="FP">FP</div>
+        <div id="FN">FN</div>
+        <div id="TN">TN</div>
+    </div>
+</div>
+<script>
+    const boxSize = 200
+
+    function setWidthAndHeight(element, width, height) {
+        element.style.width = `${width}px`
+        element.style.height = `${height}px`
+    }
+
+    function isValidValue(num) {
+        return num <= 1 && num >= 0
+    }
+
+    function update(skew, sensitivity, specificity) {
+        setWidthAndHeight(
+            document.getElementById("TP"),
+            boxSize * skew,
+            boxSize * sensitivity,
+        )
+        setWidthAndHeight(
+            document.getElementById("FP"),
+            boxSize * (1 - skew),
+            boxSize * (1 - specificity),
+        )
+        setWidthAndHeight(
+            document.getElementById("FN"),
+            boxSize * skew,
+            boxSize * (1 - sensitivity),
+        )
+        setWidthAndHeight(
+            document.getElementById("TN"),
+            boxSize * (1 - skew),
+            boxSize * specificity,
+        )
+
+        // TODO: update values of PPV and NPV
+    }
+
+    function captureSubmit(event) {
+        event.preventDefault()
+
+        skew = parseFloat(event.target[0].value) || 1
+        sensitivity = parseFloat(event.target[1].value) || 1
+        specificity = parseFloat(event.target[2].value) || 1
+
+        if (isValidValue(skew) && isValidValue(sensitivity) && isValidValue(specificity)) {
+            update(skew, sensitivity, specificity)
+        } else {
+            throw Error("not a valid value")
+            return
+        }
+    }
+
+    document.getElementById('data-form').addEventListener("submit", captureSubmit)
+
+    update(0.5, 0.5, 0.5)
+</script>
+</body>
+</html>

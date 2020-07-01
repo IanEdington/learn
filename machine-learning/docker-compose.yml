@@ -1,7 +1,0 @@
-version: '3.8'
-
-services:
-  data-science:
-    build:
-      context: ./kitted-out-jupyter-lab-docker-image
-    image: jupyter-lab-kitted-out

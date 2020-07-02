@@ -21,7 +21,12 @@ from time import time
 import IPython.display
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import svm
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.metrics import classification_report
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 import cache_sklearn_model
 from prep_terrain_data import makeTerrainData
@@ -179,9 +184,161 @@ def optimize_model(gen_data, classifier_class, add_random_state=True, **kwargs):
     clf = classifier_class(random_state=27, **kwargs) if add_random_state else classifier_class(**kwargs)
     clf, fit_delta = train_model_cached(data_desc, clf, features_train, labels_train)
 
-    print("clf fit time:", fit_delta, "s")
-
     # measure and display effectiveness
     return measure_effectiveness_of_classifier(clf, data_desc, features_test, labels_test)
 
 
+# %% [markdown]
+"""
+## An Approach to Classification
+
+constraints:
+- not allowed to increase or decrease the amount of data used
+
+#### Feature analysis:
+
+- two features
+    - grade: slope of the terrain
+    - bumpy: roughness of the terrain
+- Ways to combine:
+    - cross product (grade * bumpy)
+
+#### Take an initial pass using each of the following classifier:
+
+- Naive Bayes
+    - sklearn.naive_bayes.GaussianNB
+- sklearn.svm.SVC
+    - kernel: ‘rbf’, ‘linear’, ‘poly’, ‘sigmoid’
+- sklearn.tree.DecisionTreeClassifier
+    - min_sample_split: 2, 3, 4
+    - criterion: entropy, gini
+- sklearn.ensemble.AdaBoostClassifier
+    - base_estimator: ?
+    - algorithm: ?
+    - learning_rate vs n_estimators
+- sklearn.ensemble.RandomForestClassifier
+    - depends on DecisionTreeClassifier
+- sklearn.neighbors.KNeighborsClassifier
+    - n_neighbors
+    - weights
+    - n_jobs: -1 (use all processors)
+
+#### Look deeper into 2-3 classifiers that perform well
+
+Fine tune the parameters of the classifiers that did the best in the first round.
+
+"""
+
+
+# %%
+def terrain_data_with_feature_cross_n_points_1000():
+    def transform_features(features):
+        return [[x, y, x * y] for x, y in features]
+
+    features_train, labels_train, features_test, labels_test = makeTerrainData()
+
+    features_train = transform_features(features_train)
+    features_test = transform_features(features_test)
+
+    data_desc = inspect.stack()[0][3]
+
+    return data_desc, features_train, labels_train, features_test, labels_test
+
+
+def terrain_data_1000_points():
+    features_train, labels_train, features_test, labels_test = makeTerrainData()
+    data_desc = inspect.stack()[0][3]
+    return data_desc, features_train, labels_train, features_test, labels_test
+
+
+data_to_try = [terrain_data_1000_points, terrain_data_with_feature_cross_n_points_1000]
+
+# %% [markdown]
+"""
+## Naive Bayes using sklearn.naive_bayes.GaussianNB
+"""
+
+# %%
+for data_gen in data_to_try:
+    optimize_model(data_gen, GaussianNB, add_random_state=False)
+
+# %% [markdown]
+"""
+## SVM
+- sklearn.svm.SVC
+    - kernel: ‘rbf’, ‘linear’, ‘poly’, ‘sigmoid’
+"""
+
+# %%
+for data_gen in data_to_try:
+    for kernel in ['rbf', 'linear', 'poly', 'sigmoid']:
+        optimize_model(data_gen, svm.SVC, kernel=kernel)
+
+# %% [markdown]
+"""
+## Decision Tree
+- sklearn.tree.DecisionTreeClassifier
+    - min_sample_split: 2, 3, 4
+    - criterion: entropy, gini
+"""
+
+# %%
+for data_gen in data_to_try:
+    for criterion in ['entropy', 'gini']:
+        for min_samples_split in range(2, 5):
+            optimize_model(
+                data_gen,
+                DecisionTreeClassifier,
+                criterion=criterion,
+                min_samples_split=min_samples_split,
+            )
+
+# %% [markdown]
+"""
+## Ada Boost
+- sklearn.ensemble.AdaBoostClassifier
+    - base_estimator: ?
+    - algorithm: ?
+    - learning_rate vs n_estimators
+"""
+
+# %%
+for data_gen in data_to_try:
+    optimize_model(
+        data_gen,
+        AdaBoostClassifier,
+    )
+
+# %% [markdown]
+"""
+## Random Forest
+- sklearn.ensemble.RandomForestClassifier
+    - depends on DecisionTreeClassifier
+"""
+
+# %%
+for data_gen in data_to_try:
+    optimize_model(
+        data_gen,
+        RandomForestClassifier,
+    )
+
+# %% [markdown]
+"""
+## K-Nearest Neighbors
+- sklearn.neighbors.KNeighborsClassifier
+    - n_neighbors
+    - weights
+    - n_jobs: -1 (use all processors)
+"""
+
+# %%
+for data_gen in data_to_try:
+    optimize_model(
+        data_gen,
+        KNeighborsClassifier,
+        add_random_state=False
+    )
+
+# %%
+display_classifier_table()

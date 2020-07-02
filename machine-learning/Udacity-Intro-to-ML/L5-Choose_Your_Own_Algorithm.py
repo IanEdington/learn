@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -226,7 +227,6 @@ constraints:
 #### Look deeper into 2-3 classifiers that perform well
 
 Fine tune the parameters of the classifiers that did the best in the first round.
-
 """
 
 
@@ -342,3 +342,36 @@ for data_gen in data_to_try:
 
 # %%
 display_classifier_table()
+
+# %% [markdown]
+"""
+#### Look deeper into 2-3 classifiers that perform well
+
+##### Acc 0.928
+classifier: RandomForestClassifier
+data: terrain_data_with_feature_cross_n_points_1000
+
+classifier: SVC
+data: terrain_data_1000_points
+kernel: rbf
+
+classifier: KNeighborsClassifier
+data: terrain_data_with_feature_cross_n_points_1000
+
+The next steps would be to double down on these three classifiers and figure find out the best parameters for this data.
+"""
+
+# %% [markdown]
+"""
+# Conclusion
+
+I'm happy with the accuracy that was achieved during this lesson. There is definitely more room to improve.
+
+I'm surprised that AdaBoost didn't do well on this dataset.
+Based on my reading I expected the boosting algorithm to outperform the random tree.
+This is an area I would dig further.
+
+The approach of trying each classifier at a cursory level has pros and cons.
+A benefit is that a decently accurate solution was found rather quickly.
+However, the downside is that models requiring fine grained tuning will underperform.
+"""

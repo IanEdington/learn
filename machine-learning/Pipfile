@@ -16,6 +16,9 @@ jupyterlab = "*"
 matplotlib = "*"
 seaborn = "*"
 tensorflow = "*"
+jupytext = "*"
+toml = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.8"

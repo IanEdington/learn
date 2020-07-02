@@ -15,14 +15,18 @@
 # ---
 
 # %%
+import inspect
 from time import time
 
 import IPython.display
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.metrics import classification_report
 
 import cache_sklearn_model
 from prep_terrain_data import makeTerrainData
+
+np.random.seed(31415)
 
 # %% [markdown]
 """
@@ -112,9 +116,9 @@ def measure_effectiveness_of_classifier(classifier, data_description, features_t
         "data_description": data_description,
         "params": classifier.get_params(),
         "accuracy": report['accuracy'],
-        "recall": report['1']['recall'],
-        "precision": report['1']['precision'],
-        "f1_score": report['1']['f1-score'],
+        "recall": report['1.0']['recall'],
+        "precision": report['1.0']['precision'],
+        "f1_score": report['1.0']['f1-score'],
         "inference_speed": inference_speed,
     }
 
@@ -124,7 +128,8 @@ def measure_effectiveness_of_classifier(classifier, data_description, features_t
         print(classifier_performance)
     else:
         classifier_performance_store[classifier_key] = classifier_performance
-        display_classifier_table(classifier_key)
+
+    return classifier_key
 
 
 # %%
@@ -149,3 +154,34 @@ def display_classifier_table(classifier_key=None):
 
     # noinspection PyTypeChecker
     return IPython.display.display(IPython.display.Markdown(table_header + '\n'.join(table_rows)))
+
+
+# %%
+def train_model_cached(data_desc, clf, features_train, labels_train):
+    [is_restored, clf, meta] = cache_sklearn_model.retrieve_cached_model(clf, data_desc)
+
+    fit_delta = meta.get("fit_time_sec")
+    if not is_restored:
+        t = time()
+        clf.fit(features_train, labels_train)
+        fit_delta = round(time() - t, 3)
+        cache_sklearn_model.save_cached_model(clf, data_desc, {
+            "fit_time_sec": fit_delta,
+        })
+
+    return clf, fit_delta
+
+
+# %%
+def optimize_model(gen_data, classifier_class, add_random_state=True, **kwargs):
+    data_desc, features_train, labels_train, features_test, labels_test = gen_data()
+
+    clf = classifier_class(random_state=27, **kwargs) if add_random_state else classifier_class(**kwargs)
+    clf, fit_delta = train_model_cached(data_desc, clf, features_train, labels_train)
+
+    print("clf fit time:", fit_delta, "s")
+
+    # measure and display effectiveness
+    return measure_effectiveness_of_classifier(clf, data_desc, features_test, labels_test)
+
+

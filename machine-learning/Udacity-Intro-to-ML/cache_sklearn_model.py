@@ -1,9 +1,12 @@
 import pickle
 from pathlib import Path
+from time import time
 
 from deepdiff import DeepHash
 
-CACHE_FOLDER = Path("data", "cache")
+PROJECT_DIR = Path(__file__).parent
+DATA_DIR = PROJECT_DIR / 'data'
+CACHE_FOLDER = DATA_DIR / 'cache'
 
 
 def get_hash_of_model_and_data(model, data_description):
@@ -47,3 +50,18 @@ def save_cached_model(model, data_description, meta):
 
     with open(file_name, 'wb') as f:
         pickle.dump({"model": model, "data_description": data_description, "meta": meta}, f)
+
+
+def train_model_cached(data_desc, clf, features_train, labels_train):
+    [is_restored, clf, meta] = retrieve_cached_model(clf, data_desc)
+
+    fit_delta = meta.get("fit_time_sec")
+    if not is_restored:
+        t = time()
+        clf.fit(features_train, labels_train)
+        fit_delta = round(time() - t, 3)
+        save_cached_model(clf, data_desc, {
+            "fit_time_sec": fit_delta,
+        })
+
+    return clf, fit_delta

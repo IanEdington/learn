@@ -63,13 +63,13 @@ This is a generated dataset of fake terrain conditions.
 
 
 # %%
-def graph_grade_vs_speed():
+def graph_grade_vs_speed(points=1000):
     """
     the training data (features_train, labels_train) have both "fast" and "slow"
     points mixed together--separate them so we can give them different colors
     in the scatter plot and identify them visually
     """
-    features_train, labels_train, features_test, labels_test = makeTerrainData()
+    features_train, labels_train, features_test, labels_test = makeTerrainData(points)
     grade_fast = [features_train[ii][0] for ii in range(0, len(features_train)) if labels_train[ii] == 0]
     bumpy_fast = [features_train[ii][1] for ii in range(0, len(features_train)) if labels_train[ii] == 0]
     grade_slow = [features_train[ii][0] for ii in range(0, len(features_train)) if labels_train[ii] == 1]
@@ -78,8 +78,8 @@ def graph_grade_vs_speed():
     # initial visualization
     plt.xlim(0.0, 1.0)
     plt.ylim(0.0, 1.0)
-    plt.scatter(bumpy_fast, grade_fast, color="b", label="fast")
-    plt.scatter(grade_slow, bumpy_slow, color="r", label="slow")
+    plt.scatter(bumpy_fast, grade_fast, color=(0.0, 0.0, 1.0, 0.5), label="fast")
+    plt.scatter(grade_slow, bumpy_slow, color=(1.0, 0.0, 0.0, 0.5), label="slow")
     plt.legend()
     plt.xlabel("bumpiness")
     plt.ylabel("grade")
@@ -163,27 +163,11 @@ def display_classifier_table(classifier_key=None):
 
 
 # %%
-def train_model_cached(data_desc, clf, features_train, labels_train):
-    [is_restored, clf, meta] = cache_sklearn_model.retrieve_cached_model(clf, data_desc)
-
-    fit_delta = meta.get("fit_time_sec")
-    if not is_restored:
-        t = time()
-        clf.fit(features_train, labels_train)
-        fit_delta = round(time() - t, 3)
-        cache_sklearn_model.save_cached_model(clf, data_desc, {
-            "fit_time_sec": fit_delta,
-        })
-
-    return clf, fit_delta
-
-
-# %%
 def optimize_model(gen_data, classifier_class, add_random_state=True, **kwargs):
     data_desc, features_train, labels_train, features_test, labels_test = gen_data()
 
     clf = classifier_class(random_state=27, **kwargs) if add_random_state else classifier_class(**kwargs)
-    clf, fit_delta = train_model_cached(data_desc, clf, features_train, labels_train)
+    clf, fit_delta = cache_sklearn_model.train_model_cached(data_desc, clf, features_train, labels_train)
 
     # measure and display effectiveness
     return measure_effectiveness_of_classifier(clf, data_desc, features_test, labels_test)
@@ -374,4 +358,60 @@ This is an area I would dig further.
 The approach of trying each classifier at a cursory level has pros and cons.
 A benefit is that a decently accurate solution was found rather quickly.
 However, the downside is that models requiring fine grained tuning will underperform.
+"""
+
+# %% [markdown]
+"""
+### Try with more data
+"""
+
+
+# %%
+def terrain_data_points(points=1000):
+    data_desc = inspect.stack()[0][3] + f'_{points}'
+
+    def terrain_data_points_generator():
+        features_train, labels_train, features_test, labels_test = makeTerrainData(points)
+        return data_desc, features_train, labels_train, features_test, labels_test
+
+    return terrain_data_points_generator
+
+
+def terrain_data_with_feature_cross_points(points=1000):
+    def transform_features(features):
+        return [[x, y, x * y] for x, y in features]
+
+    def terrain_data_with_feature_cross_points_generator():
+        features_train, labels_train, features_test, labels_test = makeTerrainData(points)
+
+        features_train = transform_features(features_train)
+        features_test = transform_features(features_test)
+
+        data_desc = inspect.stack()[0][3] + f'_{points}'
+
+        return data_desc, features_train, labels_train, features_test, labels_test
+
+    return terrain_data_with_feature_cross_points_generator
+
+
+# %%
+graph_grade_vs_speed(1000)
+
+# %%
+graph_grade_vs_speed(10000)
+
+# %%
+graph_grade_vs_speed(100000)
+
+# %%
+for points in [1000, 10000, 100000]:
+    optimize_model(terrain_data_points(points), svm.SVC, kernel='rbf')
+    optimize_model(terrain_data_with_feature_cross_points(points), RandomForestClassifier)
+    optimize_model(terrain_data_with_feature_cross_points(points), KNeighborsClassifier, add_random_state=False)
+
+display_classifier_table()
+
+# %% [markdown]
+"""
+More data did help get a higher accuracy
 """

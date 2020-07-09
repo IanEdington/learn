@@ -1,11 +1,10 @@
 import pickle
-from pathlib import Path
 from time import time
 
 from deepdiff import DeepHash
 
-PROJECT_DIR = Path(__file__).parent
-DATA_DIR = PROJECT_DIR / 'data'
+from utils import DATA_DIR
+
 CACHE_FOLDER = DATA_DIR / 'cache'
 
 

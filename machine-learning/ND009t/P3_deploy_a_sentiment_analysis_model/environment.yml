@@ -1,0 +1,14 @@
+name: P3_deploy_a_sentiment_analysis_model
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pandas
+  - nltk
+  - beautifulsoup4
+  - html5lib
+  - scikit-learn
+  - ipython
+  - requests
+prefix: /Users/ian/.conda/envs/P3_deploy_a_sentiment_analysis_model
+

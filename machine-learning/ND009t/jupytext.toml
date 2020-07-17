@@ -1,0 +1,3 @@
+default_jupytext_formats = "ipynb,.ipynb.py:percent"
+default_cell_markers = '"""'
+

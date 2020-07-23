@@ -10,5 +10,6 @@ dependencies:
   - scikit-learn
   - ipython
   - requests
+  - matplotlib
 prefix: /Users/ian/.conda/envs/P3_deploy_a_sentiment_analysis_model
 

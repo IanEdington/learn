@@ -13,6 +13,28 @@
 #     name: p3_deploy_a_sentiment_analysis_model
 # ---
 
+# %%
+import glob
+import os
+import time
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import sagemaker
+from dotenv import load_dotenv
+from sagemaker.pytorch import PyTorch, PyTorchPredictor
+
+load_dotenv(override=True)
+
+TRAIN_INSTANCE = 'ml.m5.large'
+DEPLOY_INSTANCE = 'ml.m5.large'
+
+sagemaker_session = sagemaker.Session()
+bucket = sagemaker_session.default_bucket()
+prefix = 'sagemaker/sentiment_rnn'
+# role = sagemaker.get_execution_role()
+role = os.environ['SAGEMAKER_EXECUTION_ROLE']
+
 # %% [markdown]
 """
 # Creating a Sentiment Analysis Web App
@@ -26,7 +48,7 @@ Now that we have a basic understanding of how SageMaker works we will try to use
 
 ## Instructions
 
-Some template code has already been provided for you, and you will need to implement additional functionality to successfully complete this notebook. You will not need to modify the included code beyond what is requested. Sections that begin with '**TODO**' in the header indicate that you need to complete or implement some portion within them. Instructions will be provided for each section and the specifics of the implementation are marked in the code block with a `# TODO: ...` comment. Please be sure to read the instructions carefully!
+Some template code has already been provided for you, and you will need to implement additional functionality to successfully complete this notebook. You will not need to modify the included code beyond what is requested. Sections that begin with '**DONE**' in the header indicate that you need to complete or implement some portion within them. Instructions will be provided for each section and the specifics of the implementation are marked in the code block with a `# DONE: ...` comment. Please be sure to read the instructions carefully!
 
 In addition to implementing code, there will be questions for you to answer which relate to the task and your implementation. Each section where you will answer a question is preceded by a '**Question:**' header. Carefully read each question and provide your answer below the '**Answer:**' header by editing the Markdown cell.
 
@@ -61,9 +83,9 @@ As in the XGBoost in SageMaker notebook, we will be using the [IMDb dataset](htt
 """
 
 # %%
-# %mkdir ../data
-# !wget -O ../data/aclImdb_v1.tar.gz http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
-# !tar -zxf ../data/aclImdb_v1.tar.gz -C ../data
+# %mkdir ./data
+# !wget -O ./data/aclImdb_v1.tar.gz http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+# !tar -zxf ./data/aclImdb_v1.tar.gz -C ./data
 
 # %% [markdown]
 """
@@ -72,11 +94,9 @@ As in the XGBoost in SageMaker notebook, we will be using the [IMDb dataset](htt
 Also, as in the XGBoost notebook, we will be doing some initial data processing. The first few steps are the same as in the XGBoost example. To begin with, we will read in each of the reviews and combine them into a single input structure. Then, we will split the dataset into a training set and a testing set.
 """
 
+
 # %%
-import os
-
-
-def read_imdb_data(data_dir='../data/aclImdb'):
+def read_imdb_data(data_dir='./data/aclImdb'):
     data = {}
     labels = {}
 
@@ -181,8 +201,8 @@ The `review_to_words` method defined above uses `BeautifulSoup` to remove any ht
 """
 
 # %%
-# TODO: Apply review_to_words to a review (train_X[100] or any other review)
-
+# DONE: Apply review_to_words to a review (train_X[100] or any other review)
+review_to_words(train_X[100])
 
 # %% [markdown]
 """
@@ -192,6 +212,20 @@ The `review_to_words` method defined above uses `BeautifulSoup` to remove any ht
 # %% [markdown]
 """
 **Answer:**
+
+Important for this question:
+- converts to lower case
+- removes non alpha numeric characters
+- removes stopwords
+
+Full description:
+- download the stopwords
+- Remove HTML tags (already covered)
+- converts to lower case
+- removes non alpha numeric characters
+- splits into a list of words
+- removes stopwords
+- stem the words (already covered)
 """
 
 # %% [markdown]
@@ -201,8 +235,9 @@ The method below applies the `review_to_words` method to each of the reviews in 
 
 # %%
 import pickle
+from IPython.display import ProgressBar
 
-cache_dir = os.path.join("../cache", "sentiment_analysis")  # where to store cache files
+cache_dir = os.path.join("./data/cache", "sentiment_analysis")  # where to store cache files
 os.makedirs(cache_dir, exist_ok=True)  # ensure cache directory exists
 
 
@@ -223,10 +258,18 @@ def preprocess_data(data_train, data_test, labels_train, labels_test,
     # If cache is missing, then do the heavy lifting
     if cache_data is None:
         # Preprocess training and test data to obtain words for each review
+        progress = ProgressBar(len(data_train) + len(data_test))
+        progress.display()
+
+        def review_to_words_with_progress(review):
+            progress.progress = min(progress.total, progress.progress + 1)
+            progress.update()
+            return review_to_words(review)
+
         # words_train = list(map(review_to_words, data_train))
         # words_test = list(map(review_to_words, data_test))
-        words_train = [review_to_words(review) for review in data_train]
-        words_test = [review_to_words(review) for review in data_test]
+        words_train = [review_to_words_with_progress(review) for review in data_train]
+        words_test = [review_to_words_with_progress(review) for review in data_test]
 
         # Write to cache file for future runs
         if cache_file is not None:
@@ -247,6 +290,7 @@ def preprocess_data(data_train, data_test, labels_train, labels_test,
 # %%
 # Preprocess data
 train_X, test_X, train_y, test_y = preprocess_data(train_X, test_X, train_y, test_y)
+train_X[500]
 
 # %% [markdown]
 """
@@ -259,11 +303,11 @@ Since we will be using a recurrent neural network, it will be convenient if the 
 
 # %% [markdown]
 """
-### (TODO) Create a word dictionary
+### (DONE) Create a word dictionary
 
 To begin with, we need to construct a way to map words that appear in the reviews to integers. Here we fix the size of our vocabulary (including the 'no word' and 'infrequent' categories) to be `5000` but you may wish to change this to see how it affects the model.
 
-> **TODO:** Complete the implementation for the `build_dict()` method below. Note that even though the vocab_size is set to `5000`, we only want to construct a mapping for the most frequently appearing `4998` words. This is because we want to reserve the special labels `0` for 'no word' and `1` for 'infrequent word'.
+> **DONE:** Complete the implementation for the `build_dict()` method below. Note that even though the vocab_size is set to `5000`, we only want to construct a mapping for the most frequently appearing `4998` words. This is because we want to reserve the special labels `0` for 'no word' and `1` for 'infrequent word'.
 """
 
 # %%
@@ -273,15 +317,20 @@ import numpy as np
 def build_dict(data, vocab_size=5000):
     """Construct and return a dictionary mapping each of the most frequently appearing words to a unique integer."""
 
-    # TODO: Determine how often each word appears in `data`. Note that `data` is a list of sentences and that a
+    # DONE: Determine how often each word appears in `data`. Note that `data` is a list of sentences and that a
     #       sentence is a list of words.
 
     word_count = {}  # A dict storing the words that appear in the reviews along with how often they occur
 
-    # TODO: Sort the words found in `data` so that sorted_words[0] is the most frequently appearing word and
-    #       sorted_words[-1] is the least frequently appearing word.
+    for review in data:
+        for word in review:
+            word_count[word] = (word_count[word] if word in word_count else 0) + 1
 
-    sorted_words = None
+    # DONE: Sort the words found in `data` so that sorted_words[0] is the most frequently appearing word and
+    #       sorted_words[-1] is the least frequently appearing word.
+    sorted_words = list(map(lambda i: i[0],
+                            sorted(word_count.items(), key=lambda i: i[1], reverse=True)
+                            ))
 
     word_dict = {}  # This is what we are building, a dictionary that translates words into integers
     for idx, word in enumerate(sorted_words[:vocab_size - 2]):  # The -2 is so that we save room for the 'no word'
@@ -301,10 +350,18 @@ word_dict = build_dict(train_X)
 # %% [markdown]
 """
 **Answer:**
+
+movi, film, one, like, time
+
+`movi` is the stemmed version of `movie`
+
+> Does it makes sense that these words appear frequently in the training set?
+yes.
 """
 
 # %%
-# TODO: Use this space to determine the five most frequently appearing words in the training set.
+# DONE: Use this space to determine the five most frequently appearing words in the training set.
+list(word_dict.items())[:5]
 
 # %% [markdown]
 """
@@ -314,7 +371,7 @@ Later on when we construct an endpoint which processes a submitted review we wil
 """
 
 # %%
-data_dir = '../data/pytorch'  # The folder we will use for storing data
+data_dir = './data/pytorch'  # The folder we will use for storing data
 if not os.path.exists(data_dir):  # Make sure that the folder exists
     os.makedirs(data_dir)
 
@@ -327,6 +384,57 @@ with open(os.path.join(data_dir, 'word_dict.pkl'), "wb") as f:
 ### Transform the reviews
 
 Now that we have our word dictionary which allows us to transform the words appearing in the reviews into integers, it is time to make use of it and convert our reviews to their integer sequence representation, making sure to pad or truncate to a fixed length, which in our case is `500`.
+"""
+
+# %% [markdown]
+"""
+#### Is 500 the correct value for pad?
+"""
+# %%
+number_of_words_per_review = np.array(list(map(len, train_X)))
+
+number_of_reviews_with_more_than_500_words = len(number_of_words_per_review[number_of_words_per_review > 500])
+percent_of_reviews_with_gt_500_words = 100 * number_of_reviews_with_more_than_500_words / len(
+    number_of_words_per_review)
+print(f'percent of reviews with more than 500 words: {percent_of_reviews_with_gt_500_words}%')
+
+plt.hist(number_of_words_per_review, bins=range(0, 1000, 100))
+plt.title = 'hist of length of review in words'
+
+# %% [markdown]
+"""
+it seems reasonable, I might try 600, however, it would probably add very little additional information
+"""
+
+# %% [markdown]
+"""
+#### Is 5000 the correct vocabulary size?
+"""
+
+# %%
+word_count = {}
+
+for review in train_X:
+    for word in review:
+        word_count[word] = (word_count[word] if word in word_count else 0) + 1
+
+sorted_word_count = sorted(word_count.items(), key=lambda i: i[1], reverse=True)
+sorted_word_count[:5] + sorted_word_count[-5:]
+
+
+# %%
+def plot_word_count(start_word=0, end_word=5000):
+    return plt.scatter(
+        range(start_word, end_word),
+        list(map(lambda i: i[1], sorted_word_count[start_word:end_word]))
+    )
+
+
+plot_word_count(4000, 20000)
+# %% [markdown]
+"""
+We could go with a larger vocabulary. I would try up to 8000.
+However, with less than 100 training examples it will be hard for the model to learn a meaning for these words.
 """
 
 
@@ -369,6 +477,7 @@ As a quick check to make sure that things are working as intended, check to see 
 
 # %%
 # Use this cell to examine one of the processed reviews to make sure everything is working as intended.
+train_X[500]
 
 # %% [markdown]
 """
@@ -378,6 +487,35 @@ As a quick check to make sure that things are working as intended, check to see 
 # %% [markdown]
 """
 **Answer:**
+
+The `preprocess_data` and `convert_and_pad_data` form the basis of the pre-model transformation.
+This pre-processing step converts textual data into a numeric representation, allowing it to be interpreted by a ML model.
+
+`preprocess_data`: converts plain text review into a lists of tokens using `review_to_words` (already explained above)
+
+`convert_and_pad_data`: converts the tokenized list from `preprocess_data` into an array of numbers for consumption by the ML model.
+
+The way the functions are written and stored is definitely a problem from an engineering perspective:
+1. Causes duplicate code, therefor potential errors
+    - Processing functions are in a notebook and will have to be copied to at least 1 other place meaning the two functions could get out of sync with each other.
+    - this conversion is not done in the model so will need to be done in each place that calls the model
+1. Not portable to other languages
+    - if the model is called from a different language, a re-write of the functions will be needed leading to potential errors
+1. Causes Toil
+    - even if no errors are caused by the points above, any change to the functions will need to be propagated everywhere they are used, resulting in additional work to maintain the model
+
+From a Machine Learning perspective
+1. Tokenizing english without synonyms leads to
+1. Index-Based Encoding has some pros and cons
+    - pros
+        - maintains more semantic meaning than other techniques
+    - cons
+        - choosing too small of a vocabulary size (vocab_size)
+            - loose important information about highly correlated but not often used words
+        - choosing too small of a sentence length (pad)
+            - gives more weight to the beginning of the review
+            - meaning might be lost if only the first part of a sentence is taken
+        - results in a large feature space (vocabulary * sentence length)
 """
 
 # %% [markdown]
@@ -392,8 +530,6 @@ It is important to note the format of the data that we are saving as we will nee
 """
 
 # %%
-import pandas as pd
-
 pd.concat([pd.DataFrame(train_y), pd.DataFrame(train_X_len), pd.DataFrame(train_X)], axis=1) \
     .to_csv(os.path.join(data_dir, 'train.csv'), header=False, index=False)
 
@@ -404,16 +540,6 @@ pd.concat([pd.DataFrame(train_y), pd.DataFrame(train_X_len), pd.DataFrame(train_
 
 Next, we need to upload the training data to the SageMaker default S3 bucket so that we can provide access to it while training our model.
 """
-
-# %%
-import sagemaker
-
-sagemaker_session = sagemaker.Session()
-
-bucket = sagemaker_session.default_bucket()
-prefix = 'sagemaker/sentiment_rnn'
-
-role = sagemaker.get_execution_role()
 
 # %%
 input_data = sagemaker_session.upload_data(path=data_dir, bucket=bucket, key_prefix=prefix)
@@ -465,7 +591,7 @@ train_sample_dl = torch.utils.data.DataLoader(train_sample_ds, batch_size=50)
 
 # %% [markdown]
 """
-### (TODO) Writing the training method
+### (DONE) Writing the training method
 
 Next we need to write the training code itself. This should be very similar to training methods that you have written before to train PyTorch models. We will leave any difficult aspects such as model saving / loading and parameter loading until a little later.
 """
@@ -482,7 +608,13 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
             batch_X = batch_X.to(device)
             batch_y = batch_y.to(device)
 
-            # TODO: Complete this train method to train the model provided.
+            # DONE: Complete this train method to train the model provided.
+            optimizer.zero_grad()
+
+            outputs = model(batch_X)
+            loss = loss_fn(outputs, batch_y)
+            loss.backward()
+            optimizer.step()
 
             total_loss += loss.data.item()
         print("Epoch: {}, BCELoss: {}".format(epoch, total_loss / len(train_loader)))
@@ -511,32 +643,41 @@ In order to construct a PyTorch model using SageMaker we must provide SageMaker 
 
 # %% [markdown]
 """
-### (TODO) Training the model
+### (DONE) Training the model
 
 When a PyTorch model is constructed in SageMaker, an entry point must be specified. This is the Python file which will be executed when the model is trained. Inside of the `train` directory is a file called `train.py` which has been provided and which contains most of the necessary code to train our model. The only thing that is missing is the implementation of the `train()` method which you wrote earlier in this notebook.
 
-**TODO**: Copy the `train()` method written above and paste it into the `train/train.py` file where required.
+**DONE**: Copy the `train()` method written above and paste it into the `train/train.py` file where required.
 
 The way that SageMaker passes hyperparameters to the training script is by way of arguments. These arguments can then be parsed and used in the training script. To see how this is done take a look at the provided `train/train.py` file.
 """
 
 # %%
-from sagemaker.pytorch import PyTorch
+model_name = "sentiment-analysis-web-app"
 
+# %%
 estimator = PyTorch(entry_point="train.py",
                     source_dir="train",
+                    base_job_name=model_name,
                     role=role,
                     framework_version='0.4.0',
                     train_instance_count=1,
-                    train_instance_type='ml.p2.xlarge',
+                    train_instance_type=TRAIN_INSTANCE,
                     hyperparameters={
                         'epochs': 10,
                         'hidden_dim': 200,
                     })
 
 # %%
-estimator.fit({'training': input_data})
+training_job_name = model_name + '-train'
 
+estimator.fit(
+    {'training': input_data},
+    job_name=training_job_name,
+)
+
+# re-initiate estimator if estimator is lost
+# estimator = PyTorch.attach(training_job_name)
 # %% [markdown]
 """
 ## Step 5: Testing the model
@@ -557,11 +698,20 @@ Since we don't need to change anything in the code that was uploaded during trai
 
 In other words **If you are no longer using a deployed endpoint, shut it down!**
 
-**TODO:** Deploy the trained model.
+**DONE:** Deploy the trained model.
 """
 
 # %%
-# TODO: Deploy the trained model
+endpoint_name = model_name + '-endpoint'
+
+# %%
+# DONE: Deploy the trained model
+predictor = estimator.deploy(
+    initial_instance_count=1,
+    instance_type=DEPLOY_INSTANCE,
+    endpoint_name=endpoint_name
+)
+predictor = PyTorchPredictor(endpoint_name=endpoint_name)
 
 # %% [markdown]
 """
@@ -603,11 +753,19 @@ accuracy_score(test_y, predictions)
 # %% [markdown]
 """
 **Answer:**
+
+The RNN model is more complex, takes more time to train and calculate inferences, however, is capable of higher accuracy.
+
+The XGBoost model is based on random tree boosting and is generally lighter weight to train and run inferences on.
+
+In this case the accuracy difference of `0.8438` vs `0.8394` seems pretty small and depending on the use case I might go with the lower accuracy model since it is easier to host and more likely to be updated in the future.
+
+If the accuracy was important I would continue iterating on the RNN model and features since it shows more promiss than XGBoost for increasing accuracy past `0.8438`.
 """
 
 # %% [markdown]
 """
-### (TODO) More testing
+### (DONE) More testing
 
 We now have a trained model which has been deployed and which we can send processed reviews to and which returns the predicted sentiment. However, ultimately we would like to be able to send our model an unprocessed review. That is, we would like to send the review itself as a string. For example, suppose we wish to send the following review to our model.
 """
@@ -625,12 +783,13 @@ Recall in the first section of this notebook we did a bunch of data processing t
 
 In order process the review we will need to repeat these two steps.
 
-**TODO**: Using the `review_to_words` and `convert_and_pad` methods from section one, convert `test_review` into a numpy array `test_data` suitable to send to our model. Remember that our model expects input of the form `review_length, review[500]`.
+**DONE**: Using the `review_to_words` and `convert_and_pad` methods from section one, convert `test_review` into a numpy array `test_data` suitable to send to our model. Remember that our model expects input of the form `review_length, review[500]`.
 """
 
 # %%
-# TODO: Convert test_review into a form usable by the model and save the results in test_data
-test_data = None
+# DONE: Convert test_review into a form usable by the model and save the results in test_data
+test_data, test_data_length = convert_and_pad(word_dict=word_dict, sentence=test_review)
+test_data = [test_data.insert(0, test_data_length)]
 
 # %% [markdown]
 """
@@ -652,7 +811,7 @@ Since the return value of our model is close to `1`, we can be certain that the 
 Of course, just like in the XGBoost notebook, once we've deployed an endpoint it continues to run until we tell it to shut down. Since we are done using our endpoint for now, we can delete it.
 """
 
-# %%
+# %% jupyter={"outputs_hidden": false}
 estimator.delete_endpoint()
 
 # %% [markdown]
@@ -673,7 +832,7 @@ When deploying a PyTorch model in SageMaker, you are expected to provide four fu
 
 For the simple website that we are constructing during this project, the `input_fn` and `output_fn` methods are relatively straightforward. We only require being able to accept a string as input and we expect to return a single value as output. You might imagine though that in a more complex application the input or output may be image data or some other binary data which would require some effort to serialize.
 
-### (TODO) Writing inference code
+### (DONE) Writing inference code
 
 Before writing our custom inference code, we will begin by taking a look at the code which has been provided.
 """
@@ -685,7 +844,7 @@ Before writing our custom inference code, we will begin by taking a look at the 
 """
 As mentioned earlier, the `model_fn` method is the same as the one provided in the training code and the `input_fn` and `output_fn` methods are very simple and your task will be to complete the `predict_fn` method. Make sure that you save the completed file as `predict.py` in the `serve` directory.
 
-**TODO**: Complete the `predict_fn()` method in the `serve/predict.py` file.
+**DONE**: Complete the `predict_fn()` method in the `serve/predict.py` file.
 """
 
 # %% [markdown]
@@ -713,7 +872,14 @@ model = PyTorchModel(model_data=estimator.model_data,
                      entry_point='predict.py',
                      source_dir='serve',
                      predictor_cls=StringPredictor)
-predictor = model.deploy(initial_instance_count=1, instance_type='ml.m4.xlarge')
+
+predictor = model.deploy(
+    initial_instance_count=1,
+    instance_type=DEPLOY_INSTANCE,
+    endpoint_name=endpoint_name,
+    # update_endpoint=True,
+)
+# predictor = StringPredictor(endpoint_name=endpoint_name, sagemaker_session=sagemaker_session)
 
 # %% [markdown]
 """
@@ -722,11 +888,26 @@ predictor = model.deploy(initial_instance_count=1, instance_type='ml.m4.xlarge')
 Now that we have deployed our model with the custom inference code, we should test to see if everything is working. Here we test our model by loading the first `250` positive and negative reviews and send them to the endpoint, then collect the results. The reason for only sending some of the data is that the amount of time it takes for our model to process the input and then perform inference is quite long and so testing the entire data set would be prohibitive.
 """
 
-# %%
-import glob
+
+# %% jupyter={"outputs_hidden": false}
+# sagemaker default PyTorch deploy seems to re-install the requirements file on every call.
+# This lead to errors with `nltk.data` for an unknown reason.
+# I could have debugged it but adding a retry was a faster solution.
+def call_predict_with_back_off(review_input, max_tries=5, try_count=None):
+    if try_count is None:
+        try_count = 0
+
+    try:
+        return predictor.predict(review_input)
+    except Exception as e:
+        if (try_count == max_tries):
+            raise e
+
+        time.sleep((100 + 10 ** try_count) / 1000) # 100ms delay plus 10ms exponential back off
+        return call_predict_with_back_off(review_input, max_tries, try_count + 1)
 
 
-def test_reviews(data_dir='../data/aclImdb', stop=250):
+def test_reviews(data_dir='./data/aclImdb', stop=250):
     results = []
     ground = []
 
@@ -749,9 +930,10 @@ def test_reviews(data_dir='../data/aclImdb', stop=250):
                 else:
                     ground.append(0)
                 # Read in the review and convert to 'utf-8' for transmission via HTTP
-                review_input = review.read().encode('utf-8')
+                review_input = review.read()
+
                 # Send the review to the predictor and store the results
-                results.append(int(predictor.predict(review_input)))
+                results.append(int(call_predict_with_back_off(review_input)))
 
             # Sending reviews to our endpoint one at a time takes a while so we
             # only send a small number of reviews
@@ -762,7 +944,7 @@ def test_reviews(data_dir='../data/aclImdb', stop=250):
     return ground, results
 
 
-# %%
+# %% jupyter={"outputs_hidden": false}
 ground, results = test_reviews()
 
 # %%
@@ -787,7 +969,7 @@ Now that we know our endpoint is working as expected, we can set up the web page
 """
 ## Step 7 (again): Use the model for the web app
 
-> **TODO:** This entire section and the next contain tasks for you to complete, mostly using the AWS console.
+> **DONE:** This entire section and the next contain tasks for you to complete, mostly using the AWS console.
 
 So far we have been accessing our model endpoint by constructing a predictor object which uses the endpoint and then just using the predictor object to perform inference. What if we wanted to create a web app which accessed our model? The way things are set up currently makes that not possible since in order to access a SageMaker endpoint the app would first have to authenticate with AWS using an IAM role which included access to SageMaker endpoints. However, there is an easier way! We just need to use some additional AWS services.
 
@@ -877,6 +1059,9 @@ The last step in creating the API Gateway is to select the **Actions** dropdown 
 You have now successfully set up a public API to access your SageMaker model. Make sure to copy or write down the URL provided to invoke your newly created public API as this will be needed in the next step. This URL can be found at the top of the page, highlighted in blue next to the text **Invoke URL**.
 """
 
+# %%
+'https://vio1ot75y3.execute-api.us-east-1.amazonaws.com/prod'
+
 # %% [markdown]
 """
 ## Step 4: Deploying our web app
@@ -891,7 +1076,7 @@ If you'd like to go further, you can host this html file anywhere you'd like, fo
 
 > **Important Note** In order for the web app to communicate with the SageMaker endpoint, the endpoint has to actually be deployed and running. This means that you are paying for it. Make sure that the endpoint is running when you want to use the web app but that you shut it down when you don't need it, otherwise you will end up with a surprisingly large AWS bill.
 
-**TODO:** Make sure that you include the edited `index.html` file in your project submission.
+**DONE:** Make sure that you include the edited `index.html` file in your project submission.
 """
 
 # %% [markdown]
@@ -904,7 +1089,26 @@ Now that your web app is working, trying playing around with it and see how well
 # %% [markdown]
 """
 **Answer:**
+
+example review taken from https://www.imdb.com/title/tt9484998/reviews?ref_=tt_urv
+
+actual sentiment: 9/10
 """
+
+# %%
+example_review = """
+Films that revolve around characters repeating the same day over and over again has grown very tired in my mind. Groundhog Day perfected it and it really wasn't until more recently with Edge of Tomorrow that I really found a film that seemed to stand out among the rest. Well, I'm glad that I can now add Palm Springs to the list of films to put a clever spin on this concept. This film was originally supposed to play at more film festivals around the world and eventually receive a theatrical release, but things being the way they are, Hulu has now released it. Although this may be a film that's hard to find for some right now, here's why Palm Springs is one of the very best movies to come out of this bare year of 2020 so far.
+
+Nyles (Andy Samberg) and Sarah (Cristin Milioti) find themselves sort of bonding over the fact that they both really don't want to be at the wedding they're at. He's the date of someone who cheats on him and she is the sister of the bride, who clearly has many issues. Stumbling across a strange cave after the wedding, they both find themselves caught in a time loop that has them reliving the same day over and over again. Certain things are revealed about each of these characters that add a lot more depth to the story and I found myself incredibly engaged from beginning to end.
+
+Where this film shines the most is in the fact that it completely commits to the whole time loop concept, even giving a few winks at the audience. It never once makes any huge mistakes logically, which felt refreshing, especially in the ways it would subvert expectations and most importantly in the way that they choose to conclude the story. The way Palm Springs wraps up was a very entertaining and emotionally earned finale. Now, I feel like I say this about a lot of movies that focus so much of their time on very few characters, but I truly mean that if Samberg and Milioti didn't have any fun chemistry together, this film would've been a disaster. This is probably the most laid back and comfortable I've ever seen Andy Samberg be in a film and it made the entire experience that much better.
+
+Only having written and directed a few short films and a documentary before tackling Palm Springs, director Max Barbakow has honestly blown me away here. With a small budget, a small number of characters, and a small scope, this film felt much bigger than it was. I can honestly see a big future for him in the coming years. I will gladly seek out his next project. On top of his stellar work on this film, writer Andy Siara (who also doesn't have a huge filmography as of yet) added a very funny and clever tone to the whole concept. It was clear that the performers were very comfortable with the dialogue because their acting lept off the screen and that just seemed to be a nice mixture of everything coming together nicely behind the scenes.
+
+In the end, Palm Springs is a film that I was very much looking forward to, but was wary of due to the concept itself. Thankfully, this is one of the best movies that I've seen accomplish this concept in years. I'm not calling it a masterpiece by any means, but for a fun time loop movie, I really couldn't find many issues. At a mere 90 minutes, this movie flies by and has just enough clever surprises for those who may not have been completely engaged. While the idea itself has grown tired for me, this movie is undeniably hard to dislike. Everything about this movie put a huge smile on my face and if that isn't what the world needs right now, I don't know what is.
+"""
+
+predictor.predict(example_review)
 
 # %% [markdown]
 """
@@ -915,5 +1119,3 @@ Remember to always shut down your endpoint if you are no longer using it. You ar
 
 # %%
 predictor.delete_endpoint()
-
-# %%

@@ -17,6 +17,7 @@
 import glob
 import os
 import time
+from collections import Counter
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -320,17 +321,12 @@ def build_dict(data, vocab_size=5000):
     # DONE: Determine how often each word appears in `data`. Note that `data` is a list of sentences and that a
     #       sentence is a list of words.
 
-    word_count = {}  # A dict storing the words that appear in the reviews along with how often they occur
-
-    for review in data:
-        for word in review:
-            word_count[word] = (word_count[word] if word in word_count else 0) + 1
+    # A dict storing the words that appear in the reviews along with how often they occur
+    word_count = dict(Counter(word for review in data for word in review))
 
     # DONE: Sort the words found in `data` so that sorted_words[0] is the most frequently appearing word and
     #       sorted_words[-1] is the least frequently appearing word.
-    sorted_words = list(map(lambda i: i[0],
-                            sorted(word_count.items(), key=lambda i: i[1], reverse=True)
-                            ))
+    sorted_words = sorted(word_count, key=word_count.get, reverse=True)
 
     word_dict = {}  # This is what we are building, a dictionary that translates words into integers
     for idx, word in enumerate(sorted_words[:vocab_size - 2]):  # The -2 is so that we save room for the 'no word'
@@ -789,7 +785,7 @@ In order process the review we will need to repeat these two steps.
 # %%
 # DONE: Convert test_review into a form usable by the model and save the results in test_data
 test_data, test_data_length = convert_and_pad(word_dict=word_dict, sentence=test_review)
-test_data = [test_data.insert(0, test_data_length)]
+test_data = np.hstack(test_data_length, test_data).reshape(1, -1)
 
 # %% [markdown]
 """
@@ -903,7 +899,7 @@ def call_predict_with_back_off(review_input, max_tries=5, try_count=None):
         if (try_count == max_tries):
             raise e
 
-        time.sleep((100 + 10 ** try_count) / 1000) # 100ms delay plus 10ms exponential back off
+        time.sleep((100 + 10 ** try_count) / 1000)  # 100ms delay plus 10ms exponential back off
         return call_predict_with_back_off(review_input, max_tries, try_count + 1)
 
 

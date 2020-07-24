@@ -33,7 +33,7 @@ def create_datatype(df, train_value, test_value, datatype_var, compare_dfcolumn,
     # Labels all datatype_var column as train_value which will be overwritten to
     # test_value in next for loop for all test cases chosen with stratified sample
     for index in df_sampled.index:
-        # Labels all datatype_var columns with test_value for straified test sample
+        # Labels all datatype_var columns with test_value for stratified test sample
         df_subset.loc[index, datatype_var] = test_value
 
     # print("\nSubset DF:\n",df_subset)
@@ -58,7 +58,7 @@ def train_test_dataframe(clean_df, random_seed=100):
     # Creates test & training datatypes for NON-plagiarized answers (0)
     create_datatype(new_df, 1, 2, 'Datatype', 'Category', operator.eq, 0, 2, random_seed)
 
-    # creating a dictionary of categorical:numerical mappings for plagiarsm categories
+    # creating a dictionary of categorical:numerical mappings for plagiarism categories
     mapping = {0: 'orig', 1: 'train', 2: 'test'}
 
     # traversing through dataframe and replacing categorical data
@@ -77,17 +77,17 @@ def process_file(file):
     # remove newlines/tabs, etc. so it's easier to match phrases, later
     all_text = re.sub(r"\t", " ", all_text)
     all_text = re.sub(r"\n", " ", all_text)
-    all_text = re.sub("  ", " ", all_text)
-    all_text = re.sub("   ", " ", all_text)
+    all_text = re.sub(" {2}", " ", all_text)
+    all_text = re.sub(" {3}", " ", all_text)
 
     return all_text
 
 
 def create_text_column(df, file_directory='data/'):
-    '''Reads in the files, listed in a df and returns that df with an additional column, `Text`.
+    """Reads in the files, listed in a df and returns that df with an additional column, `Text`.
        :param df: A dataframe of file information including a column for `File`
        :param file_directory: the main directory where files are stored
-       :return: A dataframe with processed text '''
+       :return: A dataframe with processed text """
 
     # create copy to modify
     text_df = df.copy()

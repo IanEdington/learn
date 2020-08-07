@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # test csv file
-TEST_CSV = 'data/test_info.csv'
+TEST_CSV = 'data/data/test_info.csv'
 
 
 class AssertTest(object):

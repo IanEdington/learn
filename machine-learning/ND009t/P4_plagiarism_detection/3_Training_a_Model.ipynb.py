@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -13,12 +14,36 @@
 #     name: p4_plagiarism_detection
 # ---
 
-# %% jupyter={"outputs_hidden": true}
+# %%
+import json
 import os
+import re
+from typing import Tuple
 
 import boto3
+import numpy as np
 import pandas as pd
 import sagemaker
+from botocore.exceptions import ClientError
+from deepdiff import DeepHash
+from dotenv import load_dotenv
+from sagemaker.sklearn import SKLearn
+from sklearn.metrics import accuracy_score
+
+from helpers import OUTPUT_DIR, S3_FEATURE_DIR, S3_MODEL_DIR
+
+load_dotenv(override=True)
+
+# session and role
+sagemaker_session = sagemaker.Session()
+role = os.environ.get('SAGEMAKER_EXECUTION_ROLE') or sagemaker.get_execution_role()
+
+# create an S3 bucket
+bucket = sagemaker_session.default_bucket()
+
+# these are the largest training / deploy instances available in aws educate
+TRAIN_INSTANCE = 'ml.m5.large'
+DEPLOY_INSTANCE = 'ml.m5.large'
 
 # %% [markdown]
 """
@@ -52,16 +77,11 @@ In the last notebook, you should have created two files: a `training.csv` and `t
 Save your train and test `.csv` feature files, locally. To do this you can run the second notebook "2_Plagiarism_Feature_Engineering" in SageMaker or you can manually upload your files to this notebook using the upload icon in Jupyter Lab. Then you can upload local files to S3 by using `sagemaker_session.upload_data` and pointing directly to where the training data is saved.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
-# session and role
-sagemaker_session = sagemaker.Session()
-role = sagemaker.get_execution_role()
-
-# create an S3 bucket
-bucket = sagemaker_session.default_bucket()
+# Moved to top for easier execution while iterating on notebook
 
 # %% [markdown]
 """
@@ -72,14 +92,19 @@ Specify the `data_dir` where you've saved your `train.csv` file. Decide on a des
 You are expected to upload your entire directory. Later, the training script will only access the `train.csv` file.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # should be the name of directory you created to save your features data
-data_dir = './data'
 
-# set prefix, a descriptive name for a directory
+data_to_try = ['all-features']
 prefix = None
+data_desc = None
 
-# upload all data to S3
+for data_desc in data_to_try:
+    # set prefix, a descriptive name for a directory
+    prefix = S3_FEATURE_DIR / data_desc
+
+    # upload all data to S3
+    sagemaker_session.upload_data(path=str(OUTPUT_DIR / data_desc), key_prefix=prefix)
 
 
 # %% [markdown]
@@ -89,13 +114,13 @@ prefix = None
 Test that your data has been successfully uploaded. The below cell prints out the items in your S3 bucket and will throw an error if it is empty. You should see the contents of your `data_dir` and perhaps some checkpoints. If you see any other files listed, then you may have some old model files that you can delete via the S3 console (though, additional files shouldn't affect the performance of model developed in this notebook).
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 # confirm that data is in S3 bucket
 empty_check = []
-for obj in boto3.resource('s3').Bucket(bucket).objects.all():
+for obj in boto3.resource('s3').Bucket(bucket).objects.filter(Prefix=str(prefix)):
     empty_check.append(obj.key)
     print(obj.key)
 
@@ -142,9 +167,9 @@ Below, you can use `!pygmentize` to display an existing `train.py` file. Read th
 **Note: If you choose to create a custom PyTorch model, you will be responsible for defining the model in the `model.py` file,** and a `predict.py` file is provided. If you choose to use Scikit-learn, you only need a `train.py` file; you may import a classifier from the `sklearn` library.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # directory can be changed to: source_sklearn or source_pytorch
-# !pygmentize source_sklearn/train.py
+# !pygmentize sagemaker_container/train_and_deploy.py
 
 # %% [markdown]
 """
@@ -190,9 +215,89 @@ from sagemaker.pytorch import PyTorch
 ```
 """
 
-# %% jupyter={"outputs_hidden": true}
 
+# %%
 # your import and estimator code, here
+def build_name_from_array(model_array):
+    model_name = '-'.join(model_array)
+    model_name = re.sub(r"[^-a-zA-Z0-9]+", '-', model_name).strip('-')
+    return re.sub(r"--+", '-', model_name)
+
+
+def build_model_name(data_desc, classifier, hyperparams, count) -> str:
+    hyperparams_json = json.dumps(hyperparams, sort_keys=True, ensure_ascii=True)
+    model_name = build_name_from_array([
+        data_desc,
+        classifier,
+        hyperparams_json,
+        str(count),
+    ])
+    if len(model_name) > 63:
+        hyperparams_hash = str(DeepHash(hyperparams_json)[hyperparams_json])[:8]
+        model_name = build_name_from_array([
+            data_desc,
+            classifier,
+            hyperparams_hash,
+            str(count),
+        ])
+        if len(model_name) > 63:
+            # this will error on the server, error fast
+            raise ValueError(f'generated model name is too long: {model_name}')
+    return model_name
+
+
+def build_and_train_estimator(
+    data_desc: str,
+    classifier: str,
+    count: int = 1,
+    wait: bool = False,
+    **hyperparams: object
+) -> Tuple[SKLearn, str]:
+    """
+    Creates or returns an existing sagemaker training job
+
+    :param data_desc: name of data to use (unique)
+    :param classifier: name of sklearn classifier
+    :param count: cache buster
+    :param wait: waits on job, useful for debugging
+    :param hyperparams: hyperparameters for the model
+    :return: estimator | None
+    """
+    model_name = build_model_name(data_desc, classifier, hyperparams, count)
+    print('model_name', model_name)
+
+    # check if model has already been built on this data
+    #  if it has check if it's finished and attach
+    try:
+        import boto3
+        client = boto3.client('sagemaker')
+        response = client.describe_training_job(
+            TrainingJobName=model_name
+        )
+        if wait or response['TrainingJobStatus'] in ['Completed', 'Failed']:
+            return SKLearn.attach(model_name), model_name
+        else:
+            raise Warning(f'{model_name} isn\'t finished training yet')
+    except ClientError:
+        pass
+
+    output_location = f's3://{bucket}/{S3_MODEL_DIR / data_desc}'
+    estimator = SKLearn(
+        'train_and_deploy.py',
+        source_dir='sagemaker_container',
+        code_location=output_location,
+        output_path=output_location,
+        train_instance_type=TRAIN_INSTANCE,
+        framework_version='0.23-1',
+        role=role,
+        hyperparameters={
+            'classifier': classifier,
+            **hyperparams
+        })
+
+    estimator.fit(f's3://{bucket}/{S3_FEATURE_DIR / data_desc}', wait=wait, job_name=model_name)
+
+    return estimator, model_name
 
 
 # %% [markdown]
@@ -203,10 +308,52 @@ Train your estimator on the training data stored in S3. This should create a tra
 """
 
 # %% jupyter={"outputs_hidden": true}
-# %%time
-
 # Train your estimator on S3 training data
+build_and_train_estimator('all-features', 'SVC')
 
+
+# %% jupyter={"outputs_hidden": true}
+# GaussianNB
+for data_desc in data_to_try:
+    build_and_train_estimator(data_desc, 'GaussianNB')
+
+# %% jupyter={"outputs_hidden": true}
+# SVC
+for data_desc in data_to_try:
+    for kernel in [
+        'rbf',
+        'linear',
+        # 'poly',
+        'sigmoid',
+    ]:
+        build_and_train_estimator(data_desc, 'SVC', kernel=kernel)
+    build_and_train_estimator(data_desc, 'SVC', kernel='poly', count=2)
+
+# %% jupyter={"outputs_hidden": true}
+# AdaBoostClassifier
+for data_desc in data_to_try:
+    build_and_train_estimator(data_desc, 'AdaBoostClassifier')
+
+# %% jupyter={"outputs_hidden": true}
+# DecisionTreeClassifier
+for data_desc in data_to_try:
+    for criterion in ['entropy', 'gini']:
+        for min_samples_split in range(2, 5):
+            build_and_train_estimator(
+                data_desc,
+                'DecisionTreeClassifier',
+                count=2,
+                criterion=criterion,
+                min_samples_split=min_samples_split,
+            )
+
+# %% [markdown]
+"""
+### Final Model
+"""
+
+# %% jupyter={"outputs_hidden": true}
+estimator, model_name = build_and_train_estimator(data_desc, 'AdaBoostClassifier', count=2, wait=True)
 
 # %% [markdown]
 """
@@ -221,12 +368,14 @@ To deploy a trained model, you'll use `<model>.deploy`, which takes in two argum
 Note: If you run into an instance error, it may be because you chose the wrong training or deployment instance_type. It may help to refer to your previous exercise code to see which types of instances we used.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # %%time
-
-
 # deploy your model to create a predictor
-predictor = None
+predictor = estimator.deploy(
+    initial_instance_count=1,
+    instance_type=DEPLOY_INSTANCE,
+    endpoint_name=model_name + '-ep'
+)
 
 # %% [markdown]
 """
@@ -238,17 +387,17 @@ Once your model is deployed, you can see how it performs when applied to our tes
 The provided cell below, reads in the test data, assuming it is stored locally in `data_dir` and named `test.csv`. The labels and features are extracted from the `.csv` file.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 
 # read in test data, assuming it is stored locally
-test_data = pd.read_csv(os.path.join(data_dir, "test.csv"), header=None, names=None)
+test_data = pd.read_csv(os.path.join(OUTPUT_DIR / data_to_try[0], "test.csv"), header=None, names=None)
 
 # labels are in the first column
-test_y = test_data.iloc[:, 0]
-test_x = test_data.iloc[:, 1:]
+test_labels = test_data.iloc[:, 0]
+test_features = test_data.iloc[:, 1:]
 
 # %% [markdown]
 """
@@ -259,28 +408,23 @@ Use your deployed `predictor` to generate predicted, class labels for the test d
 **To pass this project, your model should get at least 90% test accuracy.**
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # First: generate predicted, class labels
-test_y_preds = []
+# noinspection PyTypeChecker
+predict_labels: np.ndarray = predictor.predict(test_features)  # `.predict` doesn't have a return type defined
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 # test that your model generates the correct number of labels
-assert len(test_y_preds) == len(test_y), 'Unexpected number of predictions.'
+assert len(predict_labels) == len(test_labels), 'Unexpected number of predictions.'
 print('Test passed!')
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Second: calculate the test accuracy
-accuracy = None
+accuracy = accuracy_score(predict_labels, test_labels)
 
 print(accuracy)
-
-# print out the array of predicted and true labels, if you want
-print('\nPredicted class labels: ')
-print(test_y_preds)
-print('\nTrue class labels: ')
-print(test_y.values)
 
 # %% [markdown]
 """
@@ -289,8 +433,43 @@ print(test_y.values)
 
 # %% [markdown]
 """
-** Answer**:
+**Answer**:
+
+The count of false positives and false negatives are in the next cell.
+
+> And why do you think this is?
+
+This models accuracy is not 100%.
+This means that it has to have at least some incorrect (aka false) results.
+
+False negatives are when a positive value is predicted to be a negative value. This is a
 """
+
+# %%
+test_labels = test_labels.to_numpy().astype(bool)
+predict_labels = predict_labels.astype(bool)
+
+# %%
+true_positives = (predict_labels & test_labels).sum()
+false_positives = (predict_labels & ~test_labels).sum()
+true_negatives = (~predict_labels & ~test_labels).sum()
+false_negatives = (~predict_labels & test_labels).sum()
+len(test_labels), true_positives, false_positives, true_negatives, false_negatives
+
+# %%
+assert (true_positives + false_positives + true_negatives + false_negatives) == len(test_labels), \
+    'All cases should sum to the number of instances'
+assert true_positives + false_positives == predict_labels.sum(), \
+    'number of positives (true + false) should equal the number of positives in the predict set'
+assert true_negatives + false_negatives == (len(predict_labels) - predict_labels.sum()), \
+    'number of negatives (true + false) should equal the number of negatives in the predict set'
+assert true_positives + false_negatives == test_labels.sum(), \
+    'true pos + false neg should equal the number of positives in the test set'
+assert true_negatives + false_positives == (len(test_labels) - test_labels.sum()), \
+    'true neg + false pos should equal the number of negatives in the test set'
+
+print('number of false positives', false_positives)
+print('number of false negatives', false_negatives)
 
 # %% [markdown]
 """
@@ -299,7 +478,46 @@ print(test_y.values)
 
 # %% [markdown]
 """
-** Answer**:
+**Answer**:
+
+We were looking for a 90%+ accuracy score.
+A number of scikit-learn models can achieve this level of accuracy on a dataset this size with fairly low computation requirements.
+Given the type of data, Naïve Bayes, SVM, or a Decision Tree model seemed likely to work.
+Given all this information, a search of the given models with stopping at 90% accuracy seemed like the fastest way to finish the requirements.
+
+Search criteria:
+- features
+    - start with all features
+    - remove low correlated features in a second and third round
+- models & parameters:
+    - Naïve Bayes
+        - GaussianNB
+    - SVM
+        - kernel: 'rbf', 'linear', 'poly', or 'sigmoid'
+    - Ada Boost
+        - Default
+    - Random Forest
+        - criterion: 'entropy', 'gini'
+        - min_samples_split: 2, 3, 4, 5
+- stopping conditions:
+    - more than 90% accuracy
+    - more than 3 hours spent in training
+- continue iterating on model, parameters, and features until a stopping condition is met
+
+These search parameters found a model that achieved over 90% accuracy in the first hour of training, so much of the search was not completed.
+In a work environment if we were looking for an accuracy of 90% and achieved it we would stop our search and start the deployment process in order to gain as much benefit from the improvement as possible.
+After a round of deployment and verifying the results we would most-likely circle back on improving this model further since it's most likely possible to get a higher accuracy with it's most likely possible to get a higher accuracy with a little more work.
+
+If this search hadn't found the results we were looking for it would have given us a lot of information to point us in a new direction for where to go next
+
+#### Ways to improve:
+
+Use a hyperparameter tuning job:
+
+Ideally the hyperparameter tuning solution from sagemaker would have been used.
+This would have required implementing a container that could be used with the hyperparameter tuning job and defining a tuning job per model.
+A hyperparameter tuning job would have searched the solution space more effectively and could have been used to avoid the training instance limit.
+This would have been more efficient than looping over the solution space.
 """
 
 # %% [markdown]
@@ -310,42 +528,7 @@ print(test_y.values)
 After you're done evaluating your model, **delete your model endpoint**. You can do this with a call to `.delete_endpoint()`. You need to show, in this notebook, that the endpoint was deleted. Any other resources, you may delete from the AWS console, and you will find more instructions on cleaning up all your resources, below.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # uncomment and fill in the line below!
-# <name_of_deployed_predictor>.delete_endpoint()
+predictor.delete_endpoint()
 
-
-# %% [markdown]
-"""
-### Deleting S3 bucket
-
-When you are *completely* done with training and testing models, you can also delete your entire S3 bucket. If you do this before you are done training your model, you'll have to recreate your S3 bucket and upload your training data again.
-"""
-
-# %% jupyter={"outputs_hidden": true}
-# deleting bucket, uncomment lines below
-
-# bucket_to_delete = boto3.resource('s3').Bucket(bucket)
-# bucket_to_delete.objects.all().delete()
-
-# %% [markdown]
-"""
-### Deleting all your models and instances
-
-When you are _completely_ done with this project and do **not** ever want to revisit this notebook, you can choose to delete all of your SageMaker notebook instances and models by following [these instructions](https://docs.aws.amazon.com/sagemaker/latest/dg/ex1-cleanup.html). Before you delete this notebook instance, I recommend at least downloading a copy and saving it, locally.
-"""
-
-# %% [markdown]
-"""
----
-## Further Directions
-
-There are many ways to improve or add on to this project to expand your learning or make this more of a unique project for you. A few ideas are listed below:
-* Train a classifier to predict the *category* (1-3) of plagiarism and not just plagiarized (1) or not (0).
-* Utilize a different and larger dataset to see if this model can be extended to other types of plagiarism.
-* Use language or character-level analysis to find different (and more) similarity features.
-* Write a complete pipeline function that accepts a source text and submitted text file, and classifies the submitted text as plagiarized or not.
-* Use API Gateway and a lambda function to deploy your model to a web application.
-
-These are all just options for extending your work. If you've completed all the exercises in this notebook, you've completed a real-world application, and can proceed to submit your project. Great job!
-"""

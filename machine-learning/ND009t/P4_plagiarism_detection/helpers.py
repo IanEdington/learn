@@ -1,6 +1,17 @@
 import operator
 import re
 
+from pathlib import Path
+
+PROJECT_DIR = Path(__file__).parent
+PROJECT_NAME = PROJECT_DIR.name
+DATA_DIR = PROJECT_DIR / 'data'
+RAW_DATA_DIR = DATA_DIR / 'data'
+OUTPUT_DIR = DATA_DIR / 'plagiarism_data'
+
+S3_FEATURE_DIR = Path(PROJECT_NAME) / 'feature-data'
+S3_MODEL_DIR = Path(PROJECT_NAME) / 'model-data'
+
 
 # Add 'datatype' column that indicates if the record is original wiki answer as 0, training data 1, test data 2, onto
 # the dataframe - uses stratified random sampling (with seed) to sample by task & plagiarism amount
@@ -83,7 +94,7 @@ def process_file(file):
     return all_text
 
 
-def create_text_column(df, file_directory='data/'):
+def create_text_column(df, file_directory='data/data/'):
     """Reads in the files, listed in a df and returns that df with an additional column, `Text`.
        :param df: A dataframe of file information including a column for `File`
        :param file_directory: the main directory where files are stored

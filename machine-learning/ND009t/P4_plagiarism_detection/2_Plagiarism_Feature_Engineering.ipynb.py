@@ -15,13 +15,16 @@
 
 # %%
 import os
+import shutil
 
 import numpy as np
 import pandas as pd
 from IPython.core.display import display
+from sklearn.feature_extraction.text import CountVectorizer
 
 import helpers
 import problem_unittests as tests
+from helpers import PROJECT_DIR, DATA_DIR, RAW_DATA_DIR, OUTPUT_DIR
 
 # %% [markdown]
 """
@@ -63,8 +66,13 @@ This data is a slightly modified version of a dataset created by Paul Clough (In
 # NOTE:
 # you only need to run this cell if you have not yet downloaded the data
 # otherwise you may skip this cell or comment it out
-# !wget https://s3.amazonaws.com/video.udacity-data.com/topher/2019/January/5c4147f9_data/data.zip
-# !unzip data
+if DATA_DIR.exists():
+    shutil.rmtree(DATA_DIR)
+DATA_DIR.mkdir()
+print('get data')
+# !wget -nc -P $DATA_DIR https://s3.amazonaws.com/video.udacity-data.com/topher/2019/January/5c4147f9_data/data.zip
+print('unzip data')
+# !unzip -q $DATA_DIR/data -d $DATA_DIR
 
 # %% [markdown]
 """
@@ -72,8 +80,8 @@ This plagiarism dataset is made of multiple text files; each of these files has 
 """
 
 # %%
-csv_file = 'data/file_information.csv'
-plagiarism_df = pd.read_csv(csv_file)
+INFORMATION_FILE = RAW_DATA_DIR / 'file_information.csv'
+plagiarism_df = pd.read_csv(INFORMATION_FILE)
 
 # print out the first few rows of data info
 plagiarism_df.head()
@@ -148,10 +156,18 @@ After running your function, you should get a DataFrame with rows that looks lik
 ```
 """
 
+# %%
+cat_to_cat_num_map = {
+    "non": 0,
+    "heavy": 1,
+    "light": 2,
+    "cut": 3,
+    "orig": -1
+}
 
-# %% jupyter={"outputs_hidden": true}
+
 # Read in a csv file and return a transformed dataframe
-def numerical_dataframe(csv_file='data/file_information.csv') -> pd.DataFrame:
+def numerical_dataframe(csv_file=INFORMATION_FILE) -> pd.DataFrame:
     """Reads in a csv file which is assumed to have `File`, `Category` and `Task` columns.
        This function does two things:
        1) converts `Category` column values to numerical values
@@ -162,8 +178,12 @@ def numerical_dataframe(csv_file='data/file_information.csv') -> pd.DataFrame:
        :return: A dataframe with numerical categories and a new `Class` label column"""
 
     # your code here
+    df = pd.read_csv(csv_file)
 
-    pass
+    df.Category = df.Category.apply(cat_to_cat_num_map.get)
+    df['Class'] = np.minimum(df.Category, 1)
+
+    return df
 
 
 # %% [markdown]
@@ -181,16 +201,16 @@ Often, later cells rely on the functions, imports, or variables defined in earli
 These tests do not test all cases, but they are a great way to check that you are on the right track!
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # informal testing, print out the results of a called function
 # create new `transformed_df`
-transformed_df = numerical_dataframe(csv_file='data/file_information.csv')
+transformed_df = numerical_dataframe(csv_file=INFORMATION_FILE)
 
 # check work
 # check that all categories of plagiarism have a class label = 1
 transformed_df.head(10)
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # test cell that creates `transformed_df`, if tests are passed
 
 """
@@ -203,7 +223,7 @@ DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 tests.test_numerical_df(numerical_dataframe)
 
 # if above test is passed, create NEW `transformed_df`
-transformed_df = numerical_dataframe(csv_file='data/file_information.csv')
+transformed_df = numerical_dataframe(csv_file=INFORMATION_FILE)
 
 # check work
 print('\nExample data: ')
@@ -225,7 +245,7 @@ The details of how these additional columns are created can be found in the `hel
 Run the cells below to get a `complete_df` that has all the information you need to proceed with plagiarism detection and feature engineering.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
@@ -234,7 +254,7 @@ DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 text_df = helpers.create_text_column(transformed_df)
 text_df.head()
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # after running the cell above
 # check out the processed text for a single file, by row index
 row_idx = 0  # feel free to change this index
@@ -259,8 +279,8 @@ The given code uses a helper function which you can view in the `helpers.py` fil
 The function **train_test_dataframe** takes in a DataFrame that it assumes has `Task` and `Category` columns, and, returns a modified frame that indicates which `Datatype` (train, test, or orig) a file falls into. This sampling will change slightly based on a passed in *random_seed*. Due to a small sample size, this stratified random sampling will provide more stable results for a binary plagiarism classifier. Stability here is smaller *variance* in the accuracy of classifier, given a random seed.
 """
 
-# %% jupyter={"outputs_hidden": true}
-random_seed = 1  # can change; set for reproducibility
+# %%
+random_seed = 549  # can change; set for reproducibility
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
@@ -334,8 +354,13 @@ You are encouraged to write any helper functions that you need to complete the f
 """
 
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Calculate the ngram containment for one answer file/source file pair in a df
+def get_dict_from_row(df_row):
+    assert len(df_row) == 1, 'this df appears to have more than one row'
+    return df_row.to_dict(orient='record')[0]
+
+
 def calculate_containment(df, n, answer_filename):
     """Calculates the containment between a given answer text and its associated source text.
        This function creates a count of ngrams (of a size, n) for each text file in our data.
@@ -348,10 +373,17 @@ def calculate_containment(df, n, answer_filename):
        :return: A single containment value that represents the similarity
            between an answer text and its source text.
     """
-
     # your code here
 
-    return 1
+    answer_row = get_dict_from_row(df.loc[df.File == answer_filename])
+    source_row = get_dict_from_row(df.loc[(df.Task == answer_row['Task']) & (df.Class == -1)])
+
+    answer_counts, source_counts = CountVectorizer(ngram_range=(n, n)).fit_transform([
+        answer_row['Text'],
+        source_row['Text'],
+    ]).toarray()
+
+    return np.minimum(answer_counts, source_counts).sum() / answer_counts.sum()
 
 
 # %% [markdown]
@@ -367,7 +399,7 @@ The cell below iterates through the first few files, and calculates the original
 Note what happens when you change the value of n. I recommend applying your code to multiple files and comparing the resultant containment values. You should see that the highest containment values correspond to files with the highest category (`cut`) of plagiarism level.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # select a value for n
 n = 3
 
@@ -390,7 +422,7 @@ print('Original category values: \n', category_vals)
 print()
 print(str(n) + '-gram containment values: \n', containment_vals)
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # run this test cell
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
@@ -401,12 +433,24 @@ tests.test_containment(complete_df, calculate_containment)
 
 # %% [markdown]
 """
-### QUESTION 1: Why can we calculate containment features across *all* data (training & test), prior to splitting the DataFrame for modeling? That is, what about the containment calculation means that the test and training data do not influence each other?
+### QUESTION 1:
+Why can we calculate containment features across *all* data (training & test), prior to splitting the DataFrame for modeling? That is, what about the containment calculation means that the test and training data do not influence each other?
 """
 
 # %% [markdown]
 """
 **Answer:**
+
+The containment calculation only relies on the answer and it's source.
+It is therefor independent from all the other answers.
+Since this feature is calculated independently from all other answers, the point in the data processing pipeline where it is calculated doesn't impact it's result.
+
+If a feature depended on a vocabulary built from the entire dataset,
+information from the test set would influence the training sets feature,
+possibly leading to bleeding information from the test set into the training set.
+
+Having test data bleed into training data is one of the easiest to occur, and hardest to diagnose issues in ML.
+For this reason it is a best practice to split the data before any processing occurs.
 """
 
 # %% [markdown]
@@ -496,18 +540,43 @@ After completely filling the matrix, **the bottom-right cell will hold the non-n
 This matrix treatment can be applied to a set of words instead of letters. Your function should apply this to the words in two texts and return the normalized LCS value.
 """
 
+# %%
+# longest possible subsequnce
 
-# %% jupyter={"outputs_hidden": true}
+max(complete_df.Text.apply(len))
+
+
+# np.uint16 should be enough (0 to 65535)
+
+# %%
 # Compute the normalized LCS given an answer text and a source text
 def lcs_norm_word(answer_text, source_text):
     """Computes the longest common subsequence of words in two texts; returns a normalized value.
        :param answer_text: The pre-processed text for an answer text
        :param source_text: The pre-processed text for an answer's associated source text
        :return: A normalized LCS value"""
+    answer_word_array = answer_text.split()
+    source_word_array = source_text.split()
 
     # your code here
+    count_matrix = np.zeros(
+        (len(answer_word_array), len(source_word_array)),
+        dtype=np.uint16)
 
-    pass
+    for a_idx, a_word in enumerate(answer_word_array):
+        for s_idx, s_word in enumerate(source_word_array):
+            if a_word == s_word:
+                previous = count_matrix[a_idx - 1, s_idx - 1] \
+                    if (a_idx - 1) >= 0 and (s_idx - 1) >= 0 else 0
+                value = previous + 1
+            else:
+                value = max(
+                    count_matrix[a_idx, s_idx - 1],
+                    count_matrix[a_idx - 1, s_idx],
+                )
+            count_matrix[a_idx, s_idx] = value
+
+    return count_matrix[-1, -1] / len(answer_word_array)
 
 
 # %% [markdown]
@@ -519,7 +588,7 @@ Let's start by testing out your code on the example given in the initial descrip
 In the below cell, we have specified strings A (answer text) and S (original source text). We know that these texts have 20 words in common and the submitted answer is 27 words long, so the normalized, longest common subsequence should be 20/27.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Run the test scenario from above
 # does your function return the expected value?
 
@@ -540,7 +609,7 @@ print('Test passed!')
 This next cell runs a more rigorous test.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # run test cell
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
@@ -554,7 +623,7 @@ tests.test_lcs(complete_df, lcs_norm_word)
 Finally, take a look at a few resultant values for `lcs_norm_word`. Just like before, you should see that higher values correspond to higher levels of plagiarism.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # test on your own
 test_indices = range(5)  # look at first few files
 
@@ -598,7 +667,7 @@ For our original files, the containment value is set to a special value, -1.
 This function gives you the ability to easily create several containment features, of different n-gram lengths, for each of our text files.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
@@ -606,11 +675,8 @@ DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 
 # Function returns a list of containment features, calculated for a given n
 # Should return a list of length 100 for all files in a complete_df
-def create_containment_features(df, n, column_name=None):
+def create_containment_features(df, n):
     containment_values = []
-
-    if column_name is None:
-        column_name = 'c_' + str(n)  # c_1, c_2, .. c_n
 
     # iterates through dataframe rows
     for i in df.index:
@@ -634,15 +700,16 @@ def create_containment_features(df, n, column_name=None):
 Below, your complete `lcs_norm_word` function is used to create a list of LCS features for all the answer files in a given DataFrame (again, this assumes you are passing in the `complete_df`. It assigns a special value for our original, source files, -1.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 
 
 # Function creates lcs feature and add it to the dataframe
-def create_lcs_features(df, column_name='lcs_word'):
+def create_lcs_features(df):
     lcs_values = []
+    orig_rows = df[(df['Class'] == -1)]
 
     # iterate through files in dataframe
     for i in df.index:
@@ -652,7 +719,6 @@ def create_lcs_features(df, column_name='lcs_word'):
             answer_text = df.loc[i, 'Text']
             task = df.loc[i, 'Task']
             # we know that source texts have Class = -1
-            orig_rows = df[(df['Class'] == -1)]
             orig_row = orig_rows[(orig_rows['Task'] == task)]
             source_text = orig_row['Text'].values[0]
 
@@ -679,7 +745,7 @@ You'll want to create at least 6 features to choose from as you think about whic
 In the below cell **define an n-gram range**; these will be the n's you use to create n-gram containment features. The rest of the feature creation code is provided.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Define an ngram range
 ngram_range = range(1, 7)
 
@@ -713,7 +779,7 @@ print()
 print('Features: ', features_list)
 print()
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # print some results
 features_df.head(10)
 
@@ -728,7 +794,7 @@ All of our features try to measure the similarity between two texts. Since our f
 So, you'll want to choose your features based on which pairings have the lowest correlation. These correlation values range between 0 and 1; from low to high correlation, and are displayed in a [correlation matrix](https://www.displayr.com/what-is-a-correlation-matrix/), below.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
@@ -737,6 +803,12 @@ corr_matrix = tuple(features_df.corr().abs().round(2))
 
 # display shows all of a dataframe
 display(corr_matrix)
+
+# %%
+features_df.corr()
+
+# %%
+features_df[['c_1', 'c_2', 'c_4', 'c_6', 'lcs_word']].corr()
 
 # %% [markdown]
 """
@@ -759,7 +831,7 @@ Recall that the `complete_df` has a `Datatype` column that indicates whether dat
 """
 
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Takes in dataframes and a list of selected features (column names)
 # and returns (train_x, train_y), (test_x, test_y)
 def train_test_data(complete_df, features_df, selected_features):
@@ -769,15 +841,17 @@ def train_test_data(complete_df, features_df, selected_features):
        :param features_df: A dataframe of all computed, similarity features
        :param selected_features: An array of selected features that correspond to certain columns in `features_df`
        :return: training and test features and labels: (train_x, train_y), (test_x, test_y)"""
+    train_indices = complete_df.Datatype == 'train'
+    test_indices = complete_df.Datatype == 'test'
 
     # get the training features
-    train_x = pd.DataFrame()
+    train_x = features_df[selected_features].loc[train_indices].to_numpy()
     # And training class labels (0 or 1)
-    train_y = pd.DataFrame()
+    train_y = complete_df.Class[train_indices].to_numpy()
 
     # get the test features and labels
-    test_x = pd.DataFrame()
-    test_y = pd.DataFrame()
+    test_x = features_df[selected_features].loc[test_indices].to_numpy()
+    test_y = complete_df.Class[test_indices].to_numpy()
 
     return (train_x, train_y), (test_x, test_y)
 
@@ -789,7 +863,7 @@ def train_test_data(complete_df, features_df, selected_features):
 Below, test out your implementation and create the final train/test data.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
@@ -809,10 +883,10 @@ If you passed the test above, you can create your own train/test data, below.
 Define a list of features you'd like to include in your final mode, `selected_features`; this is a list of the features names you want to include.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # Select your list of features, this should be column names from features_df
 # ex. ['c_1', 'lcs_word']
-selected_features = ['c_1', 'c_5', 'lcs_word']
+selected_features = ['c_1', 'c_2', 'c_3', 'c_4', 'c_5', 'c_6', 'lcs_word']
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
@@ -835,6 +909,15 @@ print('Training df sample: \n', train_x[:10])
 # %% [markdown]
 """
 **Answer:**
+
+Features that are too highly correlated _can_ have a negative impact on accuracy due to model specific issues.
+However, they are more likely to have an impact on training speed.
+Since the data is small (<10k), training time is most likely not a concern.
+For these reasons, all features were included in the initial feature set.
+However, if any issues arise in training, highly correlated features can be removed.
+
+Based on the correlation matrix there is a block of highly correlated features from `c_3` to `c_6`.
+If performance or accuracy is an issue, removing some of these features could be explored.
 """
 
 # %% [markdown]
@@ -858,7 +941,7 @@ It may be useful to use pandas to merge your features and labels into one DataFr
 """
 
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 def make_csv(x, y, filename, data_dir):
     """Merges features and labels and converts them into one csv file with labels in the first column.
        :param x: Data features
@@ -872,8 +955,10 @@ def make_csv(x, y, filename, data_dir):
 
     # your code here
 
+    np.savetxt(os.path.join(data_dir, filename), np.c_[y, x], delimiter=",")
+
     # nothing is returned, but a print statement indicates that the function has run
-    print('Path created: ' + str(data_dir) + '/' + str(filename))
+    print('Path created: ' + str(os.path.relpath(data_dir, PROJECT_DIR.parent)) + '/' + str(filename))
 
 
 # %% [markdown]
@@ -883,7 +968,7 @@ def make_csv(x, y, filename, data_dir):
 Test that your code produces the correct format for a `.csv` file, given some text features and labels.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
@@ -905,7 +990,7 @@ assert fake_df.shape == (3, 4), \
 assert np.all(fake_df.iloc[:, 0].values == fake_y), 'First column is not equal to the labels, fake_y.'
 print('Tests passed!')
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # delete the test csv file, generated above
 # ! rm -rf test_csv
 
@@ -914,16 +999,15 @@ print('Tests passed!')
 If you've passed the tests above, run the following cell to create `train.csv` and `test.csv` files in a directory that you specify! This will save the data in a local directory. Remember the name of this directory because you will reference it again when uploading this data to S3.
 """
 
-# %% jupyter={"outputs_hidden": true}
+# %%
 # can change directory, if you want
-data_dir = 'plagiarism_data'
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 
-make_csv(train_x, train_y, filename='train.csv', data_dir=data_dir)
-make_csv(test_x, test_y, filename='test.csv', data_dir=data_dir)
+make_csv(train_x, train_y, filename='train.csv', data_dir=OUTPUT_DIR / 'all-features')
+make_csv(test_x, test_y, filename='test.csv', data_dir=OUTPUT_DIR / 'all-features')
 
 # %% [markdown]
 """
